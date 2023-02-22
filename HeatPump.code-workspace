@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "HP_EEPROM"
+		},
+		{
+			"name": "HP_Controller",
+			"path": "HP_Controller"
+		}
+	],
+	"settings": {}
+}
