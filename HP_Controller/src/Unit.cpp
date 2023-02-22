@@ -10,7 +10,7 @@ void const Unit::print(const char* header, DebugLevel level){
 		Config.Log->append(header);
 	}
 	Config.Log->append(F("Name:")).append(Name);
-	Config.Log->append(F(";status:")).append((unsigned int)status);
+	Config.Log->append(F(";status:")).append(status);
 	Config.Log->append(F(" @"));
 	Config.Log->Log(level);
 }

@@ -13,21 +13,20 @@ void Contactor::InitUnit() {
 	if (Pin != 0) {
 		pinMode(Pin, INPUT);
 		digitalWrite(Pin, lhOn ? LOW : HIGH);
-		IsAvailable = true;
-	}
-	else {
-		IsAvailable = false;
 	}
 	prevValue = 0xff;
 	startContact = 0;
 	status = !lhOn;
 }
 
+bool Contactor::IsSimulator() {
+	return (Config.IsSimulator() || Pin==0);
+}
 
 void Contactor::handleContactor(unsigned long timePeriod) {
 
 	byte cntValue;
-	if (IsAvailable) {
+	if (!IsSimulator()) {
 		cntValue = digitalRead(Pin);
 		if (prevValue != cntValue) { // contactor is starting switch
 			unsigned long now = millis();
@@ -51,20 +50,21 @@ void Contactor::handleFinish(int newStatus) {
 	Publish(MQTT_CONTACTORS);
 }
 
-
-void Contactor::UnitLoop(unsigned long timePeriod) {
+void Contactor::UnitLoop(unsigned long timePeriod)
+{
 	handleContactor(timePeriod);
-	if (IsReady) {
-		if (!IsOk()) {
-			if (!IsAlert) {
-				publishDeviceAlert("Contactor is in alert mode");
-				IsAlert = true;
-			}
+	if (!IsOk())
+	{
+		if (!IsAlert)
+		{
+			publishDeviceAlert("Contactor is in alert mode");
+			IsAlert = true;
 		}
-		else if (IsAlert) {
-			publishDeviceAlert("");
-			IsAlert = false;
-		}
+	}
+	else if (IsAlert)
+	{
+		publishDeviceAlert("");
+		IsAlert = false;
 	}
 }
 
@@ -86,8 +86,8 @@ void const Contactor::print(const char* header, DebugLevel level) {
 		Config.Log->append(header);
 	}
 	Config.Log->append(F("Name:")).append(Name);
-	Config.Log->append(F(";Pin:")).append((unsigned int)Pin);
-	Config.Log->append(F(";lhOn:")).append((unsigned int)lhOn);
+	Config.Log->append(F(";Pin:")).append(Pin);
+	Config.Log->append(F(";lhOn:")).append(lhOn);
 	Config.Log->append(F(" @"));
 	Config.Log->Log(level);
 }
@@ -110,8 +110,4 @@ void Contactor::UpdateContactor(const char* line)
 	if (json.containsKey("lhOn")) {
 		lhOn = json["lhOn"];
 	}
-//	if (!IsReady) {
-//		Config.DevMgr->IncreaseNumberOfDevices();
-//	}
-	IsReady = true;
 }

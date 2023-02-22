@@ -100,7 +100,7 @@ void Configuration::readBoardId()
 	Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
 		.append(ip[2]).append(".").append(ip[3]).Info();
 	Log->append(F("Mqtt Address is: ")).append(mqttIp[0]).append(".").append(mqttIp[1]).append(".")
-		.append(mqttIp[2]).append(".").append(mqttIp[3]).append(":").append(mqttPort).Info();
+		.append(mqttIp[2]).append(".").append(mqttIp[3]).append(":").append((uint16_t)mqttPort).Info();
 
 }
 
@@ -218,7 +218,7 @@ void Configuration::Loop(unsigned long timePeriod) {
 
 		MqttClient->MqttLoop();
 		unitsLoop(timePeriod);
-		Runner.HeatScript(0);
+		//Runner.HeatScript(0);
 	}
 	else if (timePeriod == 60000) {
 		unitsLoop(timePeriod);

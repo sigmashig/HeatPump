@@ -51,14 +51,13 @@ void setup() {
 
 // the loop function runs over and over again until power down or reset
 void loop() {
-	/*
+	
 	static unsigned long tp60 = 0;
 	static unsigned long tp30 = 0;
 	static unsigned long tp10 = 0;
 	static unsigned long tp1 = 0;
 	unsigned long now = millis();
 	if ((now - tp60) > (unsigned long)60 * 1000) { //1 min 
-		//MEMFREE("StartLoop1m");
 		Config.Loop(60000);
 		Config.Counter60++;
 		tp60 = now;
@@ -81,5 +80,5 @@ void loop() {
 	}
 
 	Config.Loop(0);
-	*/
+	
 }

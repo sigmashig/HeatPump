@@ -14,9 +14,10 @@ public:
 	byte status = 0xFF;
 	byte Pin;
 	const char* Name;
-	bool IsAvailable = false;
-	bool IsReady = false;
+	//bool IsAvailable = false;
+	//bool IsReady = false;
 	bool IsAlert = false;
+	virtual bool IsSimulator() = 0;
 
 protected:
 	void Publish(const char* uPrefix);

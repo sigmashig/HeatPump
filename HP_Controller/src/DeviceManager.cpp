@@ -10,12 +10,13 @@ void DeviceManager::UnitLoop(unsigned long timeperiod)
 {
 	PressureSwitch.UnitLoop(timeperiod);
 	VoltageSwitch.UnitLoop(timeperiod);
+	/* //# check contactor simulator
+		Bus.UnitLoop(timeperiod);
 
-	Bus.UnitLoop(timeperiod);
-
-	for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
-		AllThermo[i]->UnitLoop(timeperiod);
-	}
+		for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
+			AllThermo[i]->UnitLoop(timeperiod);
+		}
+		*/
 }
 
 void DeviceManager::UpdateRelayEquipment(const char* name, const char* payload)
@@ -31,9 +32,7 @@ void DeviceManager::UpdateRelayEquipment(const char* name, const char* payload)
 				SigmaEEPROM::Write8(EEPROM_ADDR_RELAY + i * EEPROM_LEN_RELAY, AllRelays[i]->Pin);
 				SigmaEEPROM::Write8(EEPROM_ADDR_RELAY + i * EEPROM_LEN_RELAY + 1, AllRelays[i]->lhOn);
 			}
-			AllRelays[i]->IsReady = true;
 			AllRelays[i]->InitUnit();
-			//AllRelays[i]->print("", D_DEBUG);
 			break;
 
 		}
@@ -49,9 +48,7 @@ void DeviceManager::UpdateThermoEquipment(const char* name, const char* payload)
 			SigmaEEPROM::Write8(EEPROM_ADDR_TBUS_PIN, p);
 		}
 		Bus.Pin = p;
-		Bus.IsReady = true;
 		Bus.InitUnit();
-		//Bus.print("", D_DEBUG);
 	}
 	else {
 		for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
@@ -78,11 +75,7 @@ void DeviceManager::UpdateThermoEquipment(const char* name, const char* payload)
 					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8, (int)(AllThermo[i]->MinTemp * 2));
 					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 2, (int)(AllThermo[i]->MaxTemp * 2));
 				}
-				//OneWireBus::CopyDeviceAddress(AllThermo[i]->Address, da);
-				AllThermo[i]->IsReady = true;
 				AllThermo[i]->InitUnit();
-
-				//AllThermo[i]->print("", D_DEBUG);
 				break;
 			}
 		}
@@ -108,12 +101,9 @@ void DeviceManager::UpdateContactorEquipment(const char* name, const char* paylo
 		//Config.Log->append("Pin:").append(cont->Pin).append("#").append(pin).append(";lh:").append(cont->lhOn).append("#").append(lhOn).Debug();
 		if (cont->Pin != pin || cont->lhOn != lhOn) {
 			Config.Log->Debug("EEPROM CONTACTOR");
-
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONTACTOR + n * 2, cont->Pin);
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONTACTOR + n * 2 + 1, cont->lhOn);
-
 		}
-		cont->IsReady = true;
 		cont->InitUnit();
 	//	cont->print("", D_DEBUG);
 	}
@@ -126,7 +116,6 @@ void DeviceManager::UpdateRelayStatus(const char* name, const char* payload)
 		if (strcmp(AllRelays[i]->Name,name)==0) {
 			byte p = atoi(payload);
 			AllRelays[i]->ProcessUnit((ActionType)p);
-			
 			break;
 		}
 	}

@@ -26,11 +26,9 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 
 void OneWireBus::InitUnit() {
-	IsAvailable = (Pin != 0);
 	oneWire = new OneWire(Pin);
 	sensors = new DallasTemperature(oneWire);
 	sensors->begin();
-
 }
 
 void OneWireBus::ProcessUnit(ActionType action) {
@@ -48,7 +46,7 @@ void OneWireBus::SetResolution(const DeviceAddress address) {
 }
 
 void OneWireBus::RequestTemperature() {
-	if (IsAvailable) {
+	if (!IsSimulator()) {
 		sensors->requestTemperatures();
 	}
 }
@@ -141,7 +139,7 @@ String OneWireBus::ConvertAddressToString(const DeviceAddress address) {
 bool OneWireBus::IsZeroAddress(DeviceAddress address)
 {
 	bool res = true;
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; res && i < 8 ; i++) {
 		res &= address[i] == 0;
 	}
 	return res;
@@ -149,4 +147,9 @@ bool OneWireBus::IsZeroAddress(DeviceAddress address)
 
 OneWireBus::OneWireBus(const char* nm) : Unit(nm)
 {
+}
+
+bool OneWireBus::IsSimulator()
+{
+    return (Config.IsSimulator() || Pin==0);
 }

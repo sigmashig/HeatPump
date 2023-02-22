@@ -28,6 +28,7 @@ public:
 	static bool IsZeroAddress(DeviceAddress address);
 	void const print(const char* header, DebugLevel level);
 	OneWireBus(const char* nm);
+	bool IsSimulator();
 private:
 	OneWire* oneWire;
 	int numberThermo = 0;

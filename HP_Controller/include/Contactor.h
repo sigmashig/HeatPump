@@ -14,6 +14,7 @@ public:
 	void InitUnit();
 	void UnitLoop(unsigned long timePeriod);
 	void FinalInitUnit();
+	bool IsSimulator();
 
 	void ProcessUnit(ActionType event);
 	void const print(const char* header, DebugLevel level);

@@ -11,12 +11,12 @@ void OneWireThermo::InitUnit() {
 	parent = &(Config.DevMgr->Bus);
 	if (OneWireBus::IsZeroAddress(Address)) {
 		// Simulator
-		IsAvailable = false;
+		isSimulator = true;
 	} else 	if (!parent->CheckAddress(Address)) {
 		Config.Log->append(F("Unit:")).append(Name).append(F(" is absent on the bus")).Error();
-		IsAvailable = false;
+		isSimulator = true;
 	}	else {
-		IsAvailable = true;
+		isSimulator = false;
 		parent->SetResolution(Address);
 	}
 }
@@ -24,11 +24,11 @@ void OneWireThermo::InitUnit() {
 
 float OneWireThermo::GetTemperature() {
 	//Config.Log->append("Thermometer:").append(Name).append(";avail=").append(IsAvailable).Debug();
-	if (IsAvailable) {
+	if (!isSimulator) {
 		Temperature = parent->GetTemperature(Address);
 		sprintf(Config.TopicBuff, MQTT_STATUS_THERMOMETER, Config.BoardId(), Name);
 		sprintf(Config.PayloadBuff, "%d.%u", (int)Temperature, (unsigned)((Temperature - (int)Temperature) * 10));
-		Config.MqttClient->Publish(Config.TopicBuff, Config.PayloadBuff);
+		Config.Publish(Config.TopicBuff, Config.PayloadBuff);
 	}
 	return Temperature;
 }
@@ -44,7 +44,7 @@ void OneWireThermo::UpdateThermo(const char* line)
 	if (json.containsKey("address")) {
 		const char* s = json["address"];
 		OneWireBus::ConvertStringToAddress(Address, s);
-		IsAvailable = OneWireBus::IsZeroAddress(Address);
+		checkSimulator();
 	}
 	if (json.containsKey("min")) {
 		//Config.Log->append("min = ").append(s).Debug();
@@ -53,12 +53,6 @@ void OneWireThermo::UpdateThermo(const char* line)
 	if (json.containsKey("max")) {
 		MaxTemp = json["max"];
 	}
-	//print("", D_DEBUG);	
-//	if (!IsReady) {
-//		Config.DevMgr->IncreaseNumberOfDevices();
-//	}
-	IsReady = true;
-
 }
 
 bool OneWireThermo::IsOk()
@@ -86,22 +80,36 @@ OneWireThermo::OneWireThermo(const char* nm) : Unit(nm)
 {
 }
 
-void OneWireThermo::UnitLoop(unsigned long timeperiod) {
-		
-	if (timeperiod == 1000) {
-		GetTemperature();
-		if (IsReady) {
-			if (!IsOk()) {
-				if (!IsAlert) {
+bool OneWireThermo::checkSimulator()
+{
+    isSimulator = Config.IsSimulator() 
+	&& OneWireBus::IsZeroAddress(Address) &&
+	!parent->CheckAddress(Address) ;
+	return isSimulator;
+}
+
+void OneWireThermo::UnitLoop(unsigned long timeperiod)
+{
+
+	if (timeperiod == 1000)
+	{
+		if (!isSimulator)
+		{
+			GetTemperature();
+			if (!IsOk())
+			{
+				if (!IsAlert)
+				{
 					char tmp[MQTT_PAYLOAD_LENGTH];
-					sprintf(tmp, "Temperature is out of range: %d.%d...%d.%d", (int)MinTemp, (int)(10 * (MinTemp - (int)MinTemp))
-						, (int)MaxTemp, (int)(10 * (MaxTemp - (int)MaxTemp)));
+					sprintf(tmp, "Temperature is out of range: %d.%d...%d.%d", (int)MinTemp, (int)(10 * (MinTemp - (int)MinTemp)), (int)MaxTemp, (int)(10 * (MaxTemp - (int)MaxTemp)));
 					publishDeviceAlert(tmp);
 					IsAlert = true;
 				}
 			}
-			else {
-				if (IsAlert) {
+			else
+			{
+				if (IsAlert)
+				{
 					publishDeviceAlert("");
 					IsAlert = false;
 				}
