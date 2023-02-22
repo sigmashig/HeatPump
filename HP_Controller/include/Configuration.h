@@ -89,7 +89,7 @@ public:
 	bool GetSimulator() { return isSimulator; };
 	void SetCommand(const char* str) { setCmd(str[0] - '0'); };
 	CMD GetCommand() { return command; };
-	void Transfer(int n) { if (isMqttReady) { MqttClient->MqttLoop(n); } };
+	void Transfer(int n) { if (isMqttReady) { mqttClient->MqttLoop(n); } };
 	void SubscribeAll();
 	void Subscribe(const char* topic);
 	void ProcessMessage(const char* topic, const char* payload);
@@ -113,7 +113,7 @@ private:
 	byte hysteresis = 5;
 	CMD command = CMD_RUN;
 	char timezone[TIMEZONE_LEN]="EET";
-	Mqtt *MqttClient;
+	Mqtt *mqttClient;
 
 	byte mac[6] = { 0x00, 0xAA, 0x22, 0x07, 0x69, 0x00 };
 	IPAddress ip = IPAddress(192, 168, 0, 90);
@@ -145,26 +145,13 @@ private:
 	void setSimulator(byte b);
 	void setTimeZone(const char* tz);
 	void publishParameters();
-
-
-
 	void publishMode();
-
 	void publishWeekMode();
-
 	void publishManualTemp();
-
 	void publishHeatCold();
-
 	void publishHysteresis();
-
 	void publishSimulator();
-
 	void publishCmd();
-
-
 	void updateConfig(const char* topic, const char* payload);
-
-
 };
 

@@ -53,6 +53,7 @@ void Contactor::handleFinish(int newStatus) {
 void Contactor::UnitLoop(unsigned long timePeriod)
 {
 	handleContactor(timePeriod);
+	/*
 	if (!IsOk())
 	{
 		if (!IsAlert)
@@ -66,6 +67,7 @@ void Contactor::UnitLoop(unsigned long timePeriod)
 		publishDeviceAlert("");
 		IsAlert = false;
 	}
+	*/
 }
 
 void Contactor::FinalInitUnit()

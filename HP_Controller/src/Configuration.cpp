@@ -31,15 +31,15 @@ void Configuration::Init()
 	ScheduleMgr->Init();
 	Log->Debug("Mqtt");
 
-	MqttClient = new Mqtt(mqttIp, mqttPort, *ethClient);
-	MqttClient->Init();
+	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient);
+	mqttClient->Init();
 
-	if (MqttClient->IsMqtt()) {
+	if (mqttClient->IsMqtt()) {
 		isMqttReady = true;
 		SubscribeAll();
 	}
 
-	MqttClient->FinalInit();
+	mqttClient->FinalInit();
 	ScheduleMgr->FinalInit();
 	DevMgr->FinalInit();
 	
@@ -216,7 +216,7 @@ void Configuration::setHeatCold(byte b)
 void Configuration::Loop(unsigned long timePeriod) {
 	if (timePeriod == 0) {
 
-		MqttClient->MqttLoop();
+		mqttClient->MqttLoop();
 		unitsLoop(timePeriod);
 		//Runner.HeatScript(0);
 	}
@@ -306,13 +306,13 @@ void Configuration::publishParameters()
 
 void Configuration::Publish(const char* topic, const char* payload) {
 	if (isMqttReady) {
-		MqttClient->Publish(topic, payload);
+		mqttClient->Publish(topic, payload);
 	}
 }
 
 void Configuration::Subscribe(const char* topic) {
 	if (isMqttReady) {
-		MqttClient->Subscribe(topic);
+		mqttClient->Subscribe(topic);
 	}
 }
 
