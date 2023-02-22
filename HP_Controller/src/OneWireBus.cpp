@@ -8,6 +8,8 @@
 
 extern Configuration Config;
 
+
+
 bool OneWireBus::CheckAddress(const DeviceAddress address) {
 	return sensors->isConnected(address);
 }
@@ -118,7 +120,7 @@ void const OneWireBus::print(const char* header, DebugLevel level) {
 		Config.Log->append(header);
 	}
 	Config.Log->append(F("Name:")).append(Name);
-	Config.Log->append(F(";Pin:")).append((unsigned int)Pin);
+	Config.Log->append(F(";Pin:")).append(Pin);
 	Config.Log->append(F(" @"));
 	Config.Log->Log(level);
 }

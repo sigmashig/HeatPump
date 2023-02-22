@@ -9,11 +9,13 @@ extern Configuration Config;
 
 void OneWireThermo::InitUnit() {
 	parent = &(Config.DevMgr->Bus);
-	if (!parent->CheckAddress(Address)) {
+	if (OneWireBus::IsZeroAddress(Address)) {
+		// Simulator
+		IsAvailable = false;
+	} else 	if (!parent->CheckAddress(Address)) {
 		Config.Log->append(F("Unit:")).append(Name).append(F(" is absent on the bus")).Error();
 		IsAvailable = false;
-	}
-	else {
+	}	else {
 		IsAvailable = true;
 		parent->SetResolution(Address);
 	}
