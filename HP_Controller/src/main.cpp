@@ -44,8 +44,8 @@ void setup() {
 	Config.Init();
 	Config.Log->Info(F("Board is ready"));
 	Config.Log->append(F("Board Id#:")).append(Config.BoardId()).Info();
-	pinMode(13, OUTPUT);
-	digitalWrite(13, HIGH);
+	pinMode(LED_BUILTIN, OUTPUT);
+	digitalWrite(LED_BUILTIN, HIGH);
 	Config.Log->Info("Enjoy!");
 }
 

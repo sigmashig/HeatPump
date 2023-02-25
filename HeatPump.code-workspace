@@ -8,5 +8,12 @@
 			"path": "HP_Controller"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"C_Cpp.formatting": "vcFormat",
+		"C_Cpp.vcFormat.newLine.beforeElse": false,
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
+		"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine",
+		"C_Cpp.vcFormat.newLine.beforeWhileInDoWhile": true
+	}
 }

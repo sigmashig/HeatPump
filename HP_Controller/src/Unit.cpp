@@ -19,12 +19,14 @@ void Unit::Publish(const char* uPrefix)
 {
 	sprintf(Config.TopicBuff, MQTT_STATUS "%s%s%s%s", Config.BoardId(), MQTT_SEPARATOR, uPrefix, MQTT_SEPARATOR, Name);
 	sprintf(Config.PayloadBuff, "%u", status);
-	Config.Publish(Config.TopicBuff, Config.PayloadBuff);
+	Config.Publish();
 }
 
-void Unit::publishDeviceAlert(const char* msg) {
-	sprintf(Config.TopicBuff, MQTT_ALERT_DEVICE, Config.BoardId(), Name);
-	Config.Publish(Config.TopicBuff, msg);
+void Unit::publishDeviceAlert(Configuration::ALERTCODE code) {
+	if (alertCode != code) {
+		Config.PublishAlert(code, Name);
+		alertCode = code;
+	}
 }
 
 

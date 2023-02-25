@@ -11,25 +11,34 @@ class ScriptRunner
 {
 public:
 	typedef enum {
-		STEP_HEATER_INITIAL='I',
-		STEP_HEATER_START_PUMP='P',
-		STEP_HEATER_START='S',
-		STEP_HEATER_GND_START='G',
-		STEP_HEATER_PAUSE2='2',
-		STEP_HEATER_MIN_TIME='T',
-		STEP_HEATER_MAIN_START='M',
-		STEP_HEATER_MAIN_STOP='N',
-		STEP_HEATER_PAUSE6='6',
-		STEP_HEATER_GND_STOP='H'
+		STEP_EMPTY = 0,
+		STEP_HEATER_0_IDLE = '0',
+		STEP_HEATER_1_INITIAL='I',
+		STEP_HEATER_2_CHECK_START='S',
+		STEP_HEATER_3_GND_START='G',
+		STEP_HEATER_4_HEAT='H',
+		STEP_HEATER_5_STOP_COMPRESSOR='C',
+		STEP_HEATER_6_STOP_HEATING='T',
+		STEP_HEATER_E1_STOP='1',
+		STEP_HEATER_E2_STOP='2',
+		STEP_HEATER_E3_STOP='3'
 	} STEPS;
 
-	void HeatScript(unsigned long timeperiod);
-	bool IsAlert = false;
+	
+	void Loop(unsigned long timeperiod);
+	void HeatScript();
+//	bool IsAlert = false;
+	void Init();
 
 private:
-	STEPS step = STEP_HEATER_INITIAL;
+	STEPS step;
+	Configuration::HEATMODE mode;
+	Configuration::ALERTCODE alertCode = Configuration::ALERT_EMPTY;
 
-	unsigned long lastStart = millis();
+	const unsigned long step1Long = 0;
+	const unsigned long step2Long = 0;
+	const unsigned long step3Long = 10*60*1000;
+	const unsigned long step4Long = 20*60*1000;
 
 	bool heaterStepInitial();
 	bool heaterStepPumpStart();
@@ -42,12 +51,16 @@ private:
 	bool heaterStepGndStop();
 	bool heaterStepMinTime();
 	void publishStep();
-	void publishStepAlert(const char* msg);
+	void publishAlert(Configuration::ALERTCODE code);
+	void publishInfo(const char* msg);
 
 	bool checkElectricityFail();
 	bool checkPressureFail();
 	bool checkInternalTempFail();
 	bool checkGroundTempFail();
 	bool checkInsideTempFail();
+
+	
+	
 };
 

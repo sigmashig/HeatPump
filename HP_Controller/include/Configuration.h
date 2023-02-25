@@ -41,6 +41,13 @@ public:
 		CMD_STOP = 2
 	} CMD;
 
+	typedef enum {
+		ALERT_EMPTY = ' ',
+		ALERT_TEMP_FLOOR = 'f',
+		ALERT_STEP_TOO_LONG = 'S',
+		ALERT_TEMP_IS_OUT_OF_RANGE = 'T'
+	} ALERTCODE;
+
 	//Flags
 	bool IsMqttReady() { return isMqttReady; }
 	bool IsSimulator() { return isSimulator;  }
@@ -93,15 +100,19 @@ public:
 	void SubscribeAll();
 	void Subscribe(const char* topic);
 	void ProcessMessage(const char* topic, const char* payload);
-	void Publish(const char* topic, const char* payload);
+
+	void Publish() { Publish(TopicBuff, PayloadBuff); };
 
 	char TopicBuff[MQTT_TOPIC_LENGTH];
 	char PayloadBuff[MQTT_PAYLOAD_LENGTH];
-
+	void PublishAlert(ALERTCODE code) { PublishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
+	void PublishAlert(ALERTCODE code, const char* name) { PublishAlert(code, ScriptRunner::STEP_EMPTY, name); };
+	void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
 
 private:
 
-
+	void Publish(const char* topic, const char* payload);
+	
 	//members
 	bool isEthernetReady = false;
 	bool isMqttReady = false;

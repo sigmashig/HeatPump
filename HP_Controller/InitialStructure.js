@@ -25,8 +25,8 @@ function publish()
     mqttspy.publish("HeatPump/Board_07/Schedule/WeekEnd/Set05", "{'time':'15:00','temp':'22.0'}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Schedule/WeekEnd/Set06", "{'time':'18:00','temp':'25.0'}", 0, false);
 
-    mqttspy.publish("HeatPump/Board_07/Equipment/Relay/MotorGnd", "{'pin':0, 'lhOn':0}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Relay/Compressor", "{'pin':0, 'lhOn':0}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Relay/MotorGnd", "{'pin':0, 'lhOn':0, 'minTimeOff' : 60}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Relay/Compressor", "{'pin':0, 'lhOn':0, 'minTimeOff' : 180, 'maxtimeOn' : 1800}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Relay/PumpTankIn", "{'pin':0, 'lhOn':0}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Relay/PumpTankOut", "{'pin':0, 'lhOn':0}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Relay/PumpFloor1", "{'pin':0, 'lhOn':0}", 0, false);
@@ -42,18 +42,18 @@ function publish()
 
     mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/Bus", "0", 0, false);
 
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TGndIn", "{'address':'0000000000000000', 'min':'-10', 'max':'+40'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TGndOut", "{'address':'0000000000000000', 'min':'-10', 'max':'+40'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TCompressor", "{'address':'0000000000000000', 'min':'-10', 'max':'+120'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TVapOut", "{'address':'0000000000000000', 'min':'0', 'max':'+40'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TCondIn", "{'address':'0000000000000000', 'min':'20', 'max':'110'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TCondVap", "{'address':'0000000000000000', 'min':'-10', 'max':'+40'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TOut", "{'address':'0000000000000000', 'min':'-10', 'max':'+60'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TIn", "{'address':'0000000000000000', 'min':'-10', 'max':'+60'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TTankOut", "{'address':'0000000000000000', 'min':'-10', 'max':'+60'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TTankIn", "{'address':'0000000000000000', 'min':'-10', 'max':'+60'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TInside", "{'address':'0000000000000000', 'min':'-30', 'max':'+50'}", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TOutside", "{'address':'0000000000000000', 'min':'-40', 'max':'+50'}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TGndIn", "{'address':'0000000000000000', 'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':130}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TGndOut", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':130}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TCompressor", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TVapOut", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TCondIn", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TCondVap", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TOut", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TIn", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TTankOut", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TTankIn", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TInside", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TOutside", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
 /*
     mqttspy.publish("HeatPump/Board_07/Status/Temperature/TGndIn", "7.0", 0, false);
     mqttspy.publish("HeatPump/Board_07/Status/Temperature/TGndOut", "4.0", 0, false);
