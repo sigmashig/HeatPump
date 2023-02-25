@@ -27,7 +27,7 @@ public:
 	
 	void Loop(unsigned long timeperiod);
 	void HeatScript();
-//	bool IsAlert = false;
+ //	bool IsAlert = false;
 	void Init();
 
 private:
@@ -39,7 +39,8 @@ private:
 	const unsigned long step2Long = 0;
 	const unsigned long step3Long = 10*60*1000;
 	const unsigned long step4Long = 20*60*1000;
-
+	void heaterIdle();
+	
 	bool heaterStepInitial();
 	bool heaterStepPumpStart();
 	bool heaterStepStart();

@@ -7,9 +7,34 @@ void ScriptRunner::HeatScript()
 {
 	switch (step)
 	{
+	case STEP_HEATER_0_IDLE:
+		heaterIdle();
+		break;
 	case STEP_HEATER_1_INITIAL:
 		heaterStepInitial();
 		break;
+	}
+}
+
+void ScriptRunner::heaterIdle() {
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	
+
+	if (alertCode == Configuration::ALERT_EMPTY)
+	{// start!
+		step = STEP_HEATER_1_INITIAL;
+	} else if (alertCode == Configuration::ALERT_STEP_TOO_LONG) {
+		//waiting for 3 min
+		if (start == 0) {
+			start = now;
+		} else {
+			if (now - start >= 3 * 60 * 1000) {
+				start = 0;
+				step = STEP_HEATER_1_INITIAL;
+				publishAlert(Configuration::ALERT_EMPTY);
+			}
+		}
 	}
 }
 
@@ -35,7 +60,7 @@ void ScriptRunner::publishAlert(Configuration::ALERTCODE code) {
 		alertCode = code;
 	}
 }
-
+/*
 bool ScriptRunner::checkElectricityFail()
 {
 	bool res = !Config.DevMgr->VoltageSwitch.IsOk();
@@ -71,7 +96,7 @@ bool ScriptRunner::checkInsideTempFail()
 	return res;
 }
 
-
+*/
 
 bool ScriptRunner::heaterStepInitial()
 {
