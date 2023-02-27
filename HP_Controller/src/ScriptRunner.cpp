@@ -21,6 +21,9 @@ void ScriptRunner::HeatScript() {
 	case STEP_HEATER_FULLSTOP:
 		heaterFullStop();
 		break;
+	default:
+		Config.Log->Error("Wrong Step");
+		break;
 	}
 }
 
@@ -30,6 +33,7 @@ bool ScriptRunner::heaterEmptyStep() {
 	//unsigned long now = millis();
 
 	if (start == 0) {
+		Config.Log->append("Step: Empty, code=").append(step).Info();
 		publishStep();
 	}
 	if (mode == MODE_HEAT) {
@@ -43,9 +47,14 @@ bool ScriptRunner::heaterEmptyStep() {
 }
 
 bool ScriptRunner::heaterIdle() {
-	//static unsigned long start = 0;
+	static unsigned long start = 0;
 	//unsigned long now = millis();
 	bool res = false;
+
+	if (start == 0) {
+		Config.Log->append("Step: Idle, code=").append(step).Info();
+		publishStep();
+	}
 
 
 	if ((alertCode == ALERT_EMPTY
@@ -60,10 +69,14 @@ bool ScriptRunner::heaterIdle() {
 		step = STEP_HEATER_FULLSTOP;
 		res = true;
 	}
+	if (res) {
+		start = 0;
+	}
 	return res;
 }
 
 void ScriptRunner::Loop(unsigned long timeperiod) {
+	//Config.Log->Debug("Runner Loop");
 	if (mode == MODE_HEAT) {
 		HeatScript();
 	}
@@ -71,6 +84,7 @@ void ScriptRunner::Loop(unsigned long timeperiod) {
 
 void ScriptRunner::Init() {
 	mode = Config.GetHeatMode(); // mode can't be changed during a workcycle
+	Config.Log->append("Mode=").append(mode).Debug();
 	step = STEP_EMPTY;
 }
 
@@ -131,6 +145,7 @@ bool ScriptRunner::heaterStepInitial() {
 
 	if (start == 0) {
 		start = now;
+		Config.Log->append("Step: Initial, code=").append(step).Info();
 		publishStep();
 	}
 	if (step1Long != NAN && now - start >= step1Long) {
@@ -204,6 +219,7 @@ bool ScriptRunner::heaterFullStop() {
 
 	if (start == 0) {
 		publishStep();
+		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
 		publishInfo("FULL STOP!!!");
 	}
 	//Config.SetCommand(CMD_STOP);

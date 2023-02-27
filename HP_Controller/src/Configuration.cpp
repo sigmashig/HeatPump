@@ -99,12 +99,12 @@ void Configuration::readBoardId() {
 
 void Configuration::readConfigEEPROM() {
 
-	setMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MODE));
-	setManualTemp(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MANUALTEMP));
-	setWeekMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_WEEKMODE));
-	setHysteresis(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HYSTERESIS));
-	setHeatCold(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HEATCOLD));
-	setCmd(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CMD));
+	setMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MODE), false);
+	setManualTemp(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MANUALTEMP), false);
+	setWeekMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_WEEKMODE), false);
+	setHysteresis(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HYSTERESIS), false);
+	setHeatCold(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HEATCOLD), false);
+	setCmd(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CMD), false);
 	//setSimulator(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_SIMULATOR));
 
 	char tmp[TIMEZONE_LEN];
@@ -112,18 +112,26 @@ void Configuration::readConfigEEPROM() {
 
 }
 
-void Configuration::setTimeZone(const char* tz) {
+void Configuration::setTimeZone(const char* tz, bool save) {
 	//Log->append("SetTZ=").append(tz).Debug();
+	if (!save) {
+		strcpy(timezone, tz);
+	}
+
 	if (0 != strcmp(timezone, tz)) {
 		strcpy(timezone, tz);
+
 		Log->Debug("EEPROM TZ");
 		SigmaEEPROM::WriteTimezone(timezone);
 	}
 }
 
 
-void Configuration::setMode(byte b) {
+void Configuration::setMode(byte b, bool save) {
 	if (b == 0 || b == 1) {
+		if (!save) {
+			mode = (MODE)(b);
+		}
 		if (mode != (MODE)(b)) {
 			mode = (MODE)(b);
 			Log->Debug("EEPROM Mode");
@@ -132,8 +140,11 @@ void Configuration::setMode(byte b) {
 	}
 }
 
-void Configuration::setCmd(byte b) {
+void Configuration::setCmd(byte b, bool save) {
 	if (b == 0 || b == 1) {
+		if (!save) {
+			command = (CMD)(b);
+		}
 		if (command != (CMD)(b)) {
 			command = (CMD)(b);
 			Log->Debug("EEPROM Cmd");
@@ -143,17 +154,20 @@ void Configuration::setCmd(byte b) {
 	}
 }
 
-void Configuration::setSimulator(byte b) {
+void Configuration::setSimulator(byte b, bool save) {
 	if (b == 0 || b == 1) {
 		isSimulator = b;
 	}
 }
 
 
-void Configuration::setManualTemp(byte b) {
+void Configuration::setManualTemp(byte b, bool save) {
 	double t = (double)b / 2.0;
 	Log->append("Manual Temp:").append("system:").append(manualTemp).append("; t=").append(t).append("; b=").append(b).Debug();
 	if (t >= 15.0 && t <= 50) {
+		if (!save) {
+			manualTemp = t;
+		}
 		if (manualTemp != t) {
 			manualTemp = t;
 			Log->Debug("EEPROM Manual Temp");
@@ -165,8 +179,12 @@ void Configuration::setManualTemp(byte b) {
 	}
 }
 
-void Configuration::setWeekMode(byte b) {
+void Configuration::setWeekMode(byte b, bool save) {
 	if (b == 0 || b == 1) {
+		if (!save) {
+			weekMode = (WEEKMODE)(b);
+		}
+
 		if (weekMode != (WEEKMODE)(b)) {
 			weekMode = (WEEKMODE)(b);
 			Log->Debug("EEPROM WeekMode");
@@ -176,8 +194,12 @@ void Configuration::setWeekMode(byte b) {
 	}
 }
 
-void Configuration::setHysteresis(byte b) {
+void Configuration::setHysteresis(byte b, bool save) {
 	if (b == 0 || b == 1) {
+		if (!save) {
+			hysteresis = b;
+		}
+
 		if (hysteresis != b) {
 			hysteresis = b;
 			Log->Debug("EEPROM Hysteresis");
@@ -187,8 +209,12 @@ void Configuration::setHysteresis(byte b) {
 	}
 }
 
-void Configuration::setHeatCold(byte b) {
+void Configuration::setHeatCold(byte b, bool save) {
 	if (b == 0 || b == 1) {
+		if (!save) {
+			heatMode = (HEATMODE)(b);
+		}
+
 		if (heatMode != (HEATMODE)(b)) {
 			heatMode = (HEATMODE)(b);
 			Log->Debug("EEPROM HeatCold");
@@ -204,7 +230,8 @@ void Configuration::Loop(unsigned long timePeriod) {
 
 		mqttClient->MqttLoop();
 		unitsLoop(timePeriod);
-		//Runner.HeatScript(0);
+		Runner.Loop(timePeriod);
+
 	} else if (timePeriod == 60000) {
 		unitsLoop(timePeriod);
 	} else if (timePeriod == 30000) {
@@ -283,17 +310,17 @@ void Configuration::publishParameters() {
 	publishCmd();
 }
 
-void Configuration::PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name ) {
+void Configuration::PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name) {
 
 	PayloadBuff[0] = 0;
 	if (name != NULL) {
 		sprintf(PayloadBuff, "Device: %s. ", name);
 	}
-	
+
 	if (step != ScriptRunner::STEP_EMPTY) {
 		sprintf(PayloadBuff, "Step: %c. ", step);
 	}
-	
+
 
 	switch (code) {
 	case ALERT_EMPTY:

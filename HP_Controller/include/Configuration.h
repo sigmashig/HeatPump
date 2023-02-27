@@ -119,14 +119,14 @@ private:
 	void publishTimezone();
 	void readConfigEEPROM();
 
-	void setMode(byte b);
-	void setManualTemp(byte b);
-	void setWeekMode(byte b);
-	void setHysteresis(byte b);
-	void setHeatCold(byte b);
-	void setCmd(byte b);
-	void setSimulator(byte b);
-	void setTimeZone(const char* tz);
+	void setMode(byte b, bool save = true);
+	void setManualTemp(byte b, bool save = true);
+	void setWeekMode(byte b, bool save = true);
+	void setHysteresis(byte b, bool save = true);
+	void setHeatCold(byte b, bool save = true);
+	void setCmd(byte b, bool save = true);
+	void setSimulator(byte b, bool save = true);
+	void setTimeZone(const char* tz, bool save = true);
 	void publishParameters();
 	void publishMode();
 	void publishWeekMode();
