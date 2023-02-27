@@ -1,14 +1,16 @@
 // Wrap the script in a method, so that you can do "return false;" in case of an error or stop request
 function publish()
 {
-    mqttspy.publish("HeatPump/Board_07/Config/Command", "0", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/HeatCold", "1", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/Hysteresis", "5", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/Mode", "0", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/WeekMode", "0", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/ManualTemp", "25.0", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/Simulator", "1", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Config/Timezone", "EET", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/Command", 0, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/HeatCold", 1, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/Hysteresis", 1, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/Mode", 0, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/WeekMode", 0, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/ManualTemp", 25.0, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/Simulator", 1, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/TimeZone", "EET", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/HystGround", 5, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Config/HystHpRoom", 5, 0, false);
 
 
     mqttspy.publish("HeatPump/Board_07/Schedule/WorkDay/Set01", "{'time':'23:00','temp':'30.0'}", 0, false);

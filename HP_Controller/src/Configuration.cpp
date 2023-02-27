@@ -285,7 +285,6 @@ void Configuration::publishParameters() {
 
 void Configuration::PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name ) {
 
-	char tmp[20];
 	PayloadBuff[0] = 0;
 	if (name != NULL) {
 		sprintf(PayloadBuff, "Device: %s. ", name);

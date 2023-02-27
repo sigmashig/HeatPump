@@ -13,41 +13,12 @@
 #include "ScheduleManager.h"
 #include "SigmaClock.h"
 #include "Utils.h"
+#include "definitions.h"
 
 
 class Configuration
 {
 public:
-	typedef enum {
-		MODE_MANUAL = 0,
-		MODE_SCHEDULE = 1
-	} MODE;
-
-	typedef enum {
-		MODE_WEEK_5_2 = 0,
-		MODE_WEEK_6_1 = 1,
-		MODE_WEEK_7_0 = 2
-	} WEEKMODE;
-
-
-	typedef enum {
-		MODE_HEAT = 0,
-		MODE_COLD = 1
-	} HEATMODE;
-
-	typedef enum {
-		CMD_NOCMD = 0,
-		CMD_RUN = 1,
-		CMD_STOP = 2
-	} CMD;
-
-	typedef enum {
-		ALERT_EMPTY = ' ',
-		ALERT_TEMP_FLOOR = 'f',
-		ALERT_STEP_TOO_LONG = 'S',
-		ALERT_TEMP_IS_OUT_OF_RANGE = 'T'
-	} ALERTCODE;
-
 	//Flags
 	bool IsMqttReady() { return isMqttReady; }
 	bool IsSimulator() { return isSimulator;  }
@@ -95,6 +66,7 @@ public:
 	void SetSimulator(const char* str) { setSimulator(str[0] - '0'); };
 	bool GetSimulator() { return isSimulator; };
 	void SetCommand(const char* str) { setCmd(str[0] - '0'); };
+	void SetCommand(CMD cmd) { setCmd(cmd); };
 	CMD GetCommand() { return command; };
 	void Transfer(int n) { if (isMqttReady) { mqttClient->MqttLoop(n); } };
 	void SubscribeAll();

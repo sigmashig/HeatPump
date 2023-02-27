@@ -15,6 +15,8 @@
 
 
 
+
+
 typedef enum {
 	D_OFF = 0,
 	D_FATAL = 1,
@@ -49,6 +51,19 @@ typedef enum {
 	ACT_RELAY_DELAY_ON = 7, //Relay on with delay
 	ACT_SENSOR_READY = 10 //Sensor ready
 } ActionType;
+
+typedef enum {
+	CMD_NOCMD = 0,
+	CMD_RUN = 1,
+	CMD_STOP = 2
+} CMD;
+
+typedef enum {
+	ALERT_EMPTY = ' ',
+	ALERT_TEMP_FLOOR = 'f',
+	ALERT_STEP_TOO_LONG = 'S',
+	ALERT_TEMP_IS_OUT_OF_RANGE = 'T'
+} ALERTCODE;
 
 
 //extern DebugLevel DLevel;

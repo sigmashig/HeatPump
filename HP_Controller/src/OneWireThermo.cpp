@@ -89,9 +89,9 @@ void OneWireThermo::UnitLoop(unsigned long timeperiod) {
 		if (!isSimulator) {
 			GetTemperature();
 			if (!IsOk()) {
-				publishDeviceAlert(Configuration::ALERT_TEMP_IS_OUT_OF_RANGE);
+				publishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 			} else {
-				publishDeviceAlert(Configuration::ALERT_EMPTY);
+				publishDeviceAlert(ALERT_EMPTY);
 			}
 		}
 	}

@@ -13,6 +13,19 @@
 // #define CONFIG_NUMBER_OF_PARAMS		6
 #define CONFIG_NUMBER_OF_SCHEDULED_PARAMS		(CONFIG_NUMBER_SCHEDULES*2)
 
+typedef enum {
+	CMD_NOCMD = 0,
+	CMD_RUN = 1,
+	CMD_STOP = 2
+} CMD;
+
+typedef enum {
+	ALERT_EMPTY = ' ',
+	ALERT_TEMP_FLOOR = 'f',
+	ALERT_STEP_TOO_LONG = 'S',
+	ALERT_TEMP_IS_OUT_OF_RANGE = 'T'
+} ALERTCODE;
+
 
 
 typedef enum {
@@ -50,6 +63,22 @@ typedef enum {
 	ACT_SENSOR_READY = 10 //Sensor ready
 } ActionType;
 
+typedef enum {
+	MODE_MANUAL = 0,
+	MODE_SCHEDULE = 1
+} MODE;
+
+typedef enum {
+	MODE_WEEK_5_2 = 0,
+	MODE_WEEK_6_1 = 1,
+	MODE_WEEK_7_0 = 2
+} WEEKMODE;
+
+
+typedef enum {
+	MODE_HEAT = 0,
+	MODE_COLD = 1
+} HEATMODE;
 
 //extern DebugLevel DLevel;
 

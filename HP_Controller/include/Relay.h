@@ -25,10 +25,10 @@ private:
 	bool relayOff();
 	unsigned long delayStart;
 
-	unsigned int minTimeOn = NAN;
-	unsigned int maxTimeOn = NAN;
-	unsigned int minTimeOff = NAN;
-	unsigned int maxTimeOff = NAN;
+	unsigned int minTimeOn = (unsigned long)NAN;
+	unsigned int maxTimeOn = (unsigned long)NAN;
+	unsigned int minTimeOff = (unsigned long)NAN;
+	unsigned int maxTimeOff = (unsigned long)NAN;
 
 	unsigned long lastOn = 0;
 	unsigned long lastOff = 0;
