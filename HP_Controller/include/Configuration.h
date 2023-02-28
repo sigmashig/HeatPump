@@ -54,7 +54,7 @@ public:
 	void SetTimezone(const char* tzNew) { setTimeZone(tzNew); };
 	const char* GetTimezone() { return timezone; };
 	void SetMode(const char* str) { setMode(str[0] - '0'); };
-	MODE GetMode() { return mode; };
+	WORKMODE GetMode() { return mode; };
 	void SetWeekMode(const char* str) { setWeekMode(str[0] - '0'); };
 	WEEKMODE GetWeekMode() { return weekMode; };
 	void SetManualTemp(const char* str);
@@ -90,9 +90,9 @@ private:
 	bool isMqttReady = false;
 	bool isConfigRequested = false;
 	bool isSimulator = false;
-	WEEKMODE weekMode = MODE_WEEK_5_2;
-	MODE mode = MODE_MANUAL;
-	HEATMODE heatMode = MODE_HEAT;
+	WEEKMODE weekMode = WEEKMODE_5_2;
+	WORKMODE mode = WORKMODE_MANUAL;
+	HEATMODE heatMode = HEATMODE_HEAT;
 	byte hysteresis = 5;
 	CMD command = CMD_RUN;
 	char timezone[TIMEZONE_LEN]="EET";

@@ -64,20 +64,23 @@ typedef enum {
 } ActionType;
 
 typedef enum {
-	MODE_MANUAL = 0,
-	MODE_SCHEDULE = 1
-} MODE;
+	WORKMODE_NOMODE =0,
+	WORKMODE_MANUAL = 1,
+	WORKMODE_SCHEDULE = 2
+} WORKMODE;
 
 typedef enum {
-	MODE_WEEK_5_2 = 0,
-	MODE_WEEK_6_1 = 1,
-	MODE_WEEK_7_0 = 2
+	WEEKMODE_NOMODE = 0,
+	WEEKMODE_5_2 = 1,
+	WEEKMODE_6_1 = 2,
+	WEEKMODE_7_0 = 3
 } WEEKMODE;
 
 
 typedef enum {
-	MODE_HEAT = 0,
-	MODE_COLD = 1
+	HEATMODE_NOMODE = 0,
+	HEATMODE_HEAT = 1,
+	HEATMODE_COLD = 2
 } HEATMODE;
 
 //extern DebugLevel DLevel;

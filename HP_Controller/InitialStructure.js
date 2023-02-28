@@ -12,6 +12,10 @@ function publish()
     mqttspy.publish("HeatPump/Board_07/Config/HystGround", 5, 0, false);
     mqttspy.publish("HeatPump/Board_07/Config/HystHpRoom", 5, 0, false);
 
+    mqttspy.publish("HeatPump/Board_07/Status/Step", 0, 0, false);
+    mqttspy.publish("HeatPump/Board_07/Alarm/Code", "", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Alarm/Text", "", 0, false);
+
 
     mqttspy.publish("HeatPump/Board_07/Schedule/WorkDay/Set01", "{'time':'23:00','temp':'30.0'}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Schedule/WorkDay/Set02", "{'time':'00:00','temp':'35.0'}", 0, false);
@@ -33,6 +37,7 @@ function publish()
     mqttspy.publish("HeatPump/Board_07/Equipment/Relay/PumpTankOut", "{'pin':0, 'lhOn':0}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Relay/PumpFloor1", "{'pin':0, 'lhOn':0}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Relay/PumpFloor2", "{'pin':0, 'lhOn':0}", 0, false);
+
 
     mqttspy.publish("HeatPump/Board_07/Status/Relay/MotorGnd", "0", 0, false);
     mqttspy.publish("HeatPump/Board_07/Status/Relay/Compressor", "0", 0, false);
@@ -56,7 +61,7 @@ function publish()
     mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TTankIn", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TInside", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/Temperature/TOutside", "{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}", 0, false);
-/*
+
     mqttspy.publish("HeatPump/Board_07/Status/Temperature/TGndIn", "7.0", 0, false);
     mqttspy.publish("HeatPump/Board_07/Status/Temperature/TGndOut", "4.0", 0, false);
     mqttspy.publish("HeatPump/Board_07/Status/Temperature/TCompressor", "100.5", 0, false);
@@ -77,7 +82,7 @@ function publish()
 
     mqttspy.publish("HeatPump/Board_07/Status/Contactor/PressureSwitch", "0", 0, false);
     mqttspy.publish("HeatPump/Board_07/Status/Contactor/VoltageSwitch", "0", 0, false);
-
+/*
     mqttspy.publish("HeatPump/Board_07/Equipment/PowerMeter/PMA", "{'SerialRX':63,'SerialTX':54, 'version':3}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/PowerMeter/PMB", "{'SerialRX':64,'SerialTX':55, 'version':3}", 0, false);
     mqttspy.publish("HeatPump/Board_07/Equipment/PowerMeter/PMC", "{'SerialRX':65,'SerialTX':56, 'version':3}", 0, false);

@@ -37,13 +37,9 @@ public:
 
 private:
 	STEPS step;
-	HEATMODE mode;
+	STEPS prevStep;
+	HEATMODE heatMode;
 	ALERTCODE alertCode = ALERT_EMPTY;
-
-	const unsigned long step1Long = 0;
-	const unsigned long step2Long = 0;
-	const unsigned long step3Long = 10 * (unsigned long)60 * 1000;
-	const unsigned long step4Long = 20 * (unsigned long)60 * 1000;
 
 	bool heaterEmptyStep();
 	bool heaterIdle();
@@ -55,14 +51,7 @@ private:
 	void publishStep();
 	void publishAlert(ALERTCODE code);
 	void publishInfo(const char* msg);
-
-	bool checkElectricityFail();
-	bool checkPressureFail();
-	bool checkInternalTempFail();
-	bool checkGroundTempFail();
-	bool checkInsideTempFail();
-
-	
+	bool checkConditions();
 	
 };
 

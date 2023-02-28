@@ -128,12 +128,12 @@ void Configuration::setTimeZone(const char* tz, bool save) {
 
 
 void Configuration::setMode(byte b, bool save) {
-	if (b == 0 || b == 1) {
+	if (b == 0 || b == 1 || b==2) {
 		if (!save) {
-			mode = (MODE)(b);
+			mode = (WORKMODE)(b);
 		}
-		if (mode != (MODE)(b)) {
-			mode = (MODE)(b);
+		if (mode != (WORKMODE)(b)) {
+			mode = (WORKMODE)(b);
 			Log->Debug("EEPROM Mode");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MODE, mode);
 		}
@@ -141,7 +141,7 @@ void Configuration::setMode(byte b, bool save) {
 }
 
 void Configuration::setCmd(byte b, bool save) {
-	if (b == 0 || b == 1) {
+	if (b == 0 || b == 1 || b==2)  {
 		if (!save) {
 			command = (CMD)(b);
 		}
@@ -163,7 +163,7 @@ void Configuration::setSimulator(byte b, bool save) {
 
 void Configuration::setManualTemp(byte b, bool save) {
 	double t = (double)b / 2.0;
-	Log->append("Manual Temp:").append("system:").append(manualTemp).append("; t=").append(t).append("; b=").append(b).Debug();
+	//Log->append("Manual Temp:").append("system:").append(manualTemp).append("; t=").append(t).append("; b=").append(b).Debug();
 	if (t >= 15.0 && t <= 50) {
 		if (!save) {
 			manualTemp = t;
@@ -180,7 +180,7 @@ void Configuration::setManualTemp(byte b, bool save) {
 }
 
 void Configuration::setWeekMode(byte b, bool save) {
-	if (b == 0 || b == 1) {
+	if (b == 0 || b == 1 || b==2) {
 		if (!save) {
 			weekMode = (WEEKMODE)(b);
 		}
@@ -195,7 +195,7 @@ void Configuration::setWeekMode(byte b, bool save) {
 }
 
 void Configuration::setHysteresis(byte b, bool save) {
-	if (b == 0 || b == 1) {
+	if (b == 0 || b == 1 || b==2) {
 		if (!save) {
 			hysteresis = b;
 		}
@@ -210,7 +210,7 @@ void Configuration::setHysteresis(byte b, bool save) {
 }
 
 void Configuration::setHeatCold(byte b, bool save) {
-	if (b == 0 || b == 1) {
+	if (b == 0 || b == 1 || b==2) {
 		if (!save) {
 			heatMode = (HEATMODE)(b);
 		}
