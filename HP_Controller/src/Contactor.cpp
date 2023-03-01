@@ -16,7 +16,7 @@ void Contactor::InitUnit() {
 	}
 	prevValue = 0xff;
 	startContact = 0;
-	status = !lhOn;
+	//status = !lhOn;
 }
 
 bool Contactor::IsSimulator() {
@@ -70,17 +70,30 @@ void Contactor::UnitLoop(unsigned long timePeriod)
 	*/
 }
 
+bool Contactor::IsOk() {
+	bool res = false;
+	//Config.Log->append("ISOK. Contactor ").append(Name).append(" = ").append(status).Debug();
+	
+	if (status == lhOn) {
+		PublishDeviceAlert(ALERT_EMPTY);
+		res = true;
+	} 
+	return res;
+}
+
 void Contactor::FinalInitUnit()
 {
-	// No Subscription
-	// No Values request
 }
 
 
 
-void Contactor::ProcessUnit(ActionType event)
-{
-	status = event;
+void Contactor::ProcessUnit(ActionType event) {
+	if (event == ACT_OFF) {
+		status = !lhOn;
+	} else if (event == ACT_ON) {
+		status = lhOn;
+	}
+	//Config.Log->append("Contactor ").append(Name).append(" = ").append(status).Debug();
 }
 
 void const Contactor::print(const char* header, DebugLevel level) {

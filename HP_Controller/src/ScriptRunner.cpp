@@ -3,10 +3,22 @@
 
 extern Configuration Config;
 
-void ScriptRunner::HeatScript() {
+void ScriptRunner::Loop(unsigned long timeperiod) {
+	//Config.Log->Debug("Runner Loop");
+	StepScript();
+}
+
+void ScriptRunner::Init() {
+//	heatMode = Config.GetHeatMode(); // mode can't be changed during a workcycle
+	Config.Log->append("Mode=").append(heatMode).Debug();
+	step = STEP_EMPTY;
+}
+
+void ScriptRunner::StepScript() {
 	switch (step) {
 	case STEP_EMPTY:
-		heaterEmptyStep();
+		emptyStep();
+		break;
 	case STEP_HEATER_0_IDLE:
 		heaterIdle();
 		break;
@@ -27,7 +39,7 @@ void ScriptRunner::HeatScript() {
 	}
 }
 
-bool ScriptRunner::heaterEmptyStep() {
+bool ScriptRunner::emptyStep() {
 	bool res = false;
 	static unsigned long start = 0;
 	unsigned long now = millis();
@@ -37,15 +49,18 @@ bool ScriptRunner::heaterEmptyStep() {
 		Config.Log->append("Step: Empty, code=").append(step).Info();
 		publishStep();
 	}
-	if (heatMode == HEATMODE_HEAT) {
-		step = STEP_HEATER_0_IDLE;
-		res = true;
+	if (checkConditions()) {
+		if (Config.GetHeatMode() == HEATMODE_HEAT) {
+			step = STEP_HEATER_0_IDLE;
+			res = true;
+		}
 	}
 	if (res) {
 		start = 0;
 	}
 	return res;
 }
+
 
 bool ScriptRunner::heaterIdle() {
 	static unsigned long start = 0;
@@ -57,24 +72,22 @@ bool ScriptRunner::heaterIdle() {
 		Config.Log->append("Step: Idle, code=").append(step).Info();
 		publishStep();
 	}
-
-	if ((alertCode == ALERT_EMPTY
-		|| alertCode == ALERT_STEP_TOO_LONG)) {
-		publishAlert(ALERT_EMPTY);
-
+	if (checkConditions()) {
 		if (Config.GetCommand() == CMD_RUN) {
 			// start!
 			step = STEP_HEATER_1_INITIAL;
 			res = true;
 		} else if (Config.GetCommand() == CMD_STOP) {
+			prevStep = step;
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		} else if (Config.GetCommand() == CMD_NOCMD) {
-			step = STEP_EMPTY;
-			res = true;
+			//step = STEP_EMPTY;
+			res = false;
 		}
+
 	} else {
-		// some alert. Do Nothing. Waiting for this alert is disappeared
+		// some conditions are failed. Do Nothing. Waiting for these conditions are fixed no step ahead
 	}
 	if (res) {
 		start = 0;
@@ -82,34 +95,14 @@ bool ScriptRunner::heaterIdle() {
 	return res;
 }
 
-void ScriptRunner::Loop(unsigned long timeperiod) {
-	//Config.Log->Debug("Runner Loop");
-	if (heatMode == HEATMODE_HEAT) {
-		HeatScript();
-	}
-}
-
-void ScriptRunner::Init() {
-	heatMode = Config.GetHeatMode(); // mode can't be changed during a workcycle
-	Config.Log->append("Mode=").append(heatMode).Debug();
-	step = STEP_EMPTY;
-}
-
-
-void ScriptRunner::publishAlert(ALERTCODE code) {
-
-	if (code != alertCode) {
-
-		Config.PublishAlert(code);
-		alertCode = code;
-	}
-}
 
 bool ScriptRunner::heaterStepInitial() {
 	bool res = false;
 
 	const unsigned long stepLong = 10 * 60 * (unsigned long)1000;
 	static unsigned long start = 0;
+	static bool infoMsg1 = false;
+	static bool infoMsg2 = false;
 	unsigned long now = millis();
 
 	if (start == 0) {
@@ -124,34 +117,50 @@ bool ScriptRunner::heaterStepInitial() {
 			prevStep = step;
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
-		} else {
-			bool res1 = false;
-			bool res2 = false;
-			res1 = Config.DevMgr->PumpFloor1.ProcessUnit(ACT_ON);
-			if (res1) {
-				publishInfo("Floor 1 pump has been started");
-			}
-			res2 = Config.DevMgr->PumpFloor2.ProcessUnit(ACT_ON);
-			if (res2) {
-				publishInfo("Floor 2 pump has been started");
-			}
-			res = res1 & res2;
+		} else if (checkCommand()) {
+			
+			Config.DevMgr->PumpFloor1.ProcessUnit(ACT_ON);
+			Config.DevMgr->PumpFloor2.ProcessUnit(ACT_ON);
+			res = Config.DevMgr->PumpFloor1.IsOk() && Config.DevMgr->PumpFloor2.IsOk();
 			if (res) {
-				publishInfo("Both floor's pumps have been started");
-				step = STEP_HEATER_2_CHECK_START;
-				publishAlert(ALERT_EMPTY);
+				if (!infoMsg2) {
+					publishInfo("Both floor's pumps have been started");
+					infoMsg2 = true;
+				}
+					step = STEP_HEATER_2_CHECK_START;
 			} else {
-				publishInfo("Waiting for floor pums are started");				
+				if (!infoMsg1) {
+					publishInfo("Waiting for floor pums are started");
+					infoMsg1 = true;
+				}
 			}
-		}
+		} else // CMD_STOP CMD_NOCMD
+		{
+			res = true;
+		}	
 	}
 
 	if (res) {
 		start = 0;
+		infoMsg1 = false;
+		infoMsg2 = false;
 	}
 	return res;
 }
 
+
+bool ScriptRunner::checkCommand() {
+	bool res = true;
+	
+	if (Config.GetCommand() == CMD_RUN) {
+		res = true;
+	} else {
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = false;
+	}
+	return res;
+}
 
 
 void ScriptRunner::publishStep() {
@@ -167,31 +176,55 @@ void ScriptRunner::publishInfo(const char* msg) {
 	Config.Publish();
 }
 
+
 bool ScriptRunner::checkConditions() {
 	bool res = true;
+	bool res1;
 	switch (step) {
 		// it shouldn't break in some lines!
 	case STEP_HEATER_FULLSTOP:
 		break;
 	case STEP_HEATER_2_CHECK_START:
 		// Floor pumps are running
-		res &= Config.DevMgr->PumpFloor1.IsOk();
-		res &= Config.DevMgr->PumpFloor2.IsOk();		
+		res1 &= Config.DevMgr->PumpFloor1.IsOk();
+		if (res1) {
+			Config.DevMgr->PumpFloor1.PublishDeviceAlert(ALERT_NOT_RUNNING);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->PumpFloor2.IsOk();
+		if (res1) {
+			Config.DevMgr->PumpFloor2.PublishDeviceAlert(ALERT_NOT_RUNNING);
+		}
+		res &= res1;
 	case STEP_HEATER_1_INITIAL:
 		// Stop for any alert
 		res &= alertCode == ALERT_EMPTY;
 		// Check Temperature
-		res &= Config.DevMgr->TTankIn.IsOk();
-		res &= Config.DevMgr->TTankOut.IsOk();		
+		res1 = Config.DevMgr->TTankIn.IsOk();
+		if (!res1) {
+			Config.DevMgr->TTankIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+
+		res1 = Config.DevMgr->TTankOut.IsOk();
+		if (!res1) {
+			Config.DevMgr->TTankOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+
 	case STEP_HEATER_0_IDLE:
-		// Command
-		res &= Config.GetCommand() == CMD_RUN;
-	case STEP_EMPTY:	
+	case STEP_EMPTY:
 		// Voltage check
-		res &= Config.DevMgr->VoltageSwitch.IsOk();
+		res1 = Config.DevMgr->VoltageSwitch.IsOk();
+		if (!res1) {
+			Config.DevMgr->VoltageSwitch.PublishDeviceAlert(ALERT_VOLTAGE_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		break;
 	}
 	return res;
 }
+
 
 bool ScriptRunner::heaterStepCheckStart() {
 	bool res = false;
@@ -229,4 +262,13 @@ bool ScriptRunner::heaterFullStop() {
 		start = 0;
 	}
 	return res;
+}
+
+void ScriptRunner::publishAlert(ALERTCODE code) {
+
+	if (code != alertCode) {
+
+		Config.PublishAlert(code);
+		alertCode = code;
+	}
 }

@@ -335,12 +335,25 @@ void Configuration::PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 	case ALERT_TEMP_IS_OUT_OF_RANGE:
 		strcat(PayloadBuff, "Temperature is out of range");
 		break;
+	case ALERT_NOT_RUNNING:
+		strcat(PayloadBuff, "Engine is not running");
+		break;
+	case ALERT_OTHER:
+		strcat(PayloadBuff, "Some unknown error");
+		break;
+	case ALERT_PRESSURE_IS_OUT_OF_RANGE:
+		strcat(PayloadBuff, "Pressure is out of range");
+		break;
+	case ALERT_VOLTAGE_IS_OUT_OF_RANGE:
+		strcat(PayloadBuff, "Voltage is out of range");
+		break;
+		
 	}
 
-	sprintf(TopicBuff, MQTT_ALERT_MSG, boardId);
+	sprintf(TopicBuff, MQTT_ALERT_MSG, boardId, name);
 	Publish();
 
-	sprintf(TopicBuff, MQTT_ALERT_CODE, boardId);
+	sprintf(TopicBuff, MQTT_ALERT_CODE, boardId, name);
 	sprintf(PayloadBuff, "%c", code);
 	Publish();
 }

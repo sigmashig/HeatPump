@@ -23,8 +23,9 @@ private:
 	bool relaySwitch();
 	bool relayOn();
 	bool relayOff();
-	unsigned long delayStart;
+	//unsigned long delayStart;
 
+	/*
 	unsigned int minTimeOn = (unsigned long)NAN;
 	unsigned int maxTimeOn = (unsigned long)NAN;
 	unsigned int minTimeOff = (unsigned long)NAN;
@@ -32,5 +33,5 @@ private:
 
 	unsigned long lastOn = 0;
 	unsigned long lastOff = 0;
-
+*/
 };

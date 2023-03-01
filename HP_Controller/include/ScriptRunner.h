@@ -4,12 +4,6 @@
 
 #include "definitions.h"
 
-/*
-#define PAUSE_STEP0	(unsigned long)5000//2*60*1000
-#define PAUSE_STEP2	(unsigned long)5000//2*60*1000
-#define PAUSE_STEP6	(unsigned long)5000//2*60*1000
-#define MIN_INTERVAL_COMPRESSOR		5000//(unsigned long)5*60*1000
-*/
 
 class ScriptRunner
 {
@@ -31,7 +25,7 @@ public:
 
 	
 	void Loop(unsigned long timeperiod);
-	void HeatScript();
+	void StepScript();
  //	bool IsAlert = false;
 	void Init();
 
@@ -41,10 +35,12 @@ private:
 	HEATMODE heatMode;
 	ALERTCODE alertCode = ALERT_EMPTY;
 
-	bool heaterEmptyStep();
+	bool emptyStep();
 	bool heaterIdle();
 	bool heaterStepInitial();
+    bool checkCommand();
 	bool heaterStepCheckStart();
+    bool checkAlarm();
 	bool heaterFullStop();
 
 

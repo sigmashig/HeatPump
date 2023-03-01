@@ -55,7 +55,11 @@ void OneWireThermo::UpdateThermo(const char* line) {
 }
 
 bool OneWireThermo::IsOk() {
-	return (Temperature >= MinTemp && Temperature <= MaxTemp);
+	bool res = Temperature >= MinTemp && Temperature <= MaxTemp;
+	if (res) {
+		PublishDeviceAlert(ALERT_EMPTY);
+	}
+	return res;
 }
 
 
@@ -89,9 +93,9 @@ void OneWireThermo::UnitLoop(unsigned long timeperiod) {
 		if (!isSimulator) {
 			GetTemperature();
 			if (!IsOk()) {
-				publishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+				PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 			} else {
-				publishDeviceAlert(ALERT_EMPTY);
+				PublishDeviceAlert(ALERT_EMPTY);
 			}
 		}
 	}

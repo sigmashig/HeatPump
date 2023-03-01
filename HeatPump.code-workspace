@@ -14,6 +14,8 @@
 		"C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "sameLine",
 		"C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "sameLine",
 		"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine",
-		"C_Cpp.vcFormat.newLine.beforeWhileInDoWhile": true
+		"C_Cpp.vcFormat.newLine.beforeWhileInDoWhile": true,
+		"editor.tabCompletion": "on",
+		"diffEditor.codeLens": true
 	}
 }

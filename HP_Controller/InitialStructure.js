@@ -13,8 +13,8 @@ function publish()
     mqttspy.publish("HeatPump/Board_07/Config/HystHpRoom", 5, 0, false);
 
     mqttspy.publish("HeatPump/Board_07/Status/Step", 0, 0, false);
-    mqttspy.publish("HeatPump/Board_07/Alarm/Code", "", 0, false);
-    mqttspy.publish("HeatPump/Board_07/Alarm/Text", "", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Alarm/Other/Code", "", 0, false);
+    mqttspy.publish("HeatPump/Board_07/Alarm/Other/Text", "", 0, false);
 
 
     mqttspy.publish("HeatPump/Board_07/Schedule/WorkDay/Set01", "{'time':'23:00','temp':'30.0'}", 0, false);

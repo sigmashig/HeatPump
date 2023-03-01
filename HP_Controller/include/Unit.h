@@ -16,7 +16,8 @@ public:
 	const char* Name;
 //	bool IsAlert = false;
 	virtual bool IsSimulator() = 0;
-
+	void PublishDeviceAlert(ALERTCODE code);
+	//bool IsAlerted() { return alertCode != ALERT_EMPTY; }
 protected:
 
 	ALERTCODE alertCode = ALERT_EMPTY;
@@ -26,6 +27,5 @@ protected:
 	virtual ~Unit() {};
 	virtual void const print(const char* header, DebugLevel level);
 	Unit(const char* nm) { Name = nm; }
-	void publishDeviceAlert(ALERTCODE code);
 };
 

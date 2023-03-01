@@ -20,8 +20,7 @@ public:
 	void const print(const char* header, DebugLevel level);
 	Contactor(const char* nm);
 	void UpdateContactor(const char* line);
-	bool IsOk() { return status == lhOn; }
-
+	bool IsOk();
 private:
 	unsigned long startContact=0;
 	byte prevValue;

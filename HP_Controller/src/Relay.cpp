@@ -15,30 +15,11 @@ void Relay::InitUnit() {
 bool Relay::relaySet(bool newStatus) {
 	bool res = false;
 	if (status != newStatus) {
-		unsigned long now = millis();
-		if (status == LOW) {
-			if (minTimeOff != NAN && now - lastOff < minTimeOff * 1000) {
-				res = false;
-			} else { // ok, let's switch a relay
-				lastOn = now;
-				res = true;
-			}
-		} else {
-			if (minTimeOn != NAN && now - lastOn < minTimeOn * 1000) {
-				res = false;
-			} else { // ok, let's switch a relay
-				lastOff = now;
-				res = true;
-			}
+		if (!IsSimulator()) {
+			digitalWrite(Pin, (newStatus == HIGH ? lhOn : !lhOn));
 		}
-
-		if (res) {
-			if (!IsSimulator()) {
-				digitalWrite(Pin, (newStatus == HIGH ? lhOn : !lhOn));
-			}
-			status = newStatus;
-			Publish(MQTT_RELAYS);
-		}
+		status = newStatus;
+		Publish(MQTT_RELAYS);
 	}
 	return res;
 }
@@ -118,32 +99,14 @@ void Relay::UpdateRelay(const char* line) {
 	if (json.containsKey("lhOn")) {
 		lhOn = json["lhOn"];
 	}
-	if (json.containsKey("minTimeOff")) {
-		minTimeOff = json["minTimeOff"];
-	}
-	if (json.containsKey("minTimeOn")) {
-		minTimeOn = json["minTimeOn"];
-	}
-	if (json.containsKey("maxTimeOff")) {
-		maxTimeOff = json["maxTimeOff"];
-	}
-	if (json.containsKey("maxTimeOn")) {
-		maxTimeOn = json["maxTimeOn"];
-	}
 }
 
 bool Relay::IsOk() {
-	unsigned long now = millis();
 	bool res = true;
 
-	if (status == LOW) {
-		if (maxTimeOff != NAN && now - lastOff > maxTimeOff) {
-			res = false;
-		} 
-	} else {
-		if (maxTimeOn != NAN && now - lastOn > maxTimeOn) {
-			res = false;
-		}		
+	res = status == lhOn;
+	if (res) {
+		PublishDeviceAlert(ALERT_EMPTY);
 	}
 	return res;
 }
