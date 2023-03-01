@@ -35,6 +35,8 @@ void Configuration::Init() {
 
 	if (mqttClient->IsMqtt()) {
 		isMqttReady = true;
+		sprintf(TopicBuff, MQTT_IS_READY, boardId);
+		Publish(TopicBuff, "0");
 		SubscribeAll();
 	}
 
@@ -44,6 +46,10 @@ void Configuration::Init() {
 
 	Runner.Init();
 
+	if (mqttClient->IsMqtt()) {
+		sprintf(TopicBuff, MQTT_IS_READY, boardId);
+		Publish(TopicBuff, "1");
+	}
 	Log->Info(F("Config init is finished"));
 }
 

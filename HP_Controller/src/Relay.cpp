@@ -104,7 +104,7 @@ void Relay::UpdateRelay(const char* line) {
 bool Relay::IsOk() {
 	bool res = true;
 
-	res = status == lhOn;
+	res = status == HIGH;
 	if (res) {
 		PublishDeviceAlert(ALERT_EMPTY);
 	}

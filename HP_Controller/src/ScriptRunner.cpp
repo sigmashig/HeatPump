@@ -12,6 +12,7 @@ void ScriptRunner::Init() {
 //	heatMode = Config.GetHeatMode(); // mode can't be changed during a workcycle
 	Config.Log->append("Mode=").append(heatMode).Debug();
 	step = STEP_EMPTY;
+	
 }
 
 void ScriptRunner::StepScript() {
@@ -149,6 +150,45 @@ bool ScriptRunner::heaterStepInitial() {
 }
 
 
+bool ScriptRunner::heaterStepCheckStart() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		publishInfo("Waiting for start conditions");
+	}
+
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
+bool ScriptRunner::heaterFullStop() {
+	bool res = false;
+	static unsigned long start = 0;
+	//unsigned long now = millis();
+
+	if (start == 0) {
+		publishStep();
+		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
+		publishInfo("FULL STOP!!!");
+	}
+	//Config.SetCommand(CMD_STOP);
+
+	if (Config.GetCommand() == CMD_NOCMD || Config.GetCommand() == CMD_RUN) {
+		step = STEP_HEATER_0_IDLE;
+		res = true;
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
 bool ScriptRunner::checkCommand() {
 	bool res = true;
 	
@@ -225,44 +265,6 @@ bool ScriptRunner::checkConditions() {
 	return res;
 }
 
-
-bool ScriptRunner::heaterStepCheckStart() {
-	bool res = false;
-	static unsigned long start = 0;
-	//unsigned long now = millis();
-
-	if (start == 0) {
-		start = 1;
-		publishStep();
-	}
-
-	if (res) {
-		start = 0;
-	}
-	return res;
-}
-
-bool ScriptRunner::heaterFullStop() {
-	bool res = false;
-	static unsigned long start = 0;
-	//unsigned long now = millis();
-
-	if (start == 0) {
-		publishStep();
-		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
-		publishInfo("FULL STOP!!!");
-	}
-	//Config.SetCommand(CMD_STOP);
-
-	if (Config.GetCommand() == CMD_NOCMD || Config.GetCommand() == CMD_RUN) {
-		step = STEP_HEATER_0_IDLE;
-		res = true;
-	}
-	if (res) {
-		start = 0;
-	}
-	return res;
-}
 
 void ScriptRunner::publishAlert(ALERTCODE code) {
 

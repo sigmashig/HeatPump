@@ -16,6 +16,7 @@ void Contactor::InitUnit() {
 	}
 	prevValue = 0xff;
 	startContact = 0;
+	IsOk();
 	//status = !lhOn;
 }
 
