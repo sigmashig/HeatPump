@@ -64,7 +64,7 @@
 // 10		|2	|MaxTemp
 
 #define EEPROM_ADDR_THERM	(EEPROM_ADDR_TBUS_PIN + 1)
-#define EEPROM_LEN_THERM	12
+#define EEPROM_LEN_THERM	16
 #define EEPROM_NUMB_THERM	12
 
 

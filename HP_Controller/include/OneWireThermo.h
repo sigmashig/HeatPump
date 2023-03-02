@@ -10,8 +10,10 @@ class OneWireThermo :
 public:
 	double Temperature;
 	DeviceAddress Address;
-	double MinTemp = 0;
-	double MaxTemp = 0;
+	double ErrorLow;
+	double ErrorHigh;
+	double WarningLow;
+	double WarningHigh;
 
 	void const print(const char* header, DebugLevel level) override;
 	OneWireThermo(const char* nm);

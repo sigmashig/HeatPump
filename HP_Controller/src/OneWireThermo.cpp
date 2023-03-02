@@ -45,17 +45,23 @@ void OneWireThermo::UpdateThermo(const char* line) {
 		OneWireBus::ConvertStringToAddress(Address, s);
 		checkSimulator();
 	}
-	if (json.containsKey("min")) {
-		//Config.Log->append("min = ").append(s).Debug();
-		MinTemp = json["min"];
+	if (json.containsKey("errorLow")) {
+		ErrorLow = json["errorLow"];
 	}
-	if (json.containsKey("max")) {
-		MaxTemp = json["max"];
+	if (json.containsKey("errorHigh")) {
+		ErrorHigh = json["errorHigh"];
 	}
+	if (json.containsKey("warningHigh")) {
+		WarningHigh = json["warningHigh"];
+	}
+	if (json.containsKey("warningLow")) {
+		WarningLow = json["warningLow"];
+	}
+
 }
 
 bool OneWireThermo::IsOk() {
-	bool res = Temperature >= MinTemp && Temperature <= MaxTemp;
+	bool res = Temperature >= ErrorLow && Temperature <= ErrorHigh;
 	if (res) {
 		PublishDeviceAlert(ALERT_EMPTY);
 	}
@@ -70,8 +76,8 @@ void const OneWireThermo::print(const char* header, DebugLevel level) {
 	}
 	Config.Log->append(F("Name:")).append(Name);
 	Config.Log->append(F(";Address:")).append(OneWireBus::ConvertAddressToString(Address).c_str());
-	Config.Log->append(F(";Min:")).append(MinTemp);
-	Config.Log->append(F(";Max:")).append(MaxTemp);
+	//Config.Log->append(F(";Min:")).append(MinTemp);
+	//Config.Log->append(F(";Max:")).append(MaxTemp);
 	Config.Log->append(F("@"));
 	Config.Log->Log(level);
 

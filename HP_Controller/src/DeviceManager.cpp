@@ -61,16 +61,17 @@ void DeviceManager::UpdateThermoEquipment(const char *name, const char *payload)
 			{
 				DeviceAddress da;
 				OneWireBus::CopyDeviceAddress(da, AllThermo[i]->Address);
-				double minT = AllThermo[i]->MinTemp;
-				double maxT = AllThermo[i]->MaxTemp;
+				double eLow = AllThermo[i]->ErrorLow;
+				double eHigh = AllThermo[i]->ErrorHigh;
+				double wHigh = AllThermo[i]->WarningHigh;
+				double wLow = AllThermo[i]->WarningLow;
 
 				AllThermo[i]->UpdateThermo(payload);
-				/*
-				Config.Log->append("Thermo:").append(OneWireBus::CompareDeviceAddress(AllThermo[i]->Address, da))
-					.append("; min=").append(AllThermo[i]->MinTemp).append("#").append(minT)
-					.append("; max=").append(AllThermo[i]->MaxTemp).append("#").append(maxT).Debug();
-					*/
-				if (OneWireBus::CompareDeviceAddress(AllThermo[i]->Address, da) != 0 || minT != AllThermo[i]->MinTemp || maxT != AllThermo[i]->MaxTemp)
+				Config.Log->Debug("POINT1");
+				if (OneWireBus::CompareDeviceAddress(AllThermo[i]->Address, da) != 0
+					|| eLow != AllThermo[i]->ErrorLow || eHigh != AllThermo[i]->ErrorHigh
+					|| wLow != AllThermo[i]->WarningLow || wHigh != AllThermo[i]->WarningHigh
+					)
 				{
 					Config.Log->Debug("EEPROM THERMO");
 
@@ -78,10 +79,18 @@ void DeviceManager::UpdateThermoEquipment(const char *name, const char *payload)
 					{
 						SigmaEEPROM::Write8(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + j, AllThermo[i]->Address[j]);
 					}
-					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8, (int)(AllThermo[i]->MinTemp * 2));
-					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 2, (int)(AllThermo[i]->MaxTemp * 2));
+					Config.Log->append("EH=").append((int)(AllThermo[i]->ErrorHigh * 2)).Debug();
+					Config.Log->append("EL=").append((int)(AllThermo[i]->ErrorLow * 2)).Debug();
+					Config.Log->append("WH=").append((int)(AllThermo[i]->WarningHigh * 2)).Debug();
+					Config.Log->append("WL=").append((int)(AllThermo[i]->WarningLow * 2)).Debug();
+					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8, (int)(AllThermo[i]->ErrorHigh * 2));
+					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 2, (int)(AllThermo[i]->ErrorLow * 2));
+					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 4, (int)(AllThermo[i]->WarningHigh * 2));
+					SigmaEEPROM::Write16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 6, (int)(AllThermo[i]->WarningLow * 2));
 				}
+				Config.Log->Debug("POINT2");
 				AllThermo[i]->InitUnit();
+				Config.Log->Debug("POINT3");
 				break;
 			}
 		}
@@ -187,8 +196,10 @@ bool DeviceManager::readFromEEPROM()
 		{
 			AllThermo[i]->Address[j] = SigmaEEPROM::Read8(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + j);
 		}
-		AllThermo[i]->MinTemp = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8))) / 2.0;
-		AllThermo[i]->MaxTemp = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 2))) / 2.0;
+		AllThermo[i]->ErrorHigh = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8))) / 2.0;
+		AllThermo[i]->ErrorLow = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 2))) / 2.0;
+		AllThermo[i]->WarningHigh = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 4))) / 2.0;
+		AllThermo[i]->WarningLow = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 6))) / 2.0;
 	}
 	return res;
 }
@@ -264,12 +275,14 @@ void DeviceManager::SubscribeStatuses()
 {
 
 	int n = 0;
+	/*
 	for (int i = 0; i < CONFIG_NUMBER_RELAYS; i++)
 	{
 		sprintf(Config.TopicBuff, MQTT_STATUS_RELAY, Config.BoardId(), AllRelays[i]->Name);
 		Config.Subscribe(Config.TopicBuff);
 		n++;
 	}
+	*/
 	sprintf(Config.TopicBuff, MQTT_STATUS_CONTACTOR, Config.BoardId(), PressureSwitch.Name);
 	Config.Subscribe(Config.TopicBuff);
 	n++;
