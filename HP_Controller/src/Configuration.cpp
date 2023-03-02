@@ -260,6 +260,10 @@ void Configuration::unitsLoop(unsigned long timePeriod) {
 }
 
 
+double Configuration::GetDesiredTemp() {
+	return manualTemp; //TODO: should be fixed when ScheduleMgr is done
+}
+
 void Configuration::SubscribeAll() {
 	subscribeParameters();
 	DevMgr->SubscribeEquipment();

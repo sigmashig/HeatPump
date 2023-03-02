@@ -26,6 +26,7 @@ void DeviceManager::UpdateRelayEquipment(const char *name, const char *payload)
 		{
 			byte pin = AllRelays[i]->Pin;
 			byte lhOn = AllRelays[i]->lhOn;
+			Config.Log->Debug("POINT10");
 			AllRelays[i]->UpdateRelay(payload);
 
 			if (AllRelays[i]->Pin != pin || AllRelays[i]->lhOn != lhOn)
@@ -34,7 +35,9 @@ void DeviceManager::UpdateRelayEquipment(const char *name, const char *payload)
 				SigmaEEPROM::Write8(EEPROM_ADDR_RELAY + i * EEPROM_LEN_RELAY, AllRelays[i]->Pin);
 				SigmaEEPROM::Write8(EEPROM_ADDR_RELAY + i * EEPROM_LEN_RELAY + 1, AllRelays[i]->lhOn);
 			}
+			Config.Log->Debug("POINT11");
 			AllRelays[i]->InitUnit();
+			Config.Log->Debug("POINT12");
 			break;
 		}
 	}

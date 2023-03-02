@@ -68,6 +68,8 @@ public:
 	void SetCommand(const char* str) { setCmd(str[0] - '0'); };
 	void SetCommand(CMD cmd) { setCmd(cmd); };
 	CMD GetCommand() { return command; };
+	double GetDesiredTemp();
+	
 	void Transfer(int n) { if (isMqttReady) { mqttClient->MqttLoop(n); } };
 	void SubscribeAll();
 	void Subscribe(const char* topic);

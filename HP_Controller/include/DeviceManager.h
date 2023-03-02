@@ -9,14 +9,14 @@ class DeviceManager
 {
 public:
 
-	Relay MotorGnd = Relay("MotorGnd");
+	Relay PumpGnd = Relay("PumpGnd");
 	Relay Compressor = Relay("Compressor");
 	Relay PumpTankIn = Relay("PumpTankIn");
 	Relay PumpTankOut = Relay("PumpTankOut");
 	Relay PumpFloor1 = Relay("PumpFloor1");
 	Relay PumpFloor2 = Relay("PumpFloor2");
 
-	Relay* AllRelays[CONFIG_NUMBER_RELAYS] = { &MotorGnd, &Compressor, &PumpTankIn, &PumpTankOut, &PumpFloor1, &PumpFloor2 };
+	Relay* AllRelays[CONFIG_NUMBER_RELAYS] = { &PumpGnd, &Compressor, &PumpTankIn, &PumpTankOut, &PumpFloor1, &PumpFloor2 };
 
 	Contactor PressureSwitch = Contactor("PressureSwitch");
 	Contactor VoltageSwitch = Contactor("VoltageSwitch");
