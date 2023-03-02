@@ -16,6 +16,87 @@
 #include "definitions.h"
 
 
+#define MQTT_ROOT "HeatPump"
+//#define MQTT_BOARD_ID "Board_%02d"
+#define MQTT_SEPARATOR "/"
+
+#define MQTT_CONFIG			"Config"
+#define MQTT_IS_READY 		"IsReady"
+#define MQTT_WATCH_DOG2 	"WatchDog2"
+#define MQTT_SIMULATOR 		"Simulator"
+#define	MQTT_MODE	 		"Mode"
+#define	MQTT_MANUAL_TEMP	"ManualTemp"
+#define	MQTT_DESIRED_TEMP	"DesiredTemp"
+#define	MQTT_HEAT_COLD		"HeatCold"
+#define	MQTT_HYSTERESIS		"Hysteresis"
+#define	MQTT_WEEKMODE		"WeekMode"
+#define	MQTT_COMMAND		"Command"
+#define	MQTT_TIMEZONE		"TimeZone"
+
+#define MQTT_ALERT			"Alert"
+#define MQTT_ALERT_CODE		"Code"
+#define MQTT_ALERT_MSG		"Text"
+#define MQTT_ALERT_SCRIPT	"Script"
+
+#define MQTT_EQUIPMENT		"Equipment"
+#define MQTT_SCHEDULE		"Schedule"
+#define MQTT_STATUS			"Status"
+
+
+//#define MQTT_CONFIG		MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Config"
+/*
+#define MQTT_LOG		MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Logs" MQTT_SEPARATOR "%s"
+#define MQTT_EQUIPMENT	MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Equipment"
+#define MQTT_SCHEDULE	MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Schedule"
+#define MQTT_STATUS		MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Status"
+#define MQTT_ALERT		MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Alert"
+
+#define MQTT_ALERT_CODE	MQTT_ALERT MQTT_SEPARATOR "%s" MQTT_SEPARATOR "Code"
+#define MQTT_ALERT_MSG	MQTT_ALERT MQTT_SEPARATOR "%s" MQTT_SEPARATOR "Text"
+
+#define MQTT_STEP		MQTT_STATUS MQTT_SEPARATOR "Step"
+#define MQTT_INFO		MQTT_STATUS MQTT_SEPARATOR "Info"
+
+
+
+#define MQTT_ALERT_STEP		MQTT_ALERT MQTT_SEPARATOR "Step"
+#define MQTT_ALERT_DEVICE	MQTT_ALERT MQTT_SEPARATOR "%s"
+
+//Schedule
+
+#define MQTT_SCHEDULE_WORKDAY		MQTT_SCHEDULE MQTT_SEPARATOR "WorkDay"
+#define MQTT_SCHEDULE_WEEKEND		MQTT_SCHEDULE MQTT_SEPARATOR "WeekEnd"
+#define MQTT_SCHEDULE_WORKDAY_SET	MQTT_SCHEDULE_WORKDAY MQTT_SEPARATOR "Set%02d"
+#define MQTT_SCHEDULE_WEEKEND_SET	MQTT_SCHEDULE_WEEKEND MQTT_SEPARATOR "Set%02d"
+
+//Equipment
+#define MQTT_RELAYS			"Relay"
+#define MQTT_THERMOMETERS	"Temperature"
+#define MQTT_POWERMETERS	"PowerMeter"
+#define MQTT_CONTACTORS		"Contactor"
+
+#define MQTT_EQUIPMENT_RELAYS		MQTT_EQUIPMENT MQTT_SEPARATOR MQTT_RELAYS
+#define MQTT_EQUIPMENT_RELAY		MQTT_EQUIPMENT_RELAYS MQTT_SEPARATOR "%s"
+#define MQTT_EQUIPMENT_THERMOMETERS	MQTT_EQUIPMENT MQTT_SEPARATOR MQTT_THERMOMETERS 
+#define MQTT_EQUIPMENT_THERMOMETER	MQTT_EQUIPMENT_THERMOMETERS MQTT_SEPARATOR "%s"
+#define MQTT_EQUIPMENT_POWERMETERS	MQTT_EQUIPMENT MQTT_SEPARATOR MQTT_POWERMETERS 
+#define MQTT_EQUIPMENT_POWERMETER	MQTT_EQUIPMENT_POWERMETERS MQTT_MQTT_SEPARATOR "%s"
+#define MQTT_EQUIPMENT_CONTACTORS	MQTT_EQUIPMENT MQTT_SEPARATOR MQTT_CONTACTORS
+#define MQTT_EQUIPMENT_CONTACTOR	MQTT_EQUIPMENT_CONTACTORS MQTT_SEPARATOR "%s"
+
+//Status
+#define MQTT_STATUS_RELAYS			MQTT_STATUS MQTT_SEPARATOR MQTT_RELAYS
+#define MQTT_STATUS_RELAY			MQTT_STATUS_RELAYS MQTT_SEPARATOR "%s"
+#define MQTT_STATUS_THERMOMETERS	MQTT_STATUS MQTT_SEPARATOR MQTT_THERMOMETERS
+#define MQTT_STATUS_THERMOMETER		MQTT_STATUS_THERMOMETERS MQTT_SEPARATOR "%s"
+#define MQTT_STATUS_POWERMETERS		MQTT_STATUS MQTT_SEPARATOR MQTT_POWERMETERS
+#define MQTT_STATUS_POWERMETER		MQTT_STATUS_POWERMETERS MQTT_SEPARATOR "%s"
+#define MQTT_STATUS_CONTACTORS		MQTT_STATUS MQTT_SEPARATOR MQTT_CONTACTORS
+#define	MQTT_STATUS_CONTACTOR		MQTT_STATUS_CONTACTORS MQTT_SEPARATOR "%s"
+*/
+
+
+
 class Configuration
 {
 public:
@@ -75,13 +156,13 @@ public:
 	void Subscribe(const char* topic);
 	void ProcessMessage(const char* topic, const char* payload);
 
-	void Publish() { Publish(TopicBuff, PayloadBuff); };
+	//void Publish() { Publish(TopicBuff, PayloadBuff); };
 
-	char TopicBuff[MQTT_TOPIC_LENGTH];
-	char PayloadBuff[MQTT_PAYLOAD_LENGTH];
-	void PublishAlert(ALERTCODE code) { PublishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
-	void PublishAlert(ALERTCODE code, const char* name) { PublishAlert(code, ScriptRunner::STEP_EMPTY, name); };
-	void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
+	//char TopicBuff[MQTT_TOPIC_LENGTH];
+	//char PayloadBuff[MQTT_PAYLOAD_LENGTH];
+	//void PublishAlert(ALERTCODE code) { publishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
+	void PublishAlert(ALERTCODE code, const char* name) { publishAlert(code, ScriptRunner::STEP_EMPTY, name); };
+	void PublishAlert(ALERTCODE code, ScriptRunner step) { publishAlert(code, step, NULL); };
 
 private:
 
@@ -110,6 +191,7 @@ private:
 	double manualTemp = 20.0;
 	double desiredTemp = 20.0;
 
+	char topicRoot[MQTT_TOPIC_LENGTH+1];
 	//methods
 
 	void readBoardId();
@@ -133,10 +215,20 @@ private:
 	void publishMode();
 	void publishWeekMode();
 	void publishManualTemp();
+    void publishDesiredTemp();
 	void publishHeatCold();
 	void publishHysteresis();
 	void publishSimulator();
 	void publishCmd();
 	void updateConfig(const char* topic, const char* payload);
+    void initMqttTopics();
+    void publishConfigParameter(const char* name, const char* payload);
+    void subscribeConfigParameter(const char* name);
+
+    void publishConfigParameter(const char* name, byte payload);
+
+	void publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
+
+
 };
 

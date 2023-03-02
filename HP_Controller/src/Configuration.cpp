@@ -8,9 +8,10 @@
 
 void Configuration::Init() {
 	Log = new Loger(512);
-
+	
 
 	readBoardId();
+	initMqttTopics();
 	ethClient = new EthernetClient();
 
 	initializeEthernet();
@@ -35,8 +36,7 @@ void Configuration::Init() {
 
 	if (mqttClient->IsMqtt()) {
 		isMqttReady = true;
-		sprintf(TopicBuff, MQTT_IS_READY, boardId);
-		Publish(TopicBuff, "0");
+		publishConfigParameter(MQTT_IS_READY, "0");
 		SubscribeAll();
 	}
 
@@ -47,8 +47,7 @@ void Configuration::Init() {
 	Runner.Init();
 
 	if (mqttClient->IsMqtt()) {
-		sprintf(TopicBuff, MQTT_IS_READY, boardId);
-		Publish(TopicBuff, "1");
+		publishConfigParameter(MQTT_IS_READY, "1");
 	}
 	Log->Info(F("Config init is finished"));
 }
@@ -274,39 +273,29 @@ void Configuration::SubscribeAll() {
 void Configuration::subscribeParameters() {
 
 	int n = 0;
-	sprintf(TopicBuff, MQTT_WATCH_DOG2, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_WATCH_DOG2);
 	n++;
-	sprintf(TopicBuff, MQTT_MODE, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_MODE);
 	n++;
-	sprintf(TopicBuff, MQTT_WEEKMODE, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_WEEKMODE);
 	n++;
-	sprintf(TopicBuff, MQTT_MANUAL_TEMP, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_MANUAL_TEMP);
 	n++;
-	sprintf(TopicBuff, MQTT_HEAT_COLD, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_HEAT_COLD);
 	n++;
-	sprintf(TopicBuff, MQTT_HYSTERESIS, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_HYSTERESIS);
 	n++;
-	sprintf(TopicBuff, MQTT_TIMEZONE, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_TIMEZONE);
 	n++;
-	sprintf(TopicBuff, MQTT_SIMULATOR, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_SIMULATOR);
 	n++;
-	sprintf(TopicBuff, MQTT_COMMAND, boardId);
-	Subscribe(TopicBuff);
+	subscribeConfigParameter(MQTT_COMMAND);
 	n++;
 	Transfer(n);
 }
 
 void Configuration::publishTimezone() {
-	sprintf(TopicBuff, MQTT_TIMEZONE, boardId);
-	Publish(TopicBuff, timezone);
+	publishConfigParameter(MQTT_TIMEZONE, timezone);
 }
 
 void Configuration::publishParameters() {
@@ -320,52 +309,71 @@ void Configuration::publishParameters() {
 	publishCmd();
 }
 
-void Configuration::PublishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name) {
+void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name) {
+	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
 
-	PayloadBuff[0] = 0;
 	if (name != NULL) {
-		sprintf(PayloadBuff, "Device: %s. ", name);
+		payload += "Device: ";
+		payload += name;
 	}
-
 	if (step != ScriptRunner::STEP_EMPTY) {
-		sprintf(PayloadBuff, "Step: %c. ", step);
+		payload = "Step: ";
+		payload += step;
 	}
-
 
 	switch (code) {
 	case ALERT_EMPTY:
-		PayloadBuff[0] = 0;
+		payload = "";
 		break;
-	case ALERT_TEMP_FLOOR:
-		strcat(PayloadBuff, "Temperature of floor is too low");
-		break;
+		//case ALERT_TEMP_FLOOR:
+		//	payload += "Temperature of floor is too low";
+		//	break;
 	case ALERT_STEP_TOO_LONG:
-		strcat(PayloadBuff, "Step is too long");
+		payload += "Step is too long";
 		break;
 	case ALERT_TEMP_IS_OUT_OF_RANGE:
-		strcat(PayloadBuff, "Temperature is out of range");
+		payload += "Temperature is out of range";
 		break;
 	case ALERT_NOT_RUNNING:
-		strcat(PayloadBuff, "Engine is not running");
+		payload += "Engine is not running";
 		break;
 	case ALERT_OTHER:
-		strcat(PayloadBuff, "Some unknown error");
+		payload += "Some unknown error";
 		break;
 	case ALERT_PRESSURE_IS_OUT_OF_RANGE:
-		strcat(PayloadBuff, "Pressure is out of range");
+		payload += "Pressure is out of range";
 		break;
 	case ALERT_VOLTAGE_IS_OUT_OF_RANGE:
-		strcat(PayloadBuff, "Voltage is out of range");
+		payload += "Voltage is out of range";
 		break;
-		
+
 	}
 
-	sprintf(TopicBuff, MQTT_ALERT_MSG, boardId, name);
-	Publish();
+	createSafeString(topicAlert, MQTT_TOPIC_LENGTH);
+	topicAlert = topicRoot;
+	topicAlert += MQTT_ALERT MQTT_SEPARATOR;
+	if (name != NULL) {
+		topicAlert += name;
+	} else {
+		topicAlert += MQTT_ALERT_SCRIPT;
+	}
+	topicAlert += MQTT_SEPARATOR;
 
-	sprintf(TopicBuff, MQTT_ALERT_CODE, boardId, name);
-	sprintf(PayloadBuff, "%c", code);
-	Publish();
+	{
+		createSafeString(topic, MQTT_TOPIC_LENGTH);
+		topic = topicAlert;
+		topic += MQTT_ALERT_CODE;
+		char payload[2];
+		payload[0] = code;
+		Publish(topic.c_str(), payload);
+	}
+	{
+		createSafeString(topic, MQTT_TOPIC_LENGTH);
+		topic = topicAlert;
+		topic += MQTT_ALERT_MSG;
+		Publish(topic.c_str(), payload.c_str());
+	}
+
 }
 
 void Configuration::Publish(const char* topic, const char* payload) {
@@ -382,73 +390,69 @@ void Configuration::Subscribe(const char* topic) {
 
 
 void Configuration::publishMode() {
-	sprintf(TopicBuff, MQTT_MODE, boardId);
-	PayloadBuff[0] = (byte)mode + '0';
-	PayloadBuff[1] = 0;
-	Publish();
+	publishConfigParameter(MQTT_MODE, (byte)mode);
 }
 
 void Configuration::publishWeekMode() {
-	sprintf(TopicBuff, MQTT_WEEKMODE, boardId);
-	PayloadBuff[0] = (byte)weekMode + '0';
-	PayloadBuff[1] = 0;
-	Publish();
+	publishConfigParameter(MQTT_WEEKMODE, weekMode);
 }
 
 void Configuration::publishManualTemp() {
-	sprintf(TopicBuff, MQTT_MANUAL_TEMP, boardId);
+	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
 
-	int mt1 = (int)manualTemp;
-	int mt2 = (manualTemp - mt1) * 10;
-	sprintf(PayloadBuff, "%u.%1u", mt1, mt2);
-	Publish();
+	payload = manualTemp;
+	publishConfigParameter(MQTT_MANUAL_TEMP, payload.c_str());
+}
+
+void Configuration::publishDesiredTemp() {
+	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
+
+	payload = desiredTemp;
+	publishConfigParameter(MQTT_DESIRED_TEMP, payload.c_str());
 }
 
 void Configuration::publishHeatCold() {
-	sprintf(TopicBuff, MQTT_HEAT_COLD, boardId);
-	PayloadBuff[0] = (byte)heatMode + '0';
-	PayloadBuff[1] = 0;
-	Publish();
+	publishConfigParameter(MQTT_HEAT_COLD, (byte)heatMode);
 }
 
 void Configuration::publishHysteresis() {
-	sprintf(TopicBuff, MQTT_HYSTERESIS, boardId);
-	PayloadBuff[0] = hysteresis + '0';
-	PayloadBuff[1] = 0;
-	Publish();
+	publishConfigParameter(MQTT_HYSTERESIS, (byte)hysteresis);
 }
 
-
+/*
 void Configuration::publishSimulator() {
 	sprintf(TopicBuff, MQTT_SIMULATOR, boardId);
 	PayloadBuff[0] = (isSimulator ? '1' : '0');
 	PayloadBuff[1] = 0;
 	Publish();
 }
+*/
 
 void Configuration::publishCmd() {
-	sprintf(TopicBuff, MQTT_COMMAND, boardId);
-	PayloadBuff[0] = (byte)command + '0';
-	PayloadBuff[1] = 0;
-	Publish();
+	publishConfigParameter(MQTT_COMMAND, (byte)command);
 }
 
 void Configuration::ProcessMessage(const char* topic, const char* payload) {
-	sprintf(TopicBuff, MQTT_CONFIG, BoardId());
-	if (strncmp(topic, TopicBuff, strlen(TopicBuff)) == 0) { //Config
+	createSafeString(topic0, MQTT_TOPIC_LENGTH);
+	topic0 = topicRoot;
+	topic0 += MQTT_CONFIG MQTT_SEPARATOR;
+
+	if (strncmp(topic,  topic0.c_str(), topic0.length()) == 0) { //Config
 		updateConfig(topic, payload);
 	} else {
-		sprintf(TopicBuff, MQTT_STATUS, BoardId());
-		if (strncmp(topic, TopicBuff, strlen(TopicBuff)) == 0) { //Status
+		topic0 = topicRoot;
+		topic0 += MQTT_STATUS MQTT_SEPARATOR;
+		if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Status
 			DevMgr->UpdateStatuses(topic, payload);
 		} else {
-
-			sprintf(TopicBuff, MQTT_SCHEDULE, BoardId());
-			if (strncmp(topic, TopicBuff, strlen(TopicBuff)) == 0) { //Schedule
+			topic0 = topicRoot;
+			topic0 += MQTT_SCHEDULE MQTT_SEPARATOR;
+			if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule
 				ScheduleMgr->UpdateSchedule(topic, payload);
 			} else {
-				sprintf(TopicBuff, MQTT_EQUIPMENT, BoardId());
-				if (strncmp(topic, TopicBuff, strlen(TopicBuff)) == 0) { //Equipment
+				topic0 = topicRoot;
+				topic0 += MQTT_EQUIPMENT MQTT_SEPARATOR;
+				if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Equipment
 					DevMgr->UpdateEquipment(topic, payload);
 				}
 			}
@@ -459,36 +463,49 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 
 void Configuration::updateConfig(const char* topic, const char* payload) {
 
-	sprintf(TopicBuff, MQTT_MODE, boardId);
-	if (strcmp(topic, TopicBuff) == 0) {
+	createSafeString(topicConfig, MQTT_TOPIC_LENGTH);
+	topicConfig = topicRoot;
+	topicConfig += MQTT_CONFIG MQTT_SEPARATOR;
+
+	createSafeString(topic0, MQTT_TOPIC_LENGTH);
+	topic0 = topicConfig;
+	topic0 += MQTT_MODE;
+	if (strcmp(topic, topic0.c_str()) == 0) {
 		SetMode(payload);
 	} else {
-		sprintf(TopicBuff, MQTT_WEEKMODE, boardId);
-		if (strcmp(topic, TopicBuff) == 0) {
+		topic0 = topicConfig;
+		topic0 += MQTT_WEEKMODE;
+		if (strcmp(topic, topic0.c_str()) == 0) {
 			SetWeekMode(payload);
 		} else {
-			sprintf(TopicBuff, MQTT_MANUAL_TEMP, boardId);
-			if (strcmp(topic, TopicBuff) == 0) {
+			topic0 = topicConfig;
+			topic0 += MQTT_MANUAL_TEMP;
+			if (strcmp(topic, topic0.c_str()) == 0) {
 				SetManualTemp(payload);
 			} else {
-				sprintf(TopicBuff, MQTT_HEAT_COLD, boardId);
-				if (strcmp(topic, TopicBuff) == 0) {
+				topic0 = topicConfig;
+				topic0 += MQTT_HEAT_COLD;
+				if (strcmp(topic, topic0.c_str()) == 0) {
 					SetHeatMode(payload);
 				} else {
-					sprintf(TopicBuff, MQTT_HYSTERESIS, boardId);
-					if (strcmp(topic, TopicBuff) == 0) {
+					topic0 = topicConfig;
+					topic0 += MQTT_HYSTERESIS;
+					if (strcmp(topic, topic0.c_str()) == 0) {
 						SetHysteresis(payload);
 					} else {
-						sprintf(TopicBuff, MQTT_TIMEZONE, boardId);
-						if (strcmp(topic, TopicBuff) == 0) {
+						topic0 = topicConfig;
+						topic0 += MQTT_TIMEZONE;
+						if (strcmp(topic, topic0.c_str()) == 0) {
 							Clock->SetTimezone(payload);
 						} else {
-							sprintf(TopicBuff, MQTT_SIMULATOR, boardId);
-							if (strcmp(topic, TopicBuff) == 0) {
+							topic0 = topicConfig;
+							topic0 += MQTT_SIMULATOR;
+							if (strcmp(topic, topic0.c_str()) == 0) {
 								SetSimulator(payload);
 							} else {
-								sprintf(TopicBuff, MQTT_COMMAND, boardId);
-								if (strcmp(topic, TopicBuff) == 0) {
+								topic0 = topicConfig;
+								topic0 += MQTT_COMMAND;
+								if (strcmp(topic, topic0.c_str()) == 0) {
 									SetCommand(payload);
 								}
 							}
@@ -498,4 +515,35 @@ void Configuration::updateConfig(const char* topic, const char* payload) {
 			}
 		}
 	}
+}
+
+void Configuration::initMqttTopics() {
+
+	strcpy(topicRoot, MQTT_ROOT MQTT_SEPARATOR);
+	strcat(topicRoot, boardName);
+	strcat(topicRoot, MQTT_SEPARATOR);
+}
+
+void Configuration::publishConfigParameter(const char* name, const char* payload) {
+	createSafeString(topicConfig, MQTT_TOPIC_LENGTH);
+	topicConfig = topicRoot;
+	topicConfig += MQTT_CONFIG MQTT_SEPARATOR;
+	topicConfig += name;
+
+	Publish(topicConfig.c_str(), payload);
+}
+
+void Configuration::subscribeConfigParameter(const char* name) {
+	createSafeString(topicConfig, MQTT_TOPIC_LENGTH);
+	topicConfig = topicRoot;
+	topicConfig += MQTT_CONFIG MQTT_SEPARATOR;
+	topicConfig += name;
+
+	Subscribe(topicConfig.c_str());
+}
+
+void Configuration::publishConfigParameter(const char* name, byte payload) {
+	char p[2];
+	p[0] = (byte)payload + '0';
+	publishConfigParameter(name, p);
 }
