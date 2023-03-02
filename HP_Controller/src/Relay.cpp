@@ -10,6 +10,7 @@ void Relay::InitUnit() {
 	if (Pin != 0) {
 		pinMode(Pin, OUTPUT);
 	}
+	PublishDeviceAlert(ALERT_EMPTY, true);
 }
 
 bool Relay::relaySet(bool newStatus) {

@@ -9,6 +9,8 @@ extern Configuration Config;
 
 void OneWireThermo::InitUnit() {
 	parent = &(Config.DevMgr->Bus);
+	Config.Log->Debug("POINT2.5");
+	
 	if (OneWireBus::IsZeroAddress(Address)) {
 		// Simulator
 		isSimulator = true;
@@ -19,6 +21,10 @@ void OneWireThermo::InitUnit() {
 		isSimulator = false;
 		parent->SetResolution(Address);
 	}
+	Config.Log->Debug("POINT2.6");
+	PublishDeviceAlert(ALERT_EMPTY, true);
+	Config.Log->Debug("POINT2.7");
+
 }
 
 

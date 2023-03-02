@@ -27,8 +27,11 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 void OneWireBus::InitUnit() {
 	oneWire = new OneWire(Pin);
+	PublishDeviceAlert(ALERT_EMPTY, true);
+
 	sensors = new DallasTemperature(oneWire);
 	sensors->begin();
+	
 }
 
 void OneWireBus::ProcessUnit(ActionType action) {

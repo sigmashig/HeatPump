@@ -22,8 +22,8 @@ void Unit::Publish(const char* uPrefix)
 	Config.Publish();
 }
 
-void Unit::PublishDeviceAlert(ALERTCODE code) {
-	if (alertCode != code) {
+void Unit::PublishDeviceAlert(ALERTCODE code, bool force) {
+	if (alertCode != code || force) {
 		Config.PublishAlert(code, Name);
 		alertCode = code;
 	}

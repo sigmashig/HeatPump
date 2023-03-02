@@ -16,7 +16,7 @@ public:
 	const char* Name;
 //	bool IsAlert = false;
 	virtual bool IsSimulator() = 0;
-	void PublishDeviceAlert(ALERTCODE code);
+	void PublishDeviceAlert(ALERTCODE code, bool force=false);
 	//bool IsAlerted() { return alertCode != ALERT_EMPTY; }
 protected:
 
