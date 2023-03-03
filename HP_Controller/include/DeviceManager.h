@@ -21,6 +21,7 @@ public:
 	Contactor PressureSwitch = Contactor("PressureSwitch");
 	Contactor VoltageSwitch = Contactor("VoltageSwitch");
 
+	Contactor* AllContactor[CONFIG_NUMBER_CONTACTORS] = { &PressureSwitch, &VoltageSwitch };
 	OneWireBus Bus = OneWireBus("Bus");
 
 	OneWireThermo TGndIn = OneWireThermo("TGndIn");
@@ -38,15 +39,20 @@ public:
 
 	OneWireThermo* AllThermo[CONFIG_NUMBER_THERMO] = {&TGndIn, &TGndOut, &TCompressor, &TVapOut, &TCondIn, &TCondVap, &TOut, &TIn, &TTankOut, &TTankIn, &TInside, &TOutside};
 	
+	Unit* AllDevices[CONFIG_NUMBER_OF_DEVICES];
 
 
 	void UnitLoop(unsigned long timeperiod);
-	void UpdateRelayEquipment(const char* name, const char* payLoad);
-	void UpdateRelayStatus(const char* name, const char* payLoad);
-	void UpdateContactorEquipment(const char* name, const char* payLoad);
+    void updateRelayEquipment(int number, const char* payload);
+    void updateBusEquipment(const char* payload);
+    void updateThermoEquipment(int number, const char* payload);
+    void updateContactorEquipment(int number, const char* payload);
+	//void UpdateRelayEquipment(const char* name, const char* payLoad);
+	void updateRelayStatus(const char* name, const char* payLoad);
+	//void UpdateContactorEquipment(const char* name, const char* payLoad);
 	void UpdateContactorStatus(const char* name, const char* payLoad);
-	void UpdateThermoEquipment(const char* name, const char* payLoad);
-	void UpdateThermoStatus(const char* name, const char* payLoad);
+	//void UpdateThermoEquipment(const char* name, const char* payLoad);
+	void updateThermoStatus(const char* name, const char* payLoad);
 	DeviceManager();
 	bool readFromEEPROM();
 	bool Init();
@@ -58,15 +64,15 @@ public:
 
 	void SubscribeStatuses();
 
-	void UpdateEquipment(const char* topic, const char* payload);
+	//void UpdateEquipment(const char* topic, const char* payload);
+	void UpdateEquipment(DeviceType dType, const char* name, const char* payload);
 
-	void UpdateStatuses(const char* topic, const char* payload);
+    void UpdateStatus(DeviceType dType, const char* name, const char* payload);
 
 //	int IncreaseNumberOfDevices() { return ++numbInitialized; };
 
 private:
 //	int numbInitialized = 0;
-//	Unit* AllDevices[CONFIG_NUMBER_OF_DEVICES];
 
 };
 

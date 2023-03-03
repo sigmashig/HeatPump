@@ -3,8 +3,17 @@
 #include "Configuration.h"
 
 extern Configuration Config;
-
-ScheduleManager::ScheduleManager(){
+/*
+ScheduleManager::ScheduleManager() {
+	int j = 0;
+	for (int i = 0; i < CONFIG_NUMBER_SCHEDULES; i++) {
+		AllSchedule[j] = &Weekdays[i];
+		j++;
+	}
+	for (int i = 0; i < CONFIG_NUMBER_SCHEDULES; i++) {
+		AllSchedule[j] = &Workdays[i];
+		j++;
+	}
 	readFromEEPROM();
 }
 
@@ -30,49 +39,21 @@ void ScheduleManager::Init()
 
 void ScheduleManager::FinalInit()
 {
-	/*
-	Config.Log->append("Scheduled Params:").append(numbInitSchedules).append(" of ").append(CONFIG_NUMBER_OF_SCHEDULED_PARAMS).append(" are ready").Info();
-	int nTry = 0;
-	while (nTry < 10 * CONFIG_NUMBER_OF_SCHEDULED_PARAMS && numbInitSchedules < CONFIG_NUMBER_OF_SCHEDULED_PARAMS) {
-		nTry++;
-		Config.MqttClient->MqttLoop();
-	}
-	Config.Log->append("Scheduled Params:").append(numbInitSchedules).append(" of ").append(CONFIG_NUMBER_OF_SCHEDULED_PARAMS).append(" are ready").Info();
-	*/
 }
 
-/*
-bool ScheduleManager::IsTempActionRequired()
-{
-	bool res = false;
-
-	if (heatCold == MODE_HEAT) {
-		if (GetDesiredTemperature() + GetHysteresis()/2.0 <= Config.DevMgr->TInside.GetTemperature()) {
-			res = true;
-		}
-	}
-	else
-		if (GetDesiredTemperature() + GetHysteresis()/2.0 >= Config.DevMgr->TInside.GetTemperature()) {
-			res = true;
-		}
-	return res;
-}
-*/
 
 void ScheduleManager::SubscribeSchedules()
 {
-	for (int i = 1; i <= CONFIG_NUMBER_SCHEDULES; i++) {
-		sprintf(Config.TopicBuff, MQTT_SCHEDULE_WORKDAY_SET, Config.BoardId(), i);
-		Config.Subscribe(Config.TopicBuff);
-		sprintf(Config.TopicBuff, MQTT_SCHEDULE_WEEKEND_SET, Config.BoardId(), i);
-		Config.Subscribe(Config.TopicBuff);
-		Config.Transfer(2);
+	for (int i = 1; i <= 2 * CONFIG_NUMBER_SCHEDULES; i++) {
+		Config.SubscribeSchedule(i);
 	}
+	Config.Transfer(2 * CONFIG_NUMBER_SCHEDULES);
 }
 
 
 void ScheduleManager::UpdateSchedule(const char* topic, const char* payload)
 {
+	
 	sprintf(Config.TopicBuff, MQTT_SCHEDULE_WORKDAY, Config.BoardId());
 	if (strncmp(topic, Config.TopicBuff, strlen(Config.TopicBuff)) == 0) {
 		for (int i = 1; i <= CONFIG_NUMBER_SCHEDULES; i++) {
@@ -94,3 +75,4 @@ void ScheduleManager::UpdateSchedule(const char* topic, const char* payload)
 		}
 	}
 }
+*/

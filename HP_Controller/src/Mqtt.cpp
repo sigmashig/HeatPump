@@ -18,8 +18,9 @@ void callbackFunc(char* topic, uint8_t* payload, unsigned int length) {
 }
 
 
-Mqtt::Mqtt(IPAddress ip, unsigned int port, EthernetClient& eth) : 
+Mqtt::Mqtt(IPAddress ip, unsigned int port, EthernetClient& eth, const char* root) : 
 	PubSubClient(ip, port, callbackFunc, eth) {
+	topicRoot = root;
 	mqttWaiting = MQTT_INITIAL_RETRY_DELAY;
 }
 
@@ -74,9 +75,12 @@ void Mqtt::RepeatedLoop(int n) {
 	}
 }
 bool Mqtt::Publish(const char* topic, const char* payload) {
-	Config.Log->append(F("Publish [")).append(topic).append(F("]:")).append(payload).Debug();
+	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
+	topicFull = topicRoot;
+	topicFull += topic;
+	Config.Log->append(F("Publish [")).append(topicFull.c_str()).append(F("]:")).append(payload).Debug();
 	if (connected()) {
-		return publish(topic, payload);
+		return publish(topicFull.c_str(), payload);
 	}
 	else {
 		return false;
@@ -84,9 +88,12 @@ bool Mqtt::Publish(const char* topic, const char* payload) {
 }
 
 void Mqtt::Subscribe(const char* topic) {
-	Config.Log->append(F("Subscription:")).append(topic).Debug();
+	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
+	topicFull = topicRoot;
+	topicFull += topic;
+	Config.Log->append(F("Subscription:")).append(topicFull.c_str()).Debug();
 	if (connected()) {
-		subscribe(topic);
+		subscribe(topicFull.c_str());
 	}
 }
 /*

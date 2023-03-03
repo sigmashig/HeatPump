@@ -15,7 +15,7 @@
 #include "Utils.h"
 #include "definitions.h"
 
-
+/*
 #define MQTT_ROOT "HeatPump"
 //#define MQTT_BOARD_ID "Board_%02d"
 #define MQTT_SEPARATOR "/"
@@ -41,7 +41,7 @@
 #define MQTT_EQUIPMENT		"Equipment"
 #define MQTT_SCHEDULE		"Schedule"
 #define MQTT_STATUS			"Status"
-
+*/
 
 //#define MQTT_CONFIG		MQTT_ROOT MQTT_SEPARATOR MQTT_BOARD_ID MQTT_SEPARATOR "Config"
 /*
@@ -100,6 +100,8 @@
 class Configuration
 {
 public:
+
+	
 	//Flags
 	bool IsMqttReady() { return isMqttReady; }
 	bool IsSimulator() { return isSimulator;  }
@@ -160,14 +162,67 @@ public:
 
 	//char TopicBuff[MQTT_TOPIC_LENGTH];
 	//char PayloadBuff[MQTT_PAYLOAD_LENGTH];
-	//void PublishAlert(ALERTCODE code) { publishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
+	void PublishAlert(ALERTCODE code) { publishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
 	void PublishAlert(ALERTCODE code, const char* name) { publishAlert(code, ScriptRunner::STEP_EMPTY, name); };
-	void PublishAlert(ALERTCODE code, ScriptRunner step) { publishAlert(code, step, NULL); };
+	void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step) { publishAlert(code, step, NULL); };
+	void Publish(DeviceType dType, const char* name, byte status);
+	void Publish(DeviceType dType, const char* name, double status);
+	void PublishStep(ScriptRunner::STEPS step);
+	void SubscribeEquipment(DeviceType dType, const char* name);
+	void SubscribeStatus(DeviceType dType, const char* name);
+    void SubscribeSchedule(int number);
+	void PublishInfo(const char* txt);
 
 private:
+	typedef enum {
+		PARAMS_IS_READY,
+		PARAMS_WATCHDOG,
+		PARAMS_SIMULATOR,
+		PARAMS_WORKMODE,
+		PARAMS_MANUAL_TEMP,
+		PARAMS_DESIRED_TEMP,
+		PARAMS_HEAT_COLD,
+		PARAMS_HYSTERESIS,
+		PARAMS_WEEKMODE,
+		PARAMS_COMMAND,
+		PARAMS_TIMEZONE,
+		CONFIG_PARAMS_LAST
+	} MqttConfigParam;
+
+	typedef enum {
+		SECTION_CONFIG,
+		SECTION_ALERT,
+		SECTION_WARNING,
+		SECTION_EQUIPMENT,
+		SECTION_STATUS,
+		SECTION_SCHEDULE,
+		MQTT_SECTION_LAST
+	} MqttSection;
+
+	typedef enum {
+		ALERT_CODE,
+		ALERT_TEXT,
+		ALERT_SCRIPT,
+		MQTT_ALERT_LAST
+	} MqttAlertParam;
+
+	typedef enum {
+		SCHEDULE_WEEKEND,
+		SCHEDULE_WORKDAY,
+		SCHEDULE_SET_LAST
+	} ScheduleSet;
+	
+	const char* MQTT_ROOT = "HeatPump/";
+	//const char 	MQTT_SEPARATOR = '/';
+	const char* MqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
+									"Hysteresis", "WeekMode","Command","TimeZone" };
+	const char* MqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/" };
+	const char* MqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text", "Script" };
+	const char* MqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Thermometer/","Script/" };
+	const char* MqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
 
 	void Publish(const char* topic, const char* payload);
-	
+
 	//members
 	bool isEthernetReady = false;
 	bool isMqttReady = false;
@@ -198,6 +253,7 @@ private:
 	void setBoardId(byte id);
 	void setIp(byte ip0, byte ip1, byte ip2, byte ip3);
 	void initializeEthernet();
+    
 	void unitsLoop(unsigned long timePeriod);
 	void subscribeParameters();
 	void publishTimezone();
@@ -213,21 +269,25 @@ private:
 	void setTimeZone(const char* tz, bool save = true);
 	void publishParameters();
 	void publishMode();
-	void publishWeekMode();
-	void publishManualTemp();
-    void publishDesiredTemp();
-	void publishHeatCold();
-	void publishHysteresis();
-	void publishSimulator();
-	void publishCmd();
+
+	void publishConfigParameter(MqttConfigParam parmId, double payload);
+	//void publishManualTemp();
+    //void publishDesiredTemp();
+	//void publishHeatCold();
+	//void publishHysteresis();
+	//void publishSimulator();
+	//void publishCmd();
 	void updateConfig(const char* topic, const char* payload);
     void initMqttTopics();
-    void publishConfigParameter(const char* name, const char* payload);
-    void subscribeConfigParameter(const char* name);
+    void publishConfigParameter(MqttConfigParam parmId, const char* payload);
+    void subscribeConfigParameter(MqttConfigParam parmId);
+    void publishConfigParameter(MqttConfigParam parmId, byte payload);
 
-    void publishConfigParameter(const char* name, byte payload);
-
+	//void createMqttConfigParamName(SafeString& str, MqttConfigParam.parmId) 
+    void publishStatus(DeviceType dType, const char* name, const char* payload);
 	void publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
+
+    
 
 
 };

@@ -9,7 +9,6 @@ extern Configuration Config;
 
 void OneWireThermo::InitUnit() {
 	parent = &(Config.DevMgr->Bus);
-	Config.Log->Debug("POINT2.5");
 	
 	if (OneWireBus::IsZeroAddress(Address)) {
 		// Simulator
@@ -21,25 +20,20 @@ void OneWireThermo::InitUnit() {
 		isSimulator = false;
 		parent->SetResolution(Address);
 	}
-	Config.Log->Debug("POINT2.6");
 	PublishDeviceAlert(ALERT_EMPTY, true);
-	Config.Log->Debug("POINT2.7");
-
 }
 
 
-float OneWireThermo::GetTemperature() {
+double OneWireThermo::GetTemperature() {
 	//Config.Log->append("Thermometer:").append(Name).append(";avail=").append(IsAvailable).Debug();
 	if (!isSimulator) {
 		Temperature = parent->GetTemperature(Address);
-		sprintf(Config.TopicBuff, MQTT_STATUS_THERMOMETER, Config.BoardId(), Name);
-		sprintf(Config.PayloadBuff, "%d.%u", (int)Temperature, (unsigned)((Temperature - (int)Temperature) * 10));
-		Config.Publish();
+		Publish();
 	}
 	return Temperature;
 }
 
-void OneWireThermo::UpdateThermo(const char* line) {
+void OneWireThermo::UpdateEquipment(const char* line) {
 	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
 	StaticJsonDocument<CAPACITY> doc;
 	deserializeJson(doc, line);
@@ -89,7 +83,7 @@ void const OneWireThermo::print(const char* header, DebugLevel level) {
 
 }
 
-OneWireThermo::OneWireThermo(const char* nm): Unit(nm) {
+OneWireThermo::OneWireThermo(const char* nm): Unit(DEVTYPE_THERMOMETER, nm) {
 }
 
 bool OneWireThermo::checkSimulator() {
@@ -113,3 +107,7 @@ void OneWireThermo::UnitLoop(unsigned long timeperiod) {
 	}
 }
 
+
+void OneWireThermo::UpdateStatus(const char* payload) {
+	Temperature =atof(payload);
+}

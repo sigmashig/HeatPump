@@ -20,7 +20,7 @@ bool Relay::relaySet(bool newStatus) {
 			digitalWrite(Pin, (newStatus == HIGH ? lhOn : !lhOn));
 		}
 		status = newStatus;
-		Publish(MQTT_RELAYS);
+		Publish();
 	}
 	return res;
 }
@@ -84,10 +84,10 @@ void const Relay::print(const char* header, DebugLevel level) {
 	Config.Log->Log(level);
 }
 
-Relay::Relay(const char* nm): Unit(nm) {
+Relay::Relay(const char* nm): Unit(DEVTYPE_RELAY, nm) {
 }
 
-void Relay::UpdateRelay(const char* line) {
+void Relay::UpdateEquipment(const char* line) {
 	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
 	StaticJsonDocument<CAPACITY> doc;
 	deserializeJson(doc, line);
@@ -111,3 +111,10 @@ bool Relay::IsOk() {
 	}
 	return res;
 }
+
+void Relay::UpdateStatus(const char* payload) {
+//TODO: For some relay, like Compressor it should be prohibited to control remotely
+	ActionType a = (ActionType)atoi(payload);
+	ProcessUnit(a);
+}
+

@@ -17,8 +17,7 @@ bool OneWireBus::CheckAddress(const DeviceAddress address) {
 double OneWireBus::GetTemperature(const DeviceAddress address) {
 	if (CheckAddress(address)) {
 		return sensors->getTempC(address);
-	}
-	else {
+	} else {
 		Config.Log->append(F("Temp is failed: ")).append(Name).Error();
 		return -999;
 	}
@@ -26,16 +25,17 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 
 void OneWireBus::InitUnit() {
+	releaseResources();
 	oneWire = new OneWire(Pin);
 	PublishDeviceAlert(ALERT_EMPTY, true);
 
 	sensors = new DallasTemperature(oneWire);
 	sensors->begin();
-	
+
 }
 
 void OneWireBus::ProcessUnit(ActionType action) {
-//	status = action;
+	//	status = action;
 }
 
 void OneWireBus::UnitLoop(unsigned long timeperiod) {
@@ -107,16 +107,15 @@ bool OneWireBus::CompareDeviceAddress(DeviceAddress a0, DeviceAddress a1) {
 	return res;
 }
 
-void OneWireBus::CopyDeviceAddress(DeviceAddress dest, DeviceAddress src)
-{
+void OneWireBus::CopyDeviceAddress(DeviceAddress dest, DeviceAddress src) {
 	for (int i = 0; i < 8; i++) {
 		dest[i] = src[i];
-	}	
+	}
 }
 
 
 void const OneWireBus::print(const char* header, DebugLevel level) {
-	
+
 	if (header != NULL) {
 		Config.Log->append(header);
 	}
@@ -139,20 +138,44 @@ String OneWireBus::ConvertAddressToString(const DeviceAddress address) {
 	return str0;
 }
 
-bool OneWireBus::IsZeroAddress(DeviceAddress address)
-{
+bool OneWireBus::IsZeroAddress(DeviceAddress address) {
 	bool res = true;
-	for (int i = 0; res && i < 8 ; i++) {
+	for (int i = 0; res && i < 8; i++) {
 		res &= address[i] == 0;
 	}
 	return res;
 }
 
-OneWireBus::OneWireBus(const char* nm) : Unit(nm)
-{
+OneWireBus::OneWireBus(const char* nm): Unit(DEVTYPE_BUS, nm) {
 }
 
-bool OneWireBus::IsSimulator()
-{
-    return (Config.IsSimulator() || Pin==0);
+bool OneWireBus::IsSimulator() {
+	return (Config.IsSimulator() || Pin == 0);
+}
+
+void OneWireBus::UpdateStatus(const char* payload) {
+	// Nothing to do
+}
+
+void OneWireBus::UpdateEquipment(const char* payload) {
+	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
+	StaticJsonDocument<CAPACITY> doc;
+	deserializeJson(doc, payload);
+	// extract the data
+	JsonObject json = doc.as<JsonObject>();
+
+	if (json.containsKey("pin")) {
+		Pin = json["pin"];
+		//releaseResources();
+		InitUnit();
+	}
+}
+
+void OneWireBus::releaseResources() {
+	if (oneWire != NULL) {
+		delete oneWire;
+	}
+	if (sensors != NULL) {
+		delete sensors;
+	}
 }

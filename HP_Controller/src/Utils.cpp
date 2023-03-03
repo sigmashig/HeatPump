@@ -1,6 +1,15 @@
 #include "Utils.h"
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+
+void Utils::Double2Str(char* str, double d, int precision) {
+
+    unsigned long factor = pow(10, precision);
+    long p1 = (long)d;
+    unsigned long p2 = (unsigned long)(((double)(d - p1)) * factor);
+    sprintf(str, "%ld.%*lu", p1, precision, p2);
+}
 
 double Utils::Str2Double(const char* str)
 {

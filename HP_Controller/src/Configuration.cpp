@@ -26,28 +26,28 @@ void Configuration::Init() {
 	Log->Debug("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
-	Log->Debug("Schedule Mgr");
-	ScheduleMgr = new ScheduleManager();
-	ScheduleMgr->Init();
+	//Log->Debug("Schedule Mgr");
+	//ScheduleMgr = new ScheduleManager();
+	//ScheduleMgr->Init();
 	Log->Debug("Mqtt");
 
-	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient);
+	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
 	mqttClient->Init();
 
 	if (mqttClient->IsMqtt()) {
 		isMqttReady = true;
-		publishConfigParameter(MQTT_IS_READY, "0");
+		publishConfigParameter(PARAMS_IS_READY, "0");
 		SubscribeAll();
 	}
 
 	mqttClient->FinalInit();
-	ScheduleMgr->FinalInit();
+	//ScheduleMgr->FinalInit();
 	DevMgr->FinalInit();
 
 	Runner.Init();
 
 	if (mqttClient->IsMqtt()) {
-		publishConfigParameter(MQTT_IS_READY, "1");
+		publishConfigParameter(PARAMS_IS_READY, "1");
 	}
 	Log->Info(F("Config init is finished"));
 }
@@ -267,46 +267,34 @@ void Configuration::SubscribeAll() {
 	subscribeParameters();
 	DevMgr->SubscribeEquipment();
 	DevMgr->SubscribeStatuses();
-	ScheduleMgr->SubscribeSchedules();
+	//ScheduleMgr->SubscribeSchedules();
 }
 
 void Configuration::subscribeParameters() {
 
-	int n = 0;
-	subscribeConfigParameter(MQTT_WATCH_DOG2);
-	n++;
-	subscribeConfigParameter(MQTT_MODE);
-	n++;
-	subscribeConfigParameter(MQTT_WEEKMODE);
-	n++;
-	subscribeConfigParameter(MQTT_MANUAL_TEMP);
-	n++;
-	subscribeConfigParameter(MQTT_HEAT_COLD);
-	n++;
-	subscribeConfigParameter(MQTT_HYSTERESIS);
-	n++;
-	subscribeConfigParameter(MQTT_TIMEZONE);
-	n++;
-	subscribeConfigParameter(MQTT_SIMULATOR);
-	n++;
-	subscribeConfigParameter(MQTT_COMMAND);
-	n++;
-	Transfer(n);
-}
-
-void Configuration::publishTimezone() {
-	publishConfigParameter(MQTT_TIMEZONE, timezone);
+	for (int i = 0; i < CONFIG_PARAMS_LAST; i++) {
+		subscribeConfigParameter((MqttConfigParam)i);
+	}
+	Transfer(CONFIG_PARAMS_LAST);
 }
 
 void Configuration::publishParameters() {
 
-	publishTimezone();
-	publishMode();
-	publishManualTemp();
-	publishWeekMode();
-	publishHysteresis();
-	publishHeatCold();
-	publishCmd();
+	publishConfigParameter(PARAMS_TIMEZONE, timezone);
+	publishConfigParameter(PARAMS_WORKMODE, (byte)mode);
+	publishConfigParameter(PARAMS_MANUAL_TEMP, (byte)manualTemp);
+	publishConfigParameter(PARAMS_WEEKMODE, (byte)weekMode);
+	publishConfigParameter(PARAMS_HYSTERESIS, hysteresis);
+	publishConfigParameter(PARAMS_HEAT_COLD, (byte)heatMode);
+	publishConfigParameter(PARAMS_COMMAND, (byte)command);
+	publishConfigParameter(PARAMS_DESIRED_TEMP, desiredTemp);
+}
+
+void Configuration::PublishInfo(const char* txt) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_STATUS];
+	topic += "Info/";
+	Publish(topic.c_str(), txt);
 }
 
 void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name) {
@@ -350,27 +338,26 @@ void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 	}
 
 	createSafeString(topicAlert, MQTT_TOPIC_LENGTH);
-	topicAlert = topicRoot;
-	topicAlert += MQTT_ALERT MQTT_SEPARATOR;
+	topicAlert = MqttSectionName[SECTION_ALERT];
 	if (name != NULL) {
 		topicAlert += name;
+		topicAlert += '/';
 	} else {
-		topicAlert += MQTT_ALERT_SCRIPT;
+		topicAlert += MqttAlertParamName[ALERT_SCRIPT];
 	}
-	topicAlert += MQTT_SEPARATOR;
 
 	{
 		createSafeString(topic, MQTT_TOPIC_LENGTH);
 		topic = topicAlert;
-		topic += MQTT_ALERT_CODE;
-		char payload[2];
-		payload[0] = code;
-		Publish(topic.c_str(), payload);
+		topic += MqttAlertParamName[ALERT_CODE];
+		char p[2];
+		p[0] = code;
+		Publish(topic.c_str(), p);
 	}
 	{
 		createSafeString(topic, MQTT_TOPIC_LENGTH);
 		topic = topicAlert;
-		topic += MQTT_ALERT_MSG;
+		topic += MqttAlertParamName[ALERT_TEXT];
 		Publish(topic.c_str(), payload.c_str());
 	}
 
@@ -389,73 +376,41 @@ void Configuration::Subscribe(const char* topic) {
 }
 
 
-void Configuration::publishMode() {
-	publishConfigParameter(MQTT_MODE, (byte)mode);
-}
-
-void Configuration::publishWeekMode() {
-	publishConfigParameter(MQTT_WEEKMODE, weekMode);
-}
-
-void Configuration::publishManualTemp() {
-	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
-
-	payload = manualTemp;
-	publishConfigParameter(MQTT_MANUAL_TEMP, payload.c_str());
-}
-
-void Configuration::publishDesiredTemp() {
-	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
-
-	payload = desiredTemp;
-	publishConfigParameter(MQTT_DESIRED_TEMP, payload.c_str());
-}
-
-void Configuration::publishHeatCold() {
-	publishConfigParameter(MQTT_HEAT_COLD, (byte)heatMode);
-}
-
-void Configuration::publishHysteresis() {
-	publishConfigParameter(MQTT_HYSTERESIS, (byte)hysteresis);
-}
-
-/*
-void Configuration::publishSimulator() {
-	sprintf(TopicBuff, MQTT_SIMULATOR, boardId);
-	PayloadBuff[0] = (isSimulator ? '1' : '0');
-	PayloadBuff[1] = 0;
-	Publish();
-}
-*/
-
-void Configuration::publishCmd() {
-	publishConfigParameter(MQTT_COMMAND, (byte)command);
-}
-
 void Configuration::ProcessMessage(const char* topic, const char* payload) {
 	createSafeString(topic0, MQTT_TOPIC_LENGTH);
-	topic0 = topicRoot;
-	topic0 += MQTT_CONFIG MQTT_SEPARATOR;
 
+	topic0 = topicRoot;
+	topic0 += MqttSectionName[SECTION_CONFIG];
 	if (strncmp(topic,  topic0.c_str(), topic0.length()) == 0) { //Config
 		updateConfig(topic, payload);
 	} else {
 		topic0 = topicRoot;
-		topic0 += MQTT_STATUS MQTT_SEPARATOR;
+		topic0 += MqttSectionName[SECTION_STATUS];
 		if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Status
-			DevMgr->UpdateStatuses(topic, payload);
-		} else {
+			for (int i = 0; i < DEVICE_TYPE_LAST; i++) {
+				if (strncmp(topic + topic0.length(), MqttDeviceTypeName[i], strlen(MqttDeviceTypeName[i])) == 0) {
+					DevMgr->UpdateStatus((DeviceType)i, topic + topic0.length() + strlen(MqttDeviceTypeName[i]), payload);
+					break;
+				}
+			}
+		} else {/*
 			topic0 = topicRoot;
-			topic0 += MQTT_SCHEDULE MQTT_SEPARATOR;
+			topic0 += MqttSectionName[SECTION_SCHEDULE];
 			if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule
+				
 				ScheduleMgr->UpdateSchedule(topic, payload);
 			} else {
 				topic0 = topicRoot;
-				topic0 += MQTT_EQUIPMENT MQTT_SEPARATOR;
+				topic0 += MqttSectionName[SECTION_EQUIPMENT];
 				if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Equipment
-					DevMgr->UpdateEquipment(topic, payload);
+					for (int i = 0; i < DEVICE_TYPE_LAST; i++) {
+						if (strncmp(topic + topic0.length(), MqttDeviceTypeName[i], strlen(MqttDeviceTypeName[i])) == 0) {
+							DevMgr->UpdateEquipment((DeviceType)i,topic + topic0.length() + strlen(MqttDeviceTypeName[i]), payload);
+							break;
+						}
+					}
 				}
-			}
+			}*/
 		}
 	}
 }
@@ -463,48 +418,44 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 
 void Configuration::updateConfig(const char* topic, const char* payload) {
 
-	createSafeString(topicConfig, MQTT_TOPIC_LENGTH);
-	topicConfig = topicRoot;
-	topicConfig += MQTT_CONFIG MQTT_SEPARATOR;
-
 	createSafeString(topic0, MQTT_TOPIC_LENGTH);
-	topic0 = topicConfig;
-	topic0 += MQTT_MODE;
+	topic0 = MqttSectionName[SECTION_CONFIG];
+	topic0 += MqttConfigParamName[PARAMS_WORKMODE];
 	if (strcmp(topic, topic0.c_str()) == 0) {
 		SetMode(payload);
 	} else {
-		topic0 = topicConfig;
-		topic0 += MQTT_WEEKMODE;
+		topic0 = MqttSectionName[SECTION_CONFIG];
+		topic0 += MqttConfigParamName[PARAMS_WEEKMODE];
 		if (strcmp(topic, topic0.c_str()) == 0) {
 			SetWeekMode(payload);
 		} else {
-			topic0 = topicConfig;
-			topic0 += MQTT_MANUAL_TEMP;
+			topic0 = MqttSectionName[SECTION_CONFIG];
+			topic0 += MqttConfigParamName[PARAMS_MANUAL_TEMP];
 			if (strcmp(topic, topic0.c_str()) == 0) {
 				SetManualTemp(payload);
 			} else {
-				topic0 = topicConfig;
-				topic0 += MQTT_HEAT_COLD;
+				topic0 = MqttSectionName[SECTION_CONFIG];
+				topic0 += MqttConfigParamName[PARAMS_HEAT_COLD];
 				if (strcmp(topic, topic0.c_str()) == 0) {
 					SetHeatMode(payload);
 				} else {
-					topic0 = topicConfig;
-					topic0 += MQTT_HYSTERESIS;
+					topic0 = MqttSectionName[SECTION_CONFIG];
+					topic0 += MqttConfigParamName[PARAMS_HYSTERESIS];
 					if (strcmp(topic, topic0.c_str()) == 0) {
 						SetHysteresis(payload);
 					} else {
-						topic0 = topicConfig;
-						topic0 += MQTT_TIMEZONE;
+						topic0 = MqttSectionName[SECTION_CONFIG];
+						topic0 += MqttConfigParamName[PARAMS_TIMEZONE];
 						if (strcmp(topic, topic0.c_str()) == 0) {
 							Clock->SetTimezone(payload);
 						} else {
-							topic0 = topicConfig;
-							topic0 += MQTT_SIMULATOR;
+							topic0 = MqttSectionName[SECTION_CONFIG];
+							topic0 += MqttConfigParamName[PARAMS_SIMULATOR];
 							if (strcmp(topic, topic0.c_str()) == 0) {
 								SetSimulator(payload);
 							} else {
-								topic0 = topicConfig;
-								topic0 += MQTT_COMMAND;
+								topic0 = MqttSectionName[SECTION_CONFIG];
+								topic0 += MqttConfigParamName[PARAMS_COMMAND];
 								if (strcmp(topic, topic0.c_str()) == 0) {
 									SetCommand(payload);
 								}
@@ -518,32 +469,87 @@ void Configuration::updateConfig(const char* topic, const char* payload) {
 }
 
 void Configuration::initMqttTopics() {
-
-	strcpy(topicRoot, MQTT_ROOT MQTT_SEPARATOR);
-	strcat(topicRoot, boardName);
-	strcat(topicRoot, MQTT_SEPARATOR);
+	sprintf(topicRoot, "%s%s", MQTT_ROOT, boardName);
 }
 
-void Configuration::publishConfigParameter(const char* name, const char* payload) {
-	createSafeString(topicConfig, MQTT_TOPIC_LENGTH);
-	topicConfig = topicRoot;
-	topicConfig += MQTT_CONFIG MQTT_SEPARATOR;
-	topicConfig += name;
+void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* payload) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_CONFIG];
+	topic += MqttConfigParamName[parmId];
 
-	Publish(topicConfig.c_str(), payload);
+	Publish(topic.c_str(), payload);
 }
 
-void Configuration::subscribeConfigParameter(const char* name) {
-	createSafeString(topicConfig, MQTT_TOPIC_LENGTH);
-	topicConfig = topicRoot;
-	topicConfig += MQTT_CONFIG MQTT_SEPARATOR;
-	topicConfig += name;
-
-	Subscribe(topicConfig.c_str());
+void Configuration::subscribeConfigParameter(MqttConfigParam parmId) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_CONFIG];
+	topic += MqttConfigParamName[parmId];
+	Subscribe(topic.c_str());
 }
 
-void Configuration::publishConfigParameter(const char* name, byte payload) {
+void Configuration::publishConfigParameter(MqttConfigParam parmId, byte payload) {
+	char p[4];
+	sprintf(p, "%u", payload);
+	publishConfigParameter(parmId, p);
+}
+
+void Configuration::publishConfigParameter(MqttConfigParam parmId, double payload) {
+	createSafeString(p, MQTT_TOPIC_LENGTH);
+	p = payload;
+	publishConfigParameter(parmId, p.c_str());
+}
+
+void Configuration::Publish(DeviceType dType, const char* name, byte status) {
+	char p[4];
+	sprintf(p, "%u", status);
+	publishStatus(dType, name, p);
+}
+
+void Configuration::PublishStep(ScriptRunner::STEPS step) {
 	char p[2];
-	p[0] = (byte)payload + '0';
-	publishConfigParameter(name, p);
+	sprintf(p, "%c", step);
+	publishStatus(DEVTYPE_SCRIPT, "Step", p);
+}
+
+void Configuration::Publish(DeviceType dType, const char* name, double status) {
+	char p[10];
+	Utils::Double2Str(p, status, 1);
+	publishStatus(dType, name, p);
+}
+
+void Configuration::publishStatus(DeviceType dType, const char* name, const char* payload) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_STATUS];
+	topic += MqttDeviceTypeName[dType];
+	topic += name;
+	mqttClient->Publish(topic.c_str(), payload);
+}
+
+void Configuration::SubscribeEquipment(DeviceType dType, const char* name) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_EQUIPMENT];
+	topic += MqttDeviceTypeName[dType];
+	topic += name;
+	mqttClient->Subscribe(topic.c_str());
+}
+
+void Configuration::SubscribeStatus(DeviceType dType, const char* name) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_STATUS];
+	topic += MqttDeviceTypeName[dType];
+	topic += name;
+	mqttClient->Subscribe(topic.c_str());
+}
+
+void Configuration::SubscribeSchedule(int number) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = MqttSectionName[SECTION_SCHEDULE];
+	if (number < CONFIG_NUMBER_SCHEDULES) {
+		topic += "WeekEnd/";
+	} else {
+		topic += "WorkDays/";		
+	}
+	topic += "Step/";
+	topic += number;
+	mqttClient->Subscribe(topic.c_str());
 }

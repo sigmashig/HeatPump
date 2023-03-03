@@ -7,9 +7,8 @@
 #define BUS_RESOLUTION 9
 #define BUS_INTERVAL  2000
 
-class OneWireBus :
-	public Unit
-{
+class OneWireBus:
+	public Unit {
 public:
 
 	void InitUnit();
@@ -29,13 +28,16 @@ public:
 	void const print(const char* header, DebugLevel level);
 	OneWireBus(const char* nm);
 	bool IsSimulator();
+	void UpdateStatus(const char* payload);
+	void UpdateEquipment(const char* payload);
 private:
-	OneWire* oneWire;
+	OneWire* oneWire = NULL;
 	int numberThermo = 0;
-	DallasTemperature *sensors;
+	DallasTemperature* sensors = NULL;
 	static byte hexToDec(char c1, char c2);
 	static byte hexToDec(char c1);
+	void releaseResources();
 
-//	unsigned long prevCycle = 0;
+	//	unsigned long prevCycle = 0;
 };
 

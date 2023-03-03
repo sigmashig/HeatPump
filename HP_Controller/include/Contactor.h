@@ -19,7 +19,8 @@ public:
 	void ProcessUnit(ActionType event);
 	void const print(const char* header, DebugLevel level);
 	Contactor(const char* nm);
-	void UpdateContactor(const char* line);
+    void UpdateEquipment(const char* line);
+    void UpdateStatus(const char* payload);
 	bool IsOk();
 private:
 	unsigned long startContact=0;

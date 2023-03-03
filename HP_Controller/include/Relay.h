@@ -14,8 +14,9 @@ public:
 
 	bool ProcessUnit(ActionType event);
 	void const print(const char* header, DebugLevel level);
-	void UpdateRelay(const char* line);
+	void UpdateEquipment(const char* line);
 	bool IsOk();
+	void UpdateStatus(const char* payload);
 
 	Relay(const char* nm);
 private:

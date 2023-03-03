@@ -284,16 +284,14 @@ bool ScriptRunner::checkCommand() {
 
 
 void ScriptRunner::publishStep() {
-	sprintf(Config.PayloadBuff, "%c", step);
-	sprintf(Config.TopicBuff, MQTT_STEP, Config.BoardId());
-	Config.Publish();
+	Config.PublishStep(step);
 }
 
 
 void ScriptRunner::publishInfo(const char* msg) {
-	sprintf(Config.PayloadBuff, "Step: %c, %s", step, msg);
-	sprintf(Config.TopicBuff, MQTT_INFO, Config.BoardId());
-	Config.Publish();
+	char txt[MQTT_PAYLOAD_LENGTH+1];
+	sprintf(txt, "Step: %c, %s", step, msg);
+	Config.PublishInfo(txt);
 }
 
 

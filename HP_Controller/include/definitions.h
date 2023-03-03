@@ -21,7 +21,7 @@ typedef enum {
 
 typedef enum {
 	ALERT_EMPTY = ' ',
-	ALERT_TEMP_FLOOR = 'f',
+	// ALERT_TEMP_FLOOR = 'f',
 	ALERT_STEP_TOO_LONG = 'S',
 	ALERT_TEMP_IS_OUT_OF_RANGE = 'T',
 	ALERT_VOLTAGE_IS_OUT_OF_RANGE = 'V',
@@ -30,7 +30,14 @@ typedef enum {
 	ALERT_OTHER = 'X'
 } ALERTCODE;
 
-
+typedef enum {
+	DEVTYPE_RELAY,
+	DEVTYPE_CONTACTOR,
+	DEVTYPE_BUS,
+	DEVTYPE_THERMOMETER,
+	DEVTYPE_SCRIPT,
+	DEVICE_TYPE_LAST
+} DeviceType;
 
 typedef enum {
 	D_OFF = 0,

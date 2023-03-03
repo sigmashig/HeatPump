@@ -20,7 +20,7 @@ public:
 
 
 	//methods
-    Mqtt(IPAddress ip, unsigned int port, EthernetClient& eth);
+    Mqtt(IPAddress ip, unsigned int port, EthernetClient& eth, const char* root);
     void Init();
 	bool Publish(const char* topic, const char* payload);
 	void Subscribe(const char* topic);
@@ -32,7 +32,8 @@ public:
 
 
 private:
-    unsigned long mqttWaiting;
+	unsigned long mqttWaiting;
+	const char* topicRoot;
 	//const char* LOG_END[7] = { "OFF", "FATAL","ERROR","WARN","INFO","DEBUG","ALL" };
 
 	bool mqttReconnect();

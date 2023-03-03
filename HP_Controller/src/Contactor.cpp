@@ -50,7 +50,7 @@ void Contactor::handleContactor(unsigned long timePeriod) {
 
 void Contactor::handleFinish(int newStatus) {
 	status = newStatus;
-	Publish(MQTT_CONTACTORS);
+	Publish();
 }
 
 void Contactor::UnitLoop(unsigned long timePeriod)
@@ -110,11 +110,11 @@ void const Contactor::print(const char* header, DebugLevel level) {
 	Config.Log->Log(level);
 }
 
-Contactor::Contactor(const char* nm) : Unit(nm)
+Contactor::Contactor(const char* nm) : Unit(DEVTYPE_CONTACTOR, nm)
 {
 }
 
-void Contactor::UpdateContactor(const char* line)
+void Contactor::UpdateEquipment(const char* line)
 {
 	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
 	StaticJsonDocument<CAPACITY> doc;
@@ -128,4 +128,10 @@ void Contactor::UpdateContactor(const char* line)
 	if (json.containsKey("lhOn")) {
 		lhOn = json["lhOn"];
 	}
+}
+
+
+void Contactor::UpdateStatus(const char* payload) {
+	ActionType a = (ActionType)atoi(payload);
+	ProcessUnit(a);
 }

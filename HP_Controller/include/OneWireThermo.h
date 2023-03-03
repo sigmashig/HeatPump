@@ -21,9 +21,10 @@ public:
 	bool IsSimulator(){ return isSimulator; };
 
 	void UnitLoop(unsigned long timeperiod);
+    void UpdateStatus(const char* payload);
 	void InitUnit();
-	float GetTemperature();
-	void UpdateThermo(const char* line);
+	double GetTemperature();
+	void UpdateEquipment(const char* line);
 	bool IsOk();
 private:
 	OneWireBus* parent;
