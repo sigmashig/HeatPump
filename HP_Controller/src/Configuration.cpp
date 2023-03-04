@@ -303,10 +303,12 @@ void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 	if (name != NULL) {
 		payload += "Device: ";
 		payload += name;
+		payload += ". ";
 	}
 	if (step != ScriptRunner::STEP_EMPTY) {
 		payload = "Step: ";
 		payload += step;
+		payload += ". ";
 	}
 
 	switch (code) {
@@ -382,8 +384,8 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 
 	topic0 = topicRoot;
 	topic0 += MqttSectionName[SECTION_CONFIG];
-	if (strncmp(topic,  topic0.c_str(), topic0.length()) == 0) { //Config
-		updateConfig(topic, payload);
+	if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Config
+		updateConfig(topic + topic0.length(), payload);
 	} else {
 		topic0 = topicRoot;
 		topic0 += MqttSectionName[SECTION_STATUS];
@@ -417,46 +419,40 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 }
 
 
+/// @brief Update configuration parameters received from MQTT
+/// @param topic - topic of MQTT message
+/// @param payload - payload of MQTT message
 void Configuration::updateConfig(const char* topic, const char* payload) {
-
 	createSafeString(topic0, MQTT_TOPIC_LENGTH);
-	topic0 = MqttSectionName[SECTION_CONFIG];
-	topic0 += MqttConfigParamName[PARAMS_WORKMODE];
+	topic0 = MqttConfigParamName[PARAMS_WORKMODE];
 	if (strcmp(topic, topic0.c_str()) == 0) {
 		SetMode(payload);
 	} else {
-		topic0 = MqttSectionName[SECTION_CONFIG];
-		topic0 += MqttConfigParamName[PARAMS_WEEKMODE];
+		topic0 = MqttConfigParamName[PARAMS_WEEKMODE];
 		if (strcmp(topic, topic0.c_str()) == 0) {
 			SetWeekMode(payload);
 		} else {
-			topic0 = MqttSectionName[SECTION_CONFIG];
-			topic0 += MqttConfigParamName[PARAMS_MANUAL_TEMP];
+			topic0 = MqttConfigParamName[PARAMS_MANUAL_TEMP];
 			if (strcmp(topic, topic0.c_str()) == 0) {
 				SetManualTemp(payload);
 			} else {
-				topic0 = MqttSectionName[SECTION_CONFIG];
-				topic0 += MqttConfigParamName[PARAMS_HEAT_COLD];
+				topic0 = MqttConfigParamName[PARAMS_HEAT_COLD];
 				if (strcmp(topic, topic0.c_str()) == 0) {
 					SetHeatMode(payload);
 				} else {
-					topic0 = MqttSectionName[SECTION_CONFIG];
-					topic0 += MqttConfigParamName[PARAMS_HYSTERESIS];
+					topic0 = MqttConfigParamName[PARAMS_HYSTERESIS];
 					if (strcmp(topic, topic0.c_str()) == 0) {
 						SetHysteresis(payload);
 					} else {
-						topic0 = MqttSectionName[SECTION_CONFIG];
-						topic0 += MqttConfigParamName[PARAMS_TIMEZONE];
+						topic0 = MqttConfigParamName[PARAMS_TIMEZONE];
 						if (strcmp(topic, topic0.c_str()) == 0) {
 							Clock->SetTimezone(payload);
 						} else {
-							topic0 = MqttSectionName[SECTION_CONFIG];
-							topic0 += MqttConfigParamName[PARAMS_SIMULATOR];
+							topic0 = MqttConfigParamName[PARAMS_SIMULATOR];
 							if (strcmp(topic, topic0.c_str()) == 0) {
 								SetSimulator(payload);
 							} else {
-								topic0 = MqttSectionName[SECTION_CONFIG];
-								topic0 += MqttConfigParamName[PARAMS_COMMAND];
+								topic0 = MqttConfigParamName[PARAMS_COMMAND];
 								if (strcmp(topic, topic0.c_str()) == 0) {
 									SetCommand(payload);
 								}
