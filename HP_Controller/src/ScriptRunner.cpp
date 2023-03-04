@@ -32,12 +32,15 @@ void ScriptRunner::StepScript() {
 	case STEP_HEATER_3_GND_START:
 		heaterStepGroundStart();
 		break;
-
+	case STEP_HEATER_4_HEAT:
+		heaterStepHeat(); 
+		break;
 	case STEP_HEATER_FULLSTOP:
 		heaterFullStop();
 		break;
 	default:
 		Config.Log->Error("Wrong Step");
+		step = STEP_EMPTY;
 		break;
 	}
 }
@@ -239,6 +242,48 @@ bool ScriptRunner::heaterStepGroundStart() {
 	
 }
 
+bool ScriptRunner::heaterStepHeat() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	static bool infoMsg1 = false;
+	const unsigned long stepLong = 10 * 60 * (unsigned long)1000;
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		publishInfo("Start heating");
+	}
+	if (checkConditions()) {
+		if (now - start >= stepLong) {
+			publishAlert(ALERT_STEP_TOO_LONG);
+			prevStep = step;
+			step = STEP_HEATER_FULLSTOP;
+			res = true;
+		} else if (checkCommand()) {
+			Config.DevMgr->Compressor.ProcessUnit(ACT_ON);
+			if (Config.DevMgr->Compressor.IsOk()) {
+				publishInfo("Compressor started. Waiting for finish heating");
+				step = STEP_HEATER_5_STOP_COMPRESSOR;
+				res = true;
+			} else {
+				if (!infoMsg1) {
+					publishInfo("Waiting for start compresor");
+					infoMsg1 = true;
+				}
+			}
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_HEATER_FULLSTOP;
+			res = true;
+		}
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
 bool ScriptRunner::heaterFullStop() {
 	bool res = false;
 	static unsigned long start = 0;
@@ -301,6 +346,29 @@ bool ScriptRunner::checkConditions() {
 	switch (step) {
 		// it shouldn't break in some lines!
 	case STEP_HEATER_FULLSTOP:
+		break;
+	case STEP_HEATER_4_HEAT:
+		res1 = Config.DevMgr->TCondIn.IsOk();
+		if (!res1) {
+			Config.DevMgr->TCondIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->TCondVap.IsOk();
+		if (!res1) {
+			Config.DevMgr->TCondVap.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->TCompressor.IsOk();
+		if (!res1) {
+			Config.DevMgr->TCompressor.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->TVapOut.IsOk();
+		if (!res1) {
+			Config.DevMgr->TVapOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		
 		break;
 	case STEP_HEATER_3_GND_START:
 		res1 = Config.DevMgr->TGndIn.IsOk();

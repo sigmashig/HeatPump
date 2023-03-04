@@ -15,7 +15,7 @@ public:
 		STEP_HEATER_2_CHECK_START='S',
 		STEP_HEATER_3_GND_START='G',
 		STEP_HEATER_4_HEAT='H',
-		//STEP_HEATER_5_STOP_COMPRESSOR='C',
+		STEP_HEATER_5_STOP_COMPRESSOR='C',
 		//STEP_HEATER_6_STOP_HEATING='T',
 		//STEP_HEATER_E1_STOP='1',
 		//STEP_HEATER_E2_STOP='2',
@@ -41,6 +41,7 @@ private:
     bool checkCommand();
 	bool heaterStepCheckStart();
     bool heaterStepGroundStart();
+    bool heaterStepHeat();
     bool checkAlarm();
 	bool heaterFullStop();
 

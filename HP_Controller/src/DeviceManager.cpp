@@ -47,8 +47,6 @@ void DeviceManager::updateThermoEquipment(int number, const char* payload) {
 	double wHigh = AllThermo[number]->WarningHigh;
 	double wLow = AllThermo[number]->WarningLow;
 
-	Config.Log->append("UpdateThermo:").append(payload).Debug();
-	
 	AllThermo[number]->UpdateEquipment(payload);
 	if (OneWireBus::CompareDeviceAddress(AllThermo[number]->Address, da) != 0
 		|| eLow != AllThermo[number]->ErrorLow || eHigh != AllThermo[number]->ErrorHigh

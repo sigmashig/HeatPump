@@ -24,7 +24,7 @@ const HP_TIMEZONE = HP_CONFIG + ".TimeZone";
 
 const HP_ISREADY = HP_CONFIG + ".IsReady";
 
-const HP_STEP = HP_STATUS + ".Step";
+const HP_STEP = HP_STATUS + ".Script.Step";
 
 const HP_ALERT_CODE = HP_ALERT + ".*" + ".Code";
 const HP_ALERT_TEXT = HP_ALERT + ".*" + ".Text";
@@ -38,7 +38,19 @@ const HP_PUMP_TANKOUT = HP_RELAY + ".PumpTankOut";
 const HP_PUMP_GND = HP_RELAY + ".PumpGnd";
 const HP_COMPRESSOR = HP_RELAY + ".Compressor";
 
-const HP_TEMP_INSIDE = HP_TEMP + ".Tinside";
+const HP_TEMP_INSIDE = HP_TEMP + ".TInside";
+const HP_TEMP_OUTSIDE = HP_TEMP + ".TOutside";
+const HP_TEMP_COMPRESSOR = HP_TEMP + ".TCompressor";
+const HP_TEMP_CONDIN = HP_TEMP + ".TCondIn";
+const HP_TEMP_CONDVAP = HP_TEMP + ".TCondVap";
+const HP_TEMP_GNDIN = HP_TEMP + ".TGndIn";
+const HP_TEMP_GNDOUT = HP_TEMP + ".TGndOut";
+const HP_TEMP_IN = HP_TEMP + ".TIn";
+const HP_TEMP_OUT = HP_TEMP + ".TOut";
+const HP_TEMP_TANKIN = HP_TEMP + ".TTankIn";
+const HP_TEMP_TANKOUT = HP_TEMP + ".TTankOut";
+const HP_TEMP_VAPOUT = HP_TEMP + ".TVapOut";
+
 
 function SetInitialConfig() {
     setState(HP_COMMAND, 0); //NO cmd
@@ -54,6 +66,19 @@ function SetInitialConfig() {
 
     setState(HP_VOLTAGE_SWITCH, 1);
     setState(HP_PRESSURE_SWITCH, 1);
+
+    setState(HP_TEMP_INSIDE, 19);
+    setState(HP_TEMP_OUTSIDE, -5);
+    setState(HP_TEMP_COMPRESSOR, 20);
+    setState(HP_TEMP_CONDIN, 30);
+    setState(HP_TEMP_CONDVAP, 30);
+    setState(HP_TEMP_GNDIN, 7);
+    setState(HP_TEMP_GNDOUT, 2);
+    setState(HP_TEMP_IN, 20);
+    setState(HP_TEMP_OUT, 25);
+    setState(HP_TEMP_TANKIN, 22);
+    setState(HP_TEMP_TANKOUT, 27);
+    setState(HP_TEMP_VAPOUT, 30);
 
 }
 
@@ -177,7 +202,7 @@ function Test_Heat_CheckStart2StartGnd() {
             }
         } else {
             result = "Hardware Error";
-            log("Some pumps do not started");
+            log("Some pumps do not started: GND=" + getState(HP_PUMP_GND).val + " TankIn=" + getState(HP_PUMP_TANKIN).val);
         }
         ResultProcessing(result);
     });
@@ -200,6 +225,7 @@ function Test_Heat_StartGnd2Heat() {
         var newStep = obj.state.val;
         var result;
         unsubscribe(stepSubscription); // just one step checked
+        //log("Compressor:" + HP_COMPRESSOR +"="+getState(HP_COMPRESSOR).val);
         if (getState(HP_COMPRESSOR).val == 1) {
             log("Compressor Started", "info");
             if (newStep == 'H') {
@@ -361,16 +387,17 @@ log("start!");
 
 var nexStep;
 var stepSubscription = null;
-var alertSubscription = on({ id: HP_ALERT_CODE }, function (obj) {
+var alertSubscription = $(HP_ALERT_CODE).on(function (obj) {
     var alertCode = obj.state.val;
     var result;
-
+    var ind = obj.id.indexOf(".Code");
+    var text = obj.id.substring(0, ind) + ".Text";
     if (alertCode == '') {
         result = "OK";
         log("PASSED! Alert disappeared", "info");
     } else {
         result = "ALERT";
-        log("FAIL! Alert(" + alertCode + ") occured " + getState(HP_ALERT_TEXT).val, "error");
+        log("FAIL! Alert(" + alertCode + ") occured " + getState(text).val, "error");
     }
     ResultProcessing(result);
 });
@@ -389,7 +416,6 @@ steps.push(Test_Empty2HeatIdle,
     Finish);
 var step = 0;
 StartTest1();
-
 
 
 
