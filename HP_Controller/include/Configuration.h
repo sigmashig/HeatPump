@@ -72,6 +72,7 @@ public:
 	void SubscribeEquipment(DeviceType dType, const char* name);
 	void SubscribeStatus(DeviceType dType, const char* name);
 	void SubscribeSchedule(int number);
+	void PublishSchedule(int number);
 
 private:
 
@@ -96,7 +97,8 @@ private:
 		SECTION_WARNING,
 		SECTION_EQUIPMENT,
 		SECTION_STATUS,
-		SECTION_SCHEDULE,
+		SECTION_SCHEDULE_WEEKEND,
+		SECTION_SCHEDULE_WORKDAYS,
 		MQTT_SECTION_LAST
 	} MqttSection;
 
@@ -106,13 +108,13 @@ private:
 		ALERT_SCRIPT,
 		MQTT_ALERT_LAST
 	} MqttAlertParam;
-
+/*
 	typedef enum {
 		SCHEDULE_WEEKEND,
 		SCHEDULE_WORKDAY,
 		SCHEDULE_SET_LAST
 	} ScheduleSet;
-
+*/
 
 	// Setters for config parameters
 	void setWorkMode(byte b, bool save = true);
@@ -137,10 +139,10 @@ private:
 	const char* mQTT_ROOT = "HeatPump/";
 	const char* mqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
 									"Hysteresis", "WeekMode","Command","TimeZone" };
-	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/" };
+	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/WeekEnd/Set_", "Schedule/Workdays/Set_" };
 	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text", "Script" };
 	const char* mqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/" };
-	const char* mqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
+	//const char* mqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
 	void publish(const char* topic, const char* payload);
 
 	//members

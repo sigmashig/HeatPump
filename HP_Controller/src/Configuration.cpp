@@ -22,9 +22,9 @@ void Configuration::Init() {
 	Log->Debug("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
-	//Log->Debug("Schedule Mgr");
-	//ScheduleMgr = new ScheduleManager();
-	//ScheduleMgr->Init();
+	Log->Debug("Schedule Mgr");
+	ScheduleMgr = new ScheduleManager();
+	ScheduleMgr->Init();
 	Log->Debug("Mqtt");
 	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
 	mqttClient->Init();
@@ -243,7 +243,7 @@ void Configuration::SubscribeAll() {
 	subscribeParameters();
 	DevMgr->SubscribeEquipment();
 	DevMgr->SubscribeStatuses();
-	//ScheduleMgr->SubscribeSchedules();
+	ScheduleMgr->SubscribeSchedules();
 }
 
 void Configuration::subscribeParameters() {
@@ -362,18 +362,25 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 			}
 		} else {
 			topic0 = topicRoot;
-			topic0 += mqttSectionName[SECTION_SCHEDULE];
-			if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule
-
-				//ScheduleMgr->UpdateSchedule(topic, payload);
+			topic0 += mqttSectionName[SECTION_SCHEDULE_WEEKEND];
+			if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule weekend
+				byte setNumber = atoi(topic + topic0.length());
+				ScheduleMgr->UpdateSchedule(0, setNumber, payload);
 			} else {
 				topic0 = topicRoot;
-				topic0 += mqttSectionName[SECTION_EQUIPMENT];
-				if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Equipment
-					for (int i = 0; i < DEVICE_TYPE_LAST; i++) {
-						if (strncmp(topic + topic0.length(), mqttDeviceTypeName[i], strlen(mqttDeviceTypeName[i])) == 0) {
-							DevMgr->UpdateEquipment((DeviceType)i, topic + topic0.length() + strlen(mqttDeviceTypeName[i]), payload);
-							break;
+				topic0 += mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
+				if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule workday
+					byte setNumber = atoi(topic + topic0.length());
+					ScheduleMgr->UpdateSchedule(CONFIG_NUMBER_SCHEDULES, setNumber, payload);
+				} else {
+					topic0 = topicRoot;
+					topic0 += mqttSectionName[SECTION_EQUIPMENT];
+					if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Equipment
+						for (int i = 0; i < DEVICE_TYPE_LAST; i++) {
+							if (strncmp(topic + topic0.length(), mqttDeviceTypeName[i], strlen(mqttDeviceTypeName[i])) == 0) {
+								DevMgr->UpdateEquipment((DeviceType)i, topic + topic0.length() + strlen(mqttDeviceTypeName[i]), payload);
+								break;
+							}
 						}
 					}
 				}
@@ -505,13 +512,17 @@ void Configuration::SubscribeStatus(DeviceType dType, const char* name) {
 
 void Configuration::SubscribeSchedule(int number) {
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
-	topic = mqttSectionName[SECTION_SCHEDULE];
-	if (number < CONFIG_NUMBER_SCHEDULES) {
-		topic += "WeekEnd/";
-	} else {
-		topic += "WorkDays/";
-	}
-	topic += "Step/";
+	
+	topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
 	topic += number;
 	mqttClient->Subscribe(topic.c_str());
+}
+
+void Configuration::PublishSchedule(int number) {
+	createSafeString(topic, MQTT_TOPIC_LENGTH);
+	topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
+	topic += number;
+	char payload[MQTT_PAYLOAD_LENGTH + 1];
+	ScheduleMgr->GetSchedule(number).Serialize(payload);
+	mqttClient->Publish(topic.c_str(), payload);
 }

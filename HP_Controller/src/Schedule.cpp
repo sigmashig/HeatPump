@@ -5,6 +5,27 @@
 
 extern Configuration Config;
 
+int Schedule::CompareTime(byte hr, byte mn) {
+	if (hr < hour) {
+		return -1;
+	}
+	else if (hr > hour) {
+		return 1;
+	}
+	else {
+		if (mn < minute) {
+			return -1;
+		}
+		else if (mn > minute) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	return 0;
+}
+
 void Schedule::UpdateSchedule(const char* line)
 {
 	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
@@ -57,5 +78,13 @@ void Schedule::print(const char* header, DebugLevel level)
 	Config.Log->append(F(" @"));
 	Config.Log->Log(level);
 
+}
+
+void Schedule::Serialize(char* buffer) {
+	
+	StaticJsonDocument<JSON_SIZE> doc;
+	doc["time"] = String(hour) + ":" + String(minute);
+	doc["temp"] = temperature;
+	serializeJson(doc, buffer, JSON_SIZE);
 }
 

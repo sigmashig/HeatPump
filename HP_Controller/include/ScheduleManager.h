@@ -4,20 +4,20 @@
 class ScheduleManager
 {
 public:
-/*
-	Schedule Workdays[CONFIG_NUMBER_SCHEDULES];
-	Schedule Weekdays[CONFIG_NUMBER_SCHEDULES];
-	Schedule* AllSchedule[2 * CONFIG_NUMBER_SCHEDULES];
-	//byte IncreaseNumberOfSchedule() { return ++numbInitSchedules; };
+
 	ScheduleManager();
 	void Init();
 	void FinalInit();
 	void SubscribeSchedules();
-	void UpdateSchedule(const char* topic, const char* payload);
-
+	void UpdateSchedule(byte shift, byte setNumber, const char* payload);
+	double GetDesiredTemperature();
+	Schedule& GetSchedule(byte shift, byte setNumber) { return AllSchedule[shift + setNumber]; };
+	Schedule& GetSchedule(byte setNumber) { return AllSchedule[setNumber]; };
+	
 private:
-	//byte numbInitSchedules = 0;
+	Schedule AllSchedule[2 * CONFIG_NUMBER_SCHEDULES];
 	void readFromEEPROM();
-*/
+	bool sortSchedule(byte shift);
+	void publishSchedules(byte shift);
 };
 
