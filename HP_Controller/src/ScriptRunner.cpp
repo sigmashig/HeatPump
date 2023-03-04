@@ -4,15 +4,11 @@
 extern Configuration Config;
 
 void ScriptRunner::Loop(unsigned long timeperiod) {
-	//Config.Log->Debug("Runner Loop");
 	StepScript();
 }
 
 void ScriptRunner::Init() {
-	//	heatMode = Config.GetHeatMode(); // mode can't be changed during a workcycle
-	Config.Log->append("Mode=").append(heatMode).Debug();
 	step = STEP_EMPTY;
-
 }
 
 void ScriptRunner::StepScript() {
@@ -69,6 +65,8 @@ bool ScriptRunner::emptyStep() {
 			step = STEP_HEATER_0_IDLE;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		//Nothing to do
 	}
 	if (res) {
 		start = 0;
@@ -101,8 +99,8 @@ bool ScriptRunner::heaterIdle() {
 			res = false;
 		}
 
-	} else {
-		// some conditions are failed. Do Nothing. Waiting for these conditions are fixed no step ahead
+	} else { //Some condition is not OK
+		// Nothing to do. Waiting for wrong condition is fixed
 	}
 	if (res) {
 		start = 0;
@@ -114,7 +112,7 @@ bool ScriptRunner::heaterIdle() {
 bool ScriptRunner::heaterStepInitial() {
 	bool res = false;
 
-	const unsigned long stepLong = 10 * 60 * (unsigned long)1000;
+	const unsigned long stepLong = 1 * 60 * (unsigned long)1000;
 	static unsigned long start = 0;
 	static bool infoMsg1 = false;
 	static bool infoMsg2 = false;
@@ -161,6 +159,10 @@ bool ScriptRunner::heaterStepInitial() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 
 	if (res) {
@@ -194,6 +196,10 @@ bool ScriptRunner::heaterStepCheckStart() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 	if (res) {
 		start = 0;
@@ -204,12 +210,12 @@ bool ScriptRunner::heaterStepCheckStart() {
 bool ScriptRunner::heaterStepGroundStart() {
 	bool res = false;
 	static unsigned long start = 0;
-	//TODO: static unsigned long startDelay = 0;
+	static unsigned long startDelay = 0;
 	unsigned long now = millis();
 	static bool infoMsg1 = false;
 	static bool infoMsg2 = false;
-	const unsigned long stepLong = 10 * 60 * (unsigned long)1000;
-	//const unsigned long stepDelay = 2 * 60 * (unsigned long)1000;
+	const unsigned long stepLong = 3 * 60 * (unsigned long)1000;
+	const unsigned long stepDelay = 2 * 60 * (unsigned long)1000;
 
 
 	if (start == 0) {
@@ -232,11 +238,14 @@ bool ScriptRunner::heaterStepGroundStart() {
 				if (!infoMsg2) {
 					publishInfo("Both pumps have been started. Waiting for few minutes before start");
 					infoMsg2 = true;
+					startDelay = now;
 				}
-				if (Config.IsSimulator()) {
-					delay(1000);
+				if (Config.IsSimulator() || now - startDelay >= stepDelay) {
+					publishInfo("Start heating");
+					step = STEP_HEATER_4_HEAT;
+					res = true;
+					startDelay = 0;
 				}
-				step = STEP_HEATER_4_HEAT;
 			} else {
 				if (!infoMsg1) {
 					publishInfo("Waiting for Ground and Tank pums are started");
@@ -251,6 +260,8 @@ bool ScriptRunner::heaterStepGroundStart() {
 		}
 	}
 	if (res) {
+		infoMsg1 = false;
+		infoMsg2 = false;
 		start = 0;
 	}
 	return res;
@@ -262,7 +273,7 @@ bool ScriptRunner::heaterStepHeat() {
 	static unsigned long start = 0;
 	unsigned long now = millis();
 	static bool infoMsg1 = false;
-	const unsigned long stepLong = 10 * 60 * (unsigned long)1000;
+	const unsigned long stepLong = 3 * 60 * (unsigned long)1000;
 
 	if (start == 0) {
 		start = now;
@@ -279,9 +290,6 @@ bool ScriptRunner::heaterStepHeat() {
 			Config.DevMgr->Compressor.ProcessUnit(ACT_ON);
 			if (Config.DevMgr->Compressor.IsOk()) {
 				publishInfo("Compressor started. Waiting for finish heating");
-				if (Config.IsSimulator()) {
-					delay(1000);
-				}
 				step = STEP_HEATER_5_CHECK_STOP;
 				res = true;
 			} else {
@@ -295,9 +303,14 @@ bool ScriptRunner::heaterStepHeat() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 	if (res) {
 		start = 0;
+		infoMsg1 = false;
 	}
 	return res;
 }
@@ -322,9 +335,6 @@ bool ScriptRunner::heaterStepCheckStop() {
 		} else if (checkCommand()) {
 			if (checkStopHeating()) {
 				publishInfo("Stop heating");
-				if (Config.IsSimulator()) {
-					delay(1000);
-				}
 				step = STEP_HEATER_6_STOP_COMPRESSOR;
 				res = true;
 			}
@@ -333,6 +343,10 @@ bool ScriptRunner::heaterStepCheckStop() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 	if (res) {
 		start = 0;
@@ -344,9 +358,12 @@ bool ScriptRunner::heaterStepCheckStop() {
 bool ScriptRunner::heaterStepStopCompressor() {
 	bool res = false;
 	static unsigned long start = 0;
+	static unsigned long startDelay = 0;
 	unsigned long now = millis();
 	static bool infoMsg1 = false;
-	const unsigned long stepLong = 30 * 60 * (unsigned long)1000;
+	static bool infoMsg2 = false;
+	const unsigned long stepLong = 5 * 60 * (unsigned long)1000;
+	const unsigned long stepDelay = 2 * 60 * (unsigned long)1000;
 
 	if (start == 0) {
 		start = now;
@@ -364,12 +381,17 @@ bool ScriptRunner::heaterStepStopCompressor() {
 				Config.DevMgr->Compressor.ProcessUnit(ACT_OFF);
 				Config.DevMgr->PumpTankIn.ProcessUnit(ACT_OFF);
 				if (!Config.DevMgr->Compressor.IsOk() && !Config.DevMgr->PumpTankIn.IsOk()) {
-					publishInfo("Compressor and Tank pump stopped.");
-					if (Config.IsSimulator()) {
-						delay(1000);
+					if (!infoMsg2) {
+						publishInfo("Compressor and Tank pump stopped. Waiting for few minutes to stop Ground pump");
+						infoMsg2 = true;
+						startDelay = now;
 					}
-					step = STEP_HEATER_7_STOP_PUMPS;
-					res = true;
+					if (Config.IsSimulator() || now - startDelay >= stepDelay) {
+						publishInfo("Stoping Gnd pumps");
+						step = STEP_HEATER_7_STOP_PUMPS;
+						res = true;
+						startDelay = 0;
+					}
 				} else {
 					if (!infoMsg1) {
 						publishInfo("Waiting for stop compresor and Tank pump");
@@ -382,9 +404,15 @@ bool ScriptRunner::heaterStepStopCompressor() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 	if (res) {
 		start = 0;
+		infoMsg1 = false;
+		infoMsg2 = false;
 	}
 	return res;
 }
@@ -430,9 +458,14 @@ bool ScriptRunner::heaterStepStopGnd() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 	if (res) {
 		start = 0;
+		infoMsg1 = false;
 	}
 	return res;
 }
@@ -450,7 +483,7 @@ bool ScriptRunner::heaterFullStop() {
 		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
 		publishInfo("FULL STOP!!!");
 	}
-	
+
 	Config.DevMgr->Compressor.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpTankIn.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
