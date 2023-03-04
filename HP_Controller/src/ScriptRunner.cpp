@@ -9,10 +9,10 @@ void ScriptRunner::Loop(unsigned long timeperiod) {
 }
 
 void ScriptRunner::Init() {
-//	heatMode = Config.GetHeatMode(); // mode can't be changed during a workcycle
+	//	heatMode = Config.GetHeatMode(); // mode can't be changed during a workcycle
 	Config.Log->append("Mode=").append(heatMode).Debug();
 	step = STEP_EMPTY;
-	
+
 }
 
 void ScriptRunner::StepScript() {
@@ -33,12 +33,12 @@ void ScriptRunner::StepScript() {
 		heaterStepGroundStart();
 		break;
 	case STEP_HEATER_4_HEAT:
-		heaterStepHeat(); 
+		heaterStepHeat();
 		break;
 	case STEP_HEATER_5_CHECK_STOP:
 		heaterStepCheckStop();
 		break;
-	case STEP_HEATER_6_STOP_COMPRESSOR:	
+	case STEP_HEATER_6_STOP_COMPRESSOR:
 		heaterStepStopCompressor();
 		break;
 	case STEP_HEATER_7_STOP_PUMPS:
@@ -133,7 +133,7 @@ bool ScriptRunner::heaterStepInitial() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		} else if (checkCommand()) {
-			
+
 			Config.DevMgr->PumpFloor1.ProcessUnit(ACT_ON);
 			Config.DevMgr->PumpFloor2.ProcessUnit(ACT_ON);
 			Config.DevMgr->PumpTankOut.ProcessUnit(ACT_ON);
@@ -145,7 +145,10 @@ bool ScriptRunner::heaterStepInitial() {
 					publishInfo("Both floor's pumps and Tank pump have been started");
 					infoMsg2 = true;
 				}
-					step = STEP_HEATER_2_CHECK_START;
+				if (Config.IsSimulator()) {
+					delay(1000);
+				}
+				step = STEP_HEATER_2_CHECK_START;
 			} else {
 				if (!infoMsg1) {
 					publishInfo("Waiting for floor pums are started");
@@ -157,7 +160,7 @@ bool ScriptRunner::heaterStepInitial() {
 			prevStep = step;
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
-		}	
+		}
 	}
 
 	if (res) {
@@ -230,6 +233,9 @@ bool ScriptRunner::heaterStepGroundStart() {
 					publishInfo("Both pumps have been started. Waiting for few minutes before start");
 					infoMsg2 = true;
 				}
+				if (Config.IsSimulator()) {
+					delay(1000);
+				}
 				step = STEP_HEATER_4_HEAT;
 			} else {
 				if (!infoMsg1) {
@@ -248,7 +254,7 @@ bool ScriptRunner::heaterStepGroundStart() {
 		start = 0;
 	}
 	return res;
-	
+
 }
 
 bool ScriptRunner::heaterStepHeat() {
@@ -273,6 +279,9 @@ bool ScriptRunner::heaterStepHeat() {
 			Config.DevMgr->Compressor.ProcessUnit(ACT_ON);
 			if (Config.DevMgr->Compressor.IsOk()) {
 				publishInfo("Compressor started. Waiting for finish heating");
+				if (Config.IsSimulator()) {
+					delay(1000);
+				}
 				step = STEP_HEATER_5_CHECK_STOP;
 				res = true;
 			} else {
@@ -313,6 +322,9 @@ bool ScriptRunner::heaterStepCheckStop() {
 		} else if (checkCommand()) {
 			if (checkStopHeating()) {
 				publishInfo("Stop heating");
+				if (Config.IsSimulator()) {
+					delay(1000);
+				}
 				step = STEP_HEATER_6_STOP_COMPRESSOR;
 				res = true;
 			}
@@ -326,7 +338,7 @@ bool ScriptRunner::heaterStepCheckStop() {
 		start = 0;
 	}
 	return res;
-	
+
 }
 
 bool ScriptRunner::heaterStepStopCompressor() {
@@ -353,6 +365,9 @@ bool ScriptRunner::heaterStepStopCompressor() {
 				Config.DevMgr->PumpTankIn.ProcessUnit(ACT_OFF);
 				if (!Config.DevMgr->Compressor.IsOk() && !Config.DevMgr->PumpTankIn.IsOk()) {
 					publishInfo("Compressor and Tank pump stopped.");
+					if (Config.IsSimulator()) {
+						delay(1000);
+					}
 					step = STEP_HEATER_7_STOP_PUMPS;
 					res = true;
 				} else {
@@ -393,11 +408,15 @@ bool ScriptRunner::heaterStepStopGnd() {
 				prevStep = step;
 				step = STEP_HEATER_FULLSTOP;
 				res = true;
-			} else if (checkStopGround()){
+			} else if (checkStopGround()) {
 				Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
 				if (!Config.DevMgr->PumpGnd.IsOk()) {
 					publishInfo("Ground pump is stopped.");
-					step = STEP_HEATER_7_STOP_PUMPS;
+					if (Config.IsSimulator()) {
+						delay(1000);
+					}
+
+					step = STEP_HEATER_2_CHECK_START;
 					res = true;
 				} else {
 					if (!infoMsg1) {
@@ -431,15 +450,20 @@ bool ScriptRunner::heaterFullStop() {
 		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
 		publishInfo("FULL STOP!!!");
 	}
+	
 	Config.DevMgr->Compressor.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpTankIn.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpTankOut.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpFloor2.ProcessUnit(ACT_OFF);
 	Config.DevMgr->PumpFloor1.ProcessUnit(ACT_OFF);
-	
+
+	if (Config.IsSimulator()) {
+		delay(1000);
+	}
+
 	if (Config.GetCommand() == CMD_NOCMD || Config.GetCommand() == CMD_RUN) {
-		step = STEP_HEATER_0_IDLE;
+		step = STEP_EMPTY;
 	}
 	if (res) {
 		start = 0;
@@ -452,7 +476,7 @@ bool ScriptRunner::checkStopGround() {
 
 	//res = Config.DevMgr->TInside.GetTemperature() > Config.GetDesiredTemp() + Config.GetHysteresis();
 	res = true;
-	
+
 	return res;
 }
 
@@ -460,7 +484,7 @@ bool ScriptRunner::checkStopHeating() {
 	bool res = false;
 
 	res = Config.DevMgr->TInside.GetTemperature() > Config.GetDesiredTemp() + Config.GetHysteresis();
-	
+
 	return res;
 }
 
@@ -468,13 +492,13 @@ bool ScriptRunner::checkStartHeating() {
 	bool res = false;
 
 	res = Config.DevMgr->TInside.GetTemperature() <= Config.GetDesiredTemp() - Config.GetHysteresis();
-	
+
 	return res;
 }
 
 bool ScriptRunner::checkCommand() {
 	bool res = true;
-	
+
 	if (Config.GetCommand() == CMD_RUN) {
 		res = true;
 	} else {
@@ -492,7 +516,7 @@ void ScriptRunner::publishStep() {
 
 
 void ScriptRunner::publishInfo(const char* msg) {
-	char txt[MQTT_PAYLOAD_LENGTH+1];
+	char txt[MQTT_PAYLOAD_LENGTH + 1];
 	sprintf(txt, "Step: %c, %s", step, msg);
 	Config.PublishInfo(txt);
 }
@@ -505,7 +529,7 @@ bool ScriptRunner::checkConditions() {
 		// it shouldn't break in some lines!
 	case STEP_HEATER_FULLSTOP:
 		break;
-	case STEP_HEATER_5_CHECK_STOP:	
+	case STEP_HEATER_5_CHECK_STOP:
 	case STEP_HEATER_4_HEAT:
 		res1 = Config.DevMgr->TCondIn.IsOk();
 		if (!res1) {

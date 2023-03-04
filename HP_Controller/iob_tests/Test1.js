@@ -191,18 +191,12 @@ function Test_Heat_CheckStart2StartGnd() {
         var newStep = obj.state.val;
         var result;
         unsubscribe(stepSubscription); // just one step checked
-        if (getState(HP_PUMP_GND).val == 1 && getState(HP_PUMP_TANKIN).val == 1) {
-            log("All pumps started", "info");
-            if (newStep == 'G') {
-                result = "OK";
-                log("PASSED! Transfer Check -> Gnd", "info");
-            } else {
-                result = "Wrong Step";
-                log("FAIL! New Step is: " + newStep, "error");
-            }
+        if (newStep == 'G') {
+            result = "OK";
+            log("PASSED! Transfer Check -> Gnd", "info");
         } else {
-            result = "Hardware Error";
-            log("Some pumps do not started: GND=" + getState(HP_PUMP_GND).val + " TankIn=" + getState(HP_PUMP_TANKIN).val);
+            result = "Wrong Step";
+            log("FAIL! New Step is: " + newStep, "error");
         }
         ResultProcessing(result);
     });
@@ -225,9 +219,9 @@ function Test_Heat_StartGnd2Heat() {
         var newStep = obj.state.val;
         var result;
         unsubscribe(stepSubscription); // just one step checked
-        //log("Compressor:" + HP_COMPRESSOR +"="+getState(HP_COMPRESSOR).val);
-        if (getState(HP_COMPRESSOR).val == 1) {
-            log("Compressor Started", "info");
+        //         log("PumpGND=" + HP_PUMP_GND + "; Pump TankIn=" + HP_PUMP_TANKIN);
+        if (getState(HP_PUMP_GND).val == 1 && getState(HP_PUMP_TANKIN).val == 1) {
+            log("All pumps started", "info");
             if (newStep == 'H') {
                 result = "OK";
                 log("PASSED! Transfer Gnd -> Heat", "info");
@@ -237,7 +231,7 @@ function Test_Heat_StartGnd2Heat() {
             }
         } else {
             result = "Hardware Error";
-            log("Compressor do not started");
+            log("Some pumps do not started: GND=" + getState(HP_PUMP_GND).val + " TankIn=" + getState(HP_PUMP_TANKIN).val);
         }
         ResultProcessing(result);
     });
@@ -251,16 +245,51 @@ function Test_Heat_StartGnd2Heat() {
     //    setState(HP_TEMP_INSIDE,16); // 19 - 2 = 17
 }
 
-function Test_Heat_Heat2StopCompressor() {
+function Test_Heat_Heat2CheckStop() {
 
-    log("INFO: Test Heat -> Stop  started", "info");
+    log("INFO: Test Heat -> CheckStop  started", "info");
+    stepSubscription = on({ id: HP_STEP }, function (obj) {
+        var newStep = obj.state.val;
+        var result;
+        unsubscribe(stepSubscription); // just one step checked
+        if (getState(HP_COMPRESSOR).val == 1) {
+            log("Compressor started", "info");
+            if (newStep == 'h') {
+                result = "OK";
+                log("PASSED! Transfer Heat -> CheckStop", "info");
+            } else {
+                result = "Wrong Step";
+                log("FAIL! New Step is: " + newStep, "error");
+            }
+        } else {
+            result = "Hardware Error";
+            log("Compressor do not started: GND=" + getState(HP_COMPRESSOR).val);
+
+        }
+        ResultProcessing(result);
+    });
+
+
+    timer = setTimeout(function () {
+        clearTimeout(timer);
+        ResultProcessing("Timeout");
+    }, 5000);
+
+    //    setState(HP_HYST, 2);
+    //    setState(HP_DESIREDTEMP, 19);
+    //    setState(HP_TEMP_INSIDE, 22); // 19 + 2 = 21
+}
+
+function Test_Heat_CheckStop2StopCompressor() {
+
+    log("INFO: Test CheckStop ->  Stop compressor started", "info");
     stepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
         unsubscribe(stepSubscription); // just one step checked
         if (newStep == 'C') {
             result = "OK";
-            log("PASSED! Transfer Heat -> Stop", "info");
+            log("PASSED! Transfer CheckStop ->  Stop compressor", "info");
         } else {
             result = "Wrong Step";
             log("FAIL! New Step is: " + newStep, "error");
@@ -278,6 +307,7 @@ function Test_Heat_Heat2StopCompressor() {
     setState(HP_DESIREDTEMP, 19);
     setState(HP_TEMP_INSIDE, 22); // 19 + 2 = 21
 }
+
 
 function Test_Heat_StopCompressor2StopHeating() {
 
@@ -410,7 +440,8 @@ steps.push(Test_Empty2HeatIdle,
     Test_Heat_Initial2CheckStart,
     Test_Heat_CheckStart2StartGnd,
     Test_Heat_StartGnd2Heat,
-    Test_Heat_Heat2StopCompressor,
+    Test_Heat_Heat2CheckStop,
+    Test_Heat_CheckStop2StopCompressor,
     Test_Heat_StopCompressor2StopHeating,
     Test_Heat_StopHeating2CheckStart,
     Finish);
