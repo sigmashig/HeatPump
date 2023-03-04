@@ -35,6 +35,15 @@ void ScriptRunner::StepScript() {
 	case STEP_HEATER_4_HEAT:
 		heaterStepHeat(); 
 		break;
+	case STEP_HEATER_5_CHECK_STOP:
+		heaterStepCheckStop();
+		break;
+	case STEP_HEATER_6_STOP_COMPRESSOR:	
+		heaterStepStopCompressor();
+		break;
+	case STEP_HEATER_7_STOP_PUMPS:
+		heaterStepStopGnd();
+		break;
 	case STEP_HEATER_FULLSTOP:
 		heaterFullStop();
 		break;
@@ -264,7 +273,7 @@ bool ScriptRunner::heaterStepHeat() {
 			Config.DevMgr->Compressor.ProcessUnit(ACT_ON);
 			if (Config.DevMgr->Compressor.IsOk()) {
 				publishInfo("Compressor started. Waiting for finish heating");
-				step = STEP_HEATER_5_STOP_COMPRESSOR;
+				step = STEP_HEATER_5_CHECK_STOP;
 				res = true;
 			} else {
 				if (!infoMsg1) {
@@ -284,21 +293,80 @@ bool ScriptRunner::heaterStepHeat() {
 	return res;
 }
 
-bool ScriptRunner::heaterFullStop() {
+bool ScriptRunner::heaterStepCheckStop() {
 	bool res = false;
 	static unsigned long start = 0;
-	//unsigned long now = millis();
+	unsigned long now = millis();
+	const unsigned long stepLong = 30 * 60 * (unsigned long)1000;
 
 	if (start == 0) {
+		start = now;
 		publishStep();
-		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
-		publishInfo("FULL STOP!!!");
+		publishInfo("Check stop conditions");
 	}
-	//Config.SetCommand(CMD_STOP);
+	if (checkConditions()) {
+		if (now - start >= stepLong) {
+			publishInfo("Compressor is working too long. Stop it");
+			prevStep = step;
+			step = STEP_HEATER_6_STOP_COMPRESSOR;
+			res = true;
+		} else if (checkCommand()) {
+			if (checkStopHeating()) {
+				publishInfo("Stop heating");
+				step = STEP_HEATER_6_STOP_COMPRESSOR;
+				res = true;
+			}
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_HEATER_FULLSTOP;
+			res = true;
+		}
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+	
+}
 
-	if (Config.GetCommand() == CMD_NOCMD || Config.GetCommand() == CMD_RUN) {
-		step = STEP_HEATER_0_IDLE;
-		res = true;
+bool ScriptRunner::heaterStepStopCompressor() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	static bool infoMsg1 = false;
+	const unsigned long stepLong = 30 * 60 * (unsigned long)1000;
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		publishInfo("Stop compressor and Tank pump");
+	}
+	if (checkConditions()) {
+		if (checkCommand()) {
+			if (now - start >= stepLong) {
+				publishAlert(ALERT_STEP_TOO_LONG);
+				prevStep = step;
+				step = STEP_HEATER_FULLSTOP;
+				res = true;
+			} else {
+				Config.DevMgr->Compressor.ProcessUnit(ACT_OFF);
+				Config.DevMgr->PumpTankIn.ProcessUnit(ACT_OFF);
+				if (!Config.DevMgr->Compressor.IsOk() && !Config.DevMgr->PumpTankIn.IsOk()) {
+					publishInfo("Compressor and Tank pump stopped.");
+					step = STEP_HEATER_7_STOP_PUMPS;
+					res = true;
+				} else {
+					if (!infoMsg1) {
+						publishInfo("Waiting for stop compresor and Tank pump");
+						infoMsg1 = true;
+					}
+				}
+			}
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_HEATER_FULLSTOP;
+			res = true;
+		}
 	}
 	if (res) {
 		start = 0;
@@ -306,10 +374,100 @@ bool ScriptRunner::heaterFullStop() {
 	return res;
 }
 
+bool ScriptRunner::heaterStepStopGnd() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	static bool infoMsg1 = false;
+	const unsigned long stepLong = 30 * 60 * (unsigned long)1000;
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		publishInfo("Stop Gnd pumps");
+	}
+	if (checkConditions()) {
+		if (checkCommand()) {
+			if (now - start >= stepLong) {
+				publishAlert(ALERT_STEP_TOO_LONG);
+				prevStep = step;
+				step = STEP_HEATER_FULLSTOP;
+				res = true;
+			} else if (checkStopGround()){
+				Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
+				if (!Config.DevMgr->PumpGnd.IsOk()) {
+					publishInfo("Ground pump is stopped.");
+					step = STEP_HEATER_7_STOP_PUMPS;
+					res = true;
+				} else {
+					if (!infoMsg1) {
+						publishInfo("Waiting for stop compresor");
+						infoMsg1 = true;
+					}
+				}
+			}
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_HEATER_FULLSTOP;
+			res = true;
+		}
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
+
+bool ScriptRunner::heaterFullStop() {
+	bool res = false;
+	static unsigned long start = 0;
+	//unsigned long now = millis();
+
+	res = true;
+
+	if (start == 0) {
+		publishStep();
+		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
+		publishInfo("FULL STOP!!!");
+	}
+	Config.DevMgr->Compressor.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpTankIn.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpTankOut.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpFloor2.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpFloor1.ProcessUnit(ACT_OFF);
+	
+	if (Config.GetCommand() == CMD_NOCMD || Config.GetCommand() == CMD_RUN) {
+		step = STEP_HEATER_0_IDLE;
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
+bool ScriptRunner::checkStopGround() {
+	bool res = false;
+
+	//res = Config.DevMgr->TInside.GetTemperature() > Config.GetDesiredTemp() + Config.GetHysteresis();
+	res = true;
+	
+	return res;
+}
+
+bool ScriptRunner::checkStopHeating() {
+	bool res = false;
+
+	res = Config.DevMgr->TInside.GetTemperature() > Config.GetDesiredTemp() + Config.GetHysteresis();
+	
+	return res;
+}
+
 bool ScriptRunner::checkStartHeating() {
 	bool res = false;
 
-	res = Config.DevMgr->TInside.GetTemperature() <= Config.GetDesiredTemp() + Config.GetHysteresis();
+	res = Config.DevMgr->TInside.GetTemperature() <= Config.GetDesiredTemp() - Config.GetHysteresis();
 	
 	return res;
 }
@@ -347,6 +505,7 @@ bool ScriptRunner::checkConditions() {
 		// it shouldn't break in some lines!
 	case STEP_HEATER_FULLSTOP:
 		break;
+	case STEP_HEATER_5_CHECK_STOP:	
 	case STEP_HEATER_4_HEAT:
 		res1 = Config.DevMgr->TCondIn.IsOk();
 		if (!res1) {
@@ -368,8 +527,6 @@ bool ScriptRunner::checkConditions() {
 			Config.DevMgr->TVapOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 		}
 		res &= res1;
-		
-		break;
 	case STEP_HEATER_3_GND_START:
 		res1 = Config.DevMgr->TGndIn.IsOk();
 		if (!res1) {
@@ -418,7 +575,8 @@ bool ScriptRunner::checkConditions() {
 			Config.DevMgr->TTankOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 		}
 		res &= res1;
-
+	case STEP_HEATER_7_STOP_PUMPS:
+	case STEP_HEATER_6_STOP_COMPRESSOR:
 	case STEP_HEATER_0_IDLE:
 	case STEP_EMPTY:
 		// Voltage check
