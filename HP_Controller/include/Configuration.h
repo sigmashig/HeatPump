@@ -218,7 +218,7 @@ private:
 									"Hysteresis", "WeekMode","Command","TimeZone" };
 	const char* MqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/" };
 	const char* MqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text", "Script" };
-	const char* MqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Thermometer/","Script/" };
+	const char* MqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/" };
 	const char* MqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
 
 	void Publish(const char* topic, const char* payload);

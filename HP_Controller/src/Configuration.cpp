@@ -352,6 +352,7 @@ void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 		topic += MqttAlertParamName[ALERT_CODE];
 		char p[2];
 		p[0] = code;
+		p[1] = 0;
 		Publish(topic.c_str(), p);
 	}
 	{
@@ -393,12 +394,12 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 					break;
 				}
 			}
-		} else {/*
+		} else {
 			topic0 = topicRoot;
 			topic0 += MqttSectionName[SECTION_SCHEDULE];
 			if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule
 				
-				ScheduleMgr->UpdateSchedule(topic, payload);
+				//ScheduleMgr->UpdateSchedule(topic, payload);
 			} else {
 				topic0 = topicRoot;
 				topic0 += MqttSectionName[SECTION_EQUIPMENT];
@@ -410,7 +411,7 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 						}
 					}
 				}
-			}*/
+			}
 		}
 	}
 }
@@ -469,7 +470,7 @@ void Configuration::updateConfig(const char* topic, const char* payload) {
 }
 
 void Configuration::initMqttTopics() {
-	sprintf(topicRoot, "%s%s", MQTT_ROOT, boardName);
+	sprintf(topicRoot, "%s%s/", MQTT_ROOT, boardName);
 }
 
 void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* payload) {
@@ -518,11 +519,13 @@ void Configuration::Publish(DeviceType dType, const char* name, double status) {
 }
 
 void Configuration::publishStatus(DeviceType dType, const char* name, const char* payload) {
-	createSafeString(topic, MQTT_TOPIC_LENGTH);
-	topic = MqttSectionName[SECTION_STATUS];
-	topic += MqttDeviceTypeName[dType];
-	topic += name;
-	mqttClient->Publish(topic.c_str(), payload);
+	if (isMqttReady) {
+		createSafeString(topic, MQTT_TOPIC_LENGTH);
+		topic = MqttSectionName[SECTION_STATUS];
+		topic += MqttDeviceTypeName[dType];
+		topic += name;
+		mqttClient->Publish(topic.c_str(), payload);
+	}
 }
 
 void Configuration::SubscribeEquipment(DeviceType dType, const char* name) {

@@ -43,7 +43,7 @@ void OneWireThermo::UpdateEquipment(const char* line) {
 	if (json.containsKey("address")) {
 		const char* s = json["address"];
 		OneWireBus::ConvertStringToAddress(Address, s);
-		checkSimulator();
+		//checkSimulator();
 	}
 	if (json.containsKey("errorLow")) {
 		ErrorLow = json["errorLow"];
