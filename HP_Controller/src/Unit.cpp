@@ -5,18 +5,17 @@ extern Configuration Config;
 
 
 void const Unit::print(const char* header, DebugLevel level) {
-
 	if (header != NULL) {
 		Config.Log->append(header);
 	}
 	Config.Log->append(F("Name:")).append(Name);
-	Config.Log->append(F(";status:")).append(status);
+	Config.Log->append(F(";status:")).append(Status);
 	Config.Log->append(F(" @"));
 	Config.Log->Log(level);
 }
 
 void Unit::Publish() {
-	Config.Publish(DevType, Name, status);
+	Config.Publish(DevType, Name, Status);
 }
 
 void Unit::SubscribeEquipment() {

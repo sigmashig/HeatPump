@@ -14,7 +14,6 @@ void callbackFunc(char* topic, uint8_t* payload, unsigned int length) {
 	} else {
 		Config.Log->Debug("Wrong Length");
 	}
-	
 }
 
 
@@ -67,7 +66,7 @@ bool Mqtt::mqttReconnect() {
 	return res;
 }
 
-void Mqtt::RepeatedLoop(int n) {
+void Mqtt::repeatedLoop(int n) {
 
 	for (n *= 2; n >= 0; n--) {
 		MqttLoop();

@@ -15,18 +15,18 @@ void Relay::InitUnit() {
 
 bool Relay::relaySet(bool newStatus) {
 	bool res = false;
-	if (status != newStatus) {
+	if (Status != newStatus) {
 		if (!IsSimulator()) {
 			digitalWrite(Pin, (newStatus == HIGH ? lhOn : !lhOn));
 		}
-		status = newStatus;
+		Status = newStatus;
 		Publish();
 	}
 	return res;
 }
 
 bool Relay::relaySwitch() {
-	return relaySet(!status);
+	return relaySet(!Status);
 }
 
 bool Relay::ProcessUnit(ActionType event) {
@@ -79,7 +79,7 @@ void const Relay::print(const char* header, DebugLevel level) {
 	Config.Log->append(F(";Pin:")).append(Pin);
 	Config.Log->append(F(";lhOn:")).append(lhOn);
 	Config.Log->append(F(";Sim:")).append(IsSimulator());
-	Config.Log->append(F(";status:")).append(status);
+	Config.Log->append(F(";status:")).append(Status);
 	Config.Log->append(F(" @"));
 	Config.Log->Log(level);
 }
@@ -105,7 +105,7 @@ void Relay::UpdateEquipment(const char* line) {
 bool Relay::IsOk() {
 	bool res = true;
 
-	res = status == HIGH;
+	res = Status == HIGH;
 	if (res) {
 		PublishDeviceAlert(ALERT_EMPTY);
 	}

@@ -43,7 +43,7 @@ void setup() {
 	//initialization of config
 	Config.Init();
 	Config.Log->Info(F("Board is ready"));
-	Config.Log->append(F("Board Id#:")).append(Config.BoardId()).Info();
+	Config.Log->append(F("Board Name#:")).append(Config.BoardName()).Info();
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, HIGH);
 	Config.Log->Info("Enjoy!");

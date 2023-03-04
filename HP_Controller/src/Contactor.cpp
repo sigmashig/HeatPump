@@ -49,7 +49,7 @@ void Contactor::handleContactor(unsigned long timePeriod) {
 }
 
 void Contactor::handleFinish(int newStatus) {
-	status = newStatus;
+	Status = newStatus;
 	Publish();
 }
 
@@ -77,7 +77,7 @@ bool Contactor::IsOk() {
 	bool res = false;
 	//Config.Log->append("ISOK. Contactor ").append(Name).append(" = ").append(status).Debug();
 	
-	if (status == lhOn) {
+	if (Status == lhOn) {
 		PublishDeviceAlert(ALERT_EMPTY);
 		res = true;
 	} 
@@ -92,9 +92,9 @@ void Contactor::FinalInitUnit()
 
 void Contactor::ProcessUnit(ActionType event) {
 	if (event == ACT_OFF) {
-		status = !lhOn;
+		Status = !lhOn;
 	} else if (event == ACT_ON) {
-		status = lhOn;
+		Status = lhOn;
 	}
 	//Config.Log->append("Contactor ").append(Name).append(" = ").append(status).Debug();
 }
