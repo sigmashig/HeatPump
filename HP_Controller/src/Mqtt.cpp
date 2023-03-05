@@ -74,6 +74,7 @@ void Mqtt::repeatedLoop(int n) {
 	}
 }
 bool Mqtt::Publish(const char* topic, const char* payload) {
+	//Config.Log->append("Publish length=").append((int)strlen(topic)).Debug();
 	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
 	topicFull = topicRoot;
 	topicFull += topic;
@@ -87,6 +88,7 @@ bool Mqtt::Publish(const char* topic, const char* payload) {
 }
 
 void Mqtt::Subscribe(const char* topic) {
+	//Config.Log->append("Subscribe length=").append((int)strlen(topic)).Debug();
 	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
 	topicFull = topicRoot;
 	topicFull += topic;

@@ -58,20 +58,31 @@ byte SigmaEEPROM::ReadBoardId() {
 	return Read8(EEPROM_ADDR_ID);
 }
 
-void SigmaEEPROM::ReadIp(IPAddress& ip)
-{
-	for (int i = 0; i < 4; i++) {
-		ip[i] = Read8(EEPROM_ADDR_IP + i);
-	}
-}
-
+/*
 unsigned int SigmaEEPROM::ReadMqtt(IPAddress& ip)
 {
 	for (int i = 0; i < 4; i++) {
-		ip[i] = Read8(EEPROM_ADDR_MQTT + i);
+		ip[i] = Read8(EEPROM_ADDR_MQTT_IP + i);
 	}
 	//Config.Log->append(Read8(EEPROM_ADDR_MQTT + 4)).Debug();
 	//Config.Log->append(Read8(EEPROM_ADDR_MQTT + 5)).Debug();
 
 	return Read16(EEPROM_ADDR_MQTT + 4);
+}
+*/
+
+void SigmaEEPROM::WriteIp(IPAddress& ip, uint16_t addr) {
+	bool res = (ip[0] + ip[1] + ip[2] + ip[3]) != 0;
+	if (res) {
+		for (int i = 0; i < 4;i++) {
+			Write8(addr + i, ip[i]);
+		}
+	}
+}
+
+
+void SigmaEEPROM::ReadIp(IPAddress& ip, uint16_t addr) {
+	for (int i = 0; i < 4; i++) {
+		ip[i] = Read8(addr + i);
+	}
 }

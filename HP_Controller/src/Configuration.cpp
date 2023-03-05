@@ -84,8 +84,9 @@ void Configuration::initializeEthernet() {
 void Configuration::readBoardId() {
 	byte id = SigmaEEPROM::ReadBoardId();
 	setBoardId(id);
-	SigmaEEPROM::ReadIp(ip);
-	mqttPort = SigmaEEPROM::ReadMqtt(mqttIp);
+	SigmaEEPROM::ReadIp(ip, EEPROM_ADDR_IP);
+	SigmaEEPROM::ReadIp(mqttIp, EEPROM_ADDR_MQTT_IP);
+	mqttPort = SigmaEEPROM::Read16(EEPROM_ADDR_MQTT_PORT);
 
 	Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
 		.append(ip[2]).append(".").append(ip[3]).Info();
