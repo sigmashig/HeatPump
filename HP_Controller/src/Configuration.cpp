@@ -132,6 +132,56 @@ void Configuration::setTimeZone(const char* tz, bool save) {
 	}
 }
 
+void Configuration::setIp(IPAddress& ip, bool save) {
+	if (!save) {
+		this->ip = ip;
+	} else {
+		if (this->ip != ip) {
+			this->ip = ip;
+			Log->Debug("EEPROM IP");
+			SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_IP);
+		}
+	}
+}
+
+void Configuration::setMqttIp(IPAddress& ip, bool save) {
+	if (!save) {
+		this->mqttIp = ip;
+	} else {
+		if (this->mqttIp != ip) {
+			this->mqttIp = ip;
+			Log->Debug("EEPROM Mqtt IP");
+			SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_MQTT_IP);
+		}
+	}
+}
+
+void Configuration::setMqttPort(uint16_t port, bool save) {
+	if (!save) {
+		mqttPort = port;
+	} else {
+		if (mqttPort != port) {
+			mqttPort = port;
+			Log->Debug("EEPROM Mqtt Port");
+			SigmaEEPROM::Write16(EEPROM_ADDR_MQTT_PORT, port);
+		}
+	}
+}
+
+void Configuration::setClockType(byte b, bool save) {
+	
+	SigmaClock::CalendarServerType type = (SigmaClock::CalendarServerType)b;
+	
+	if (!save) {
+		Clock->SetServerType(type);
+	} else {
+		if (Clock->GetServerType() != type) {
+			Clock->SetServerType(type);
+			Log->Debug("EEPROM ClockType");
+			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE, type);
+		}
+	}
+}
 
 void Configuration::setWorkMode(byte b, bool save) {
 	if (b == 0 || b == 1 || b == 2) {
@@ -165,7 +215,20 @@ void Configuration::setSimulator(byte b, bool save) {
 	}
 }
 
+void Configuration::setManualTemp(double t, bool save) {
+	if (t >= 15.0 && t <= 50) {
+		if (!save) {
+			manualTemp = t;
+		}
+		if (manualTemp != t) {
+			manualTemp = t;
+			Log->Debug("EEPROM Manual Temp");
+			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MANUALTEMP, (byte)(manualTemp * 2));
+		}
+	}
+}
 
+/*
 void Configuration::setManualTemp(byte b, bool save) {
 	double t = (double)b / 2.0;
 	if (t >= 15.0 && t <= 50) {
@@ -179,6 +242,7 @@ void Configuration::setManualTemp(byte b, bool save) {
 		}
 	}
 }
+*/
 
 void Configuration::setWeekMode(byte b, bool save) {
 	if (b == 0 || b == 1 || b == 2) {
@@ -236,11 +300,12 @@ void Configuration::Loop(unsigned long timePeriod) {
 		unitsLoop(timePeriod);
 	}
 }
-
+/*
 void Configuration::setManualTemp(const char* str) {
 	double t = Utils::Str2Double(str);
 	setManualTemp((byte)(t * 2.0));
 }
+*/
 
 void Configuration::unitsLoop(unsigned long timePeriod) {
 	DevMgr->UnitLoop(timePeriod);
@@ -400,11 +465,94 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 	}
 }
 
+void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload) {
+	switch (parm) {
+	case PARAMS_WORKMODE: {
+		byte b = atoi(payload);
+		setWorkMode(b);
+		break;
+	}
+	case PARAMS_WEEKMODE: {
+		byte b = atoi(payload);
+		setWeekMode(b);
+		break;
+	}
+	case PARAMS_MANUAL_TEMP: {
+		double f = atof(payload);
+		setManualTemp(f);
+		break;	
+	}
+	case PARAMS_SIMULATOR: {
+		byte b = atoi(payload);
+		setSimulator(b);
+		break;
+	}
+	case PARAMS_HEAT_COLD: {
+		byte b = atoi(payload);
+		setHeatMode(b);
+		break;
+	}
+	case PARAMS_HYSTERESIS: {
+		double f = atof(payload);
+		setHysteresis(f);
+		break;
+	}
+	case PARAMS_COMMAND: {
+		byte b = atoi(payload);
+		setCommand(b);
+		break;
+	}
+	case PARAMS_TIMEZONE:
+		setTimeZone(payload);
+		break;
+	case PARAMS_IP: {
+		IPAddress ip;
+		ip.fromString(payload);
+		setIp(ip);
+		break;
+	}
+	case PARAMS_BOARD_ID: {
+		byte b = atoi(payload);
+		setBoardId(b);
+		break;
+	}
+	case PARAMS_MQTT_IP: {
+		IPAddress ip;
+		ip.fromString(payload);
+		setMqttIp(ip);
+		break;
+	}
+	case PARAMS_MQTT_PORT: {
+		int i = atoi(payload);
+		setMqttPort(i);
+		break;
+	}
+	
+	case PARAMS_CLOCK_TYPE: {
+		byte b = atoi(payload);
+		setClockType(b);
+		break;
+	}
+	case CONFIG_PARAMS_LAST:
+	case PARAMS_DESIRED_TEMP:
+	case PARAMS_WATCHDOG:
+	case PARAMS_IS_READY:
+		break;
+	}
+}
 
 /// @brief Update configuration parameters received from MQTT
 /// @param topic - topic of MQTT message
 /// @param payload - payload of MQTT message
 void Configuration::updateConfig(const char* topic, const char* payload) {
+
+	for (int i = 0; i < CONFIG_PARAMS_LAST; i++) {
+		if (strcmp(topic, mqttConfigParamName[i]) == 0) {
+			updateSingleParam((MqttConfigParam)i, payload);
+			return;
+		}
+	}
+	/*
 	createSafeString(topic0, MQTT_TOPIC_LENGTH);
 	topic0 = mqttConfigParamName[PARAMS_WORKMODE];
 	if (strcmp(topic, topic0.c_str()) == 0) {
@@ -445,6 +593,7 @@ void Configuration::updateConfig(const char* topic, const char* payload) {
 			}
 		}
 	}
+*/
 }
 
 void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* payload) {

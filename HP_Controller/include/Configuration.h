@@ -68,7 +68,7 @@ public:
 	void PublishInfo(const char* txt);
 	void Transfer(int n) { if (isMqttReady) { mqttClient->MqttLoop(n); } };
 	void ProcessMessage(const char* topic, const char* payload);
-	void SubscribeAll();
+  	void SubscribeAll();
 	void SubscribeEquipment(DeviceType dType, const char* name);
 	void SubscribeStatus(DeviceType dType, const char* name);
 	void SubscribeSchedule(int number);
@@ -94,7 +94,6 @@ private:
 		PARAMS_BOARD_ID,
 		PARAMS_MQTT_IP,
 		PARAMS_MQTT_PORT,
-		PARAMS_CLOCK_IP,
 		PARAMS_CLOCK_TYPE,
 		CONFIG_PARAMS_LAST
 	} MqttConfigParam;
@@ -125,30 +124,33 @@ private:
 
 	// Setters for config parameters
 	void setWorkMode(byte b, bool save = true);
-	void setWorkMode(const char* str) { setWorkMode(str[0] - '0'); };
-	void setManualTemp(byte b, bool save = true);
-	void setManualTemp(const char* str);
+	//void setWorkMode(const char* str) { setWorkMode(str[0] - '0'); };
+	//void setManualTemp(byte b, bool save = true);
+	void setManualTemp(double d, bool save = true);
+	//void setManualTemp(const char* str);
 	void setWeekMode(byte b, bool save = true);
-	void setWeekMode(const char* str) { setWeekMode(str[0] - '0'); };
+	//void setWeekMode(const char* str) { setWeekMode(str[0] - '0'); };
 	void setHysteresis(byte b, bool save = true);
-	void setHysteresis(const char* str) { setHysteresis(str[0] - '0'); };
+	//void setHysteresis(const char* str) { setHysteresis(str[0] - '0'); };
 	void setHeatMode(byte b, bool save = true);
-	void setHeatMode(const char* str) { setHeatMode(str[0] - '0'); };
-	void setCommand(const char* str) { setCommand(str[0] - '0'); };
+	//void setHeatMode(const char* str) { setHeatMode(str[0] - '0'); };
+	//void setCommand(const char* str) { setCommand(str[0] - '0'); };
 	void setCommand(byte b, bool save = true);
 	void setSimulator(byte b, bool save = true);
-	void setSimulator(const char* str) { setSimulator(str[0] - '0'); };
+	//void setSimulator(const char* str) { setSimulator(str[0] - '0'); };
 	void setTimeZone(const char* tz, bool save = true);
 	void setMqttIp(IPAddress& ip, bool save = true);
 	void setMqttPort(uint16_t port, bool save = true);
-	void setIp(const char* str, bool save = true){ IPAddress ip; ip.fromString(str); setIp(ip, save); };
+	//void setIp(const char* str, bool save = true){ IPAddress ip; ip.fromString(str); setIp(ip, save); };
 	void setIp(IPAddress& ip, bool save = true);
+	void setClockType(byte b, bool save = true);
+	
 
 	byte BoardId() { return boardId; };
 
 	const char* mQTT_ROOT = "HeatPump/";
 	const char* mqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
-										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockIP","ClockType" };
+										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockType" };
 
 	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/WeekEnd/Set_", "Schedule/Workdays/Set_" };
 	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text"};
@@ -202,6 +204,8 @@ private:
 	
 	void publishStatus(DeviceType dType, const char* name, const char* payload);
 	void publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
+
+	void updateSingleParam(MqttConfigParam parm, const char* payload);
 
 	MqttConfigParam paramTypeByName(const char* name);
 };

@@ -13,6 +13,10 @@
 class SigmaClock
 {
 public:
+	typedef enum {
+		CAL_SERVER_WORLDTIMEAPI
+	} CalendarServerType;
+	
 	SigmaClock(EthernetClient* cli, const char* timezone = NULL);
 	bool SyncClock();
 	TimeElements GetClock();
@@ -23,8 +27,11 @@ public:
 	void SetTimezone(const char* tzNew);
 	const char* GetTimezone() { return tz; };
 	void Init();
-
+	void SetServerType(CalendarServerType type) { serverType = type; };
+	CalendarServerType GetServerType() { return serverType; };
+	
 private:
+	CalendarServerType serverType;
 	TimeElements tm;
 	EthernetClient* client;
 	bool readClock();
