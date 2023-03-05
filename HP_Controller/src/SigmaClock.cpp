@@ -178,8 +178,8 @@ bool SigmaClock::parseJson(const char* buf)
     bool res = false;
     if (buf[0] != 0) {
         //const size_t CAPACITY = JSON_OBJECT_SIZE(25);
-        //StaticJsonDocument<128> doc;
-        DynamicJsonDocument doc(BUF_SIZE);
+        StaticJsonDocument<400> doc;
+        //DynamicJsonDocument doc(200);
         DeserializationError error = deserializeJson(doc, buf);
         if (error) {
             Config.Log->append("JSON Error=").append(error.f_str()).Debug();
