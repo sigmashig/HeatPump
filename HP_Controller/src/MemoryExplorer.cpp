@@ -19,6 +19,7 @@ int getNumberOfBlocksInFreeList() {
 
 
 void memoryReport(const char* title) {
+    
     Serial.print("---- Memory report: ");
     Serial.println(title);
     Serial.print("HEAP:");

@@ -4,6 +4,7 @@
 
 #include "SigmaEEPROM.h"
 #include "ScriptRunner.h"
+#include "MemoryExplorer.h"
 
 
 void Configuration::Init() {
@@ -11,20 +12,28 @@ void Configuration::Init() {
 
 
 	readBoardId();
-	initMqttTopics();
+	//initMqttTopics();
 	ethClient = new EthernetClient();
+
 	initializeEthernet();
 	readConfigEEPROM();
 	Log->Debug("Clock");
 	Clock = new SigmaClock(ethClient);
 	Clock->SetClock();
 	Log->append("Now:").Info(Clock->PrintClock());
+
 	Log->Debug("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
+
 	Log->Debug("Schedule Mgr");
 	ScheduleMgr = new ScheduleManager();
 	ScheduleMgr->Init();
+
+	char topicRoot[CONFIG_LENGTH_OF_ROOT+1];
+	sprintf(topicRoot, "%s%s/", mQTT_ROOT, boardName);
+	lengthOfRoot = strlen(topicRoot);
+
 	Log->Debug("Mqtt");
 	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
 	mqttClient->Init();
@@ -33,6 +42,7 @@ void Configuration::Init() {
 		publishConfigParameter(PARAMS_IS_READY, "0");
 		SubscribeAll();
 	}
+
 	mqttClient->FinalInit();
 	//ScheduleMgr->FinalInit();
 	DevMgr->FinalInit();
@@ -216,6 +226,7 @@ void Configuration::Loop(unsigned long timePeriod) {
 		unitsLoop(timePeriod);
 		Runner.Loop(timePeriod);
 	} else if (timePeriod == 60000) {
+		memoryReport("Configuration::Loop 60000");
 		unitsLoop(timePeriod);
 	} else if (timePeriod == 30000) {
 		unitsLoop(timePeriod);
@@ -244,13 +255,15 @@ void Configuration::SubscribeAll() {
 	subscribeParameters();
 	DevMgr->SubscribeEquipment();
 	DevMgr->SubscribeStatuses();
-	ScheduleMgr->SubscribeSchedules();
+	//ScheduleMgr->SubscribeSchedules();
 }
 
 void Configuration::subscribeParameters() {
 
 	for (int i = 0; i < CONFIG_PARAMS_LAST; i++) {
-		subscribeConfigParameter((MqttConfigParam)i);
+		if (i != PARAMS_IS_READY) {
+			subscribeConfigParameter((MqttConfigParam)i);
+		}
 	}
 	Transfer(CONFIG_PARAMS_LAST);
 }
@@ -276,7 +289,7 @@ void Configuration::PublishInfo(const char* txt) {
 void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name) {
 	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
 	if (name != NULL) {
-		payload += "Device: ";
+		payload = "Device: ";
 		payload += name;
 		payload += ". ";
 	}
@@ -308,13 +321,14 @@ void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 		payload += "Voltage is out of range";
 		break;
 	}
+	 
 	createSafeString(topicAlert, MQTT_TOPIC_LENGTH);
 	topicAlert = mqttSectionName[SECTION_ALERT];
 	if (name != NULL) {
 		topicAlert += name;
 		topicAlert += '/';
 	} else {
-		topicAlert += mqttAlertParamName[ALERT_SCRIPT];
+		//topicAlert += mqttAlertParamName[ALERT_SCRIPT];
 	}
 	{
 		createSafeString(topic, MQTT_TOPIC_LENGTH);
@@ -335,6 +349,7 @@ void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 
 void Configuration::publish(const char* topic, const char* payload) {
 	if (isMqttReady) {
+		//Log->append("Generic:").append("topic=").append(topic).append(" payload=").append(payload).Debug();
 		mqttClient->Publish(topic, payload);
 	}
 }
@@ -346,40 +361,35 @@ void Configuration::Subscribe(const char* topic) {
 }
 
 void Configuration::ProcessMessage(const char* topic, const char* payload) {
-	createSafeString(topic0, MQTT_TOPIC_LENGTH);
-	topic0 = topicRoot;
-	topic0 += mqttSectionName[SECTION_CONFIG];
-	if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Config
-		updateConfig(topic + topic0.length(), payload);
+	char const * topic0;
+	topic0 = mqttSectionName[SECTION_CONFIG];
+	if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Config
+		updateConfig(topic + strlen(topic0), payload);
 	} else {
-		topic0 = topicRoot;
-		topic0 += mqttSectionName[SECTION_STATUS];
-		if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Status
+		topic0 = mqttSectionName[SECTION_STATUS];
+		if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Status
 			for (int i = 0; i < DEVICE_TYPE_LAST; i++) {
-				if (strncmp(topic + topic0.length(), mqttDeviceTypeName[i], strlen(mqttDeviceTypeName[i])) == 0) {
-					DevMgr->UpdateStatus((DeviceType)i, topic + topic0.length() + strlen(mqttDeviceTypeName[i]), payload);
+				if (strncmp(topic + strlen(topic0), mqttDeviceTypeName[i], strlen(mqttDeviceTypeName[i])) == 0) {
+					DevMgr->UpdateStatus((DeviceType)i, topic + strlen(topic0) + strlen(mqttDeviceTypeName[i]), payload);
 					break;
 				}
 			}
 		} else {
-			topic0 = topicRoot;
-			topic0 += mqttSectionName[SECTION_SCHEDULE_WEEKEND];
-			if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule weekend
-				byte setNumber = atoi(topic + topic0.length());
+			topic0 = mqttSectionName[SECTION_SCHEDULE_WEEKEND];
+			if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Schedule weekend
+				byte setNumber = atoi(topic + strlen(topic0));
 				ScheduleMgr->UpdateSchedule(0, setNumber, payload);
 			} else {
-				topic0 = topicRoot;
-				topic0 += mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
-				if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Schedule workday
-					byte setNumber = atoi(topic + topic0.length());
+				topic0 = mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
+				if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Schedule workday
+					byte setNumber = atoi(topic + strlen(topic0));
 					ScheduleMgr->UpdateSchedule(CONFIG_NUMBER_SCHEDULES, setNumber, payload);
 				} else {
-					topic0 = topicRoot;
-					topic0 += mqttSectionName[SECTION_EQUIPMENT];
-					if (strncmp(topic, topic0.c_str(), topic0.length()) == 0) { //Equipment
+					topic0 = mqttSectionName[SECTION_EQUIPMENT];
+					if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Equipment
 						for (int i = 0; i < DEVICE_TYPE_LAST; i++) {
-							if (strncmp(topic + topic0.length(), mqttDeviceTypeName[i], strlen(mqttDeviceTypeName[i])) == 0) {
-								DevMgr->UpdateEquipment((DeviceType)i, topic + topic0.length() + strlen(mqttDeviceTypeName[i]), payload);
+							if (strncmp(topic + strlen(topic0), mqttDeviceTypeName[i], strlen(mqttDeviceTypeName[i])) == 0) {
+								DevMgr->UpdateEquipment((DeviceType)i, topic + strlen(topic0) + strlen(mqttDeviceTypeName[i]), payload);
 								break;
 							}
 						}
@@ -437,10 +447,6 @@ void Configuration::updateConfig(const char* topic, const char* payload) {
 	}
 }
 
-void Configuration::initMqttTopics() {
-	sprintf(topicRoot, "%s%s/", mQTT_ROOT, boardName);
-}
-
 void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* payload) {
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
 	topic = mqttSectionName[SECTION_CONFIG];
@@ -486,6 +492,7 @@ void Configuration::Publish(DeviceType dType, const char* name, double status) {
 }
 
 void Configuration::publishStatus(DeviceType dType, const char* name, const char* payload) {
+	//Log->append("Status: ").append(dType).append(" name=").append(name).Debug();
 	if (isMqttReady) {
 		createSafeString(topic, MQTT_TOPIC_LENGTH);
 		topic = mqttSectionName[SECTION_STATUS];
@@ -520,6 +527,7 @@ void Configuration::SubscribeSchedule(int number) {
 }
 
 void Configuration::PublishSchedule(int number) {
+	Log->append("Schedule:").append(number).Debug();
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
 	topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
 	topic += number;

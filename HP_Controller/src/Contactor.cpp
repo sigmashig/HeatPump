@@ -116,9 +116,15 @@ Contactor::Contactor(const char* nm) : Unit(DEVTYPE_CONTACTOR, nm)
 
 void Contactor::UpdateEquipment(const char* line)
 {
-	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
+	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	StaticJsonDocument<CAPACITY> doc;
-	deserializeJson(doc, line);
+	DeserializationError error = deserializeJson(doc, line);
+	if (error) {
+		Config.Log->append("JSON Error=").append(error.f_str()).Debug();
+		return;
+	}
+
+	//deserializeJson(doc, line);
 	// extract the data
 	JsonObject json = doc.as<JsonObject>();
 

@@ -29,10 +29,10 @@ private:
 	EthernetClient* client;
 	bool readClock();
 	bool parseResponse(int len);
-	bool parseJson();
+	bool parseJson(const char* buf);
 	const char* server = CALENDAR_SERVER;
 	char tz[TIMEZONE_LEN];
-	char buf[BUF_SIZE];
-
+	//char buf[BUF_SIZE];
+	char strClock[25];
 };
 

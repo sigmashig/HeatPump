@@ -2,32 +2,27 @@
 #include "ArduinoJson.h"
 #include "Configuration.h"
 #include "SigmaEEPROM.h"
+//#include "MemoryExplorer.h"
 
 extern Configuration Config;
 
 
-SigmaClock::SigmaClock(EthernetClient* cli, const char* timezone)
-{
+SigmaClock::SigmaClock(EthernetClient* cli, const char* timezone) {
     client = cli;
     if (timezone == NULL) {
         SigmaEEPROM::ReadTimezone(tz);
-    }
-    else {
+    } else {
         strcpy(tz, timezone);
     }
     SetTimezone(tz);
     SyncClock();
-   //Config.Log->append("Timezone:").append(tz).Debug();
 }
 
 bool SigmaClock::SyncClock() {
     bool res = false;
-
     if (Config.IsEthernetReady()) {
         if (readClock()) {
-            if (parseJson()) {
-                res=SetClock();
-            }
+            res = SetClock();
         }
     }
     return res;
@@ -84,8 +79,8 @@ bool SigmaClock::SetClock()
 
 const char* SigmaClock::PrintClock()
 {
-    sprintf(buf, "%u-%02u-%02u %02u:%02u:%02u", tm.Year + 1970, tm.Month, tm.Day, tm.Hour, tm.Minute, tm.Second);
-    return buf;
+    sprintf(strClock, "%u-%02u-%02u %02u:%02u:%02u", tm.Year + 1970, tm.Month, tm.Day, tm.Hour, tm.Minute, tm.Second);
+    return strClock;
 }
 
 void SigmaClock::SetTimezone(const char* tzNew)
@@ -107,7 +102,8 @@ bool SigmaClock::readClock()
     int len = 0;
     bool res = false;
     int connRes;
-
+    char buf[100];
+    
     while (numbTry < 5 && len == 0) {
         numbTry++;
         connRes = client->connect(server, 80);
@@ -139,13 +135,14 @@ bool SigmaClock::readClock()
         Config.Log->Error("Time server doesn't respond");
         return res;
     }
-    res =parseResponse(len);
+    res = parseResponse(len);
  	return res;
 }
 
 bool SigmaClock::parseResponse(int len)
 {
     bool res = false;
+    char buf[BUF_SIZE];
 
     String s;
     int payloadLen = 0;
@@ -170,15 +167,18 @@ bool SigmaClock::parseResponse(int len)
         buf[0] = 0;
     }
     res = (buf[0] != 0);
+    if (res) {
+        res = parseJson(buf);
+    }
     return res;
 }
 
-bool SigmaClock::parseJson()
+bool SigmaClock::parseJson(const char* buf)
 {
     bool res = false;
     if (buf[0] != 0) {
-        //const size_t CAPACITY = JSON_OBJECT_SIZE(BUF_SIZE);
-        //StaticJsonDocument<CAPACITY> doc;
+        //const size_t CAPACITY = JSON_OBJECT_SIZE(25);
+        //StaticJsonDocument<128> doc;
         DynamicJsonDocument doc(BUF_SIZE);
         DeserializationError error = deserializeJson(doc, buf);
         if (error) {

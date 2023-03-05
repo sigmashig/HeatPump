@@ -59,9 +59,9 @@ public:
 	// Subscriptions
 	void Subscribe(const char* topic);
 
-	void PublishAlert(ALERTCODE code) { publishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
+	//void PublishAlert(ALERTCODE code) { publishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
 	void PublishAlert(ALERTCODE code, const char* name) { publishAlert(code, ScriptRunner::STEP_EMPTY, name); };
-	void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step) { publishAlert(code, step, NULL); };
+	//void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step) { publishAlert(code, step, NULL); };
 	void Publish(DeviceType dType, const char* name, byte status);
 	void Publish(DeviceType dType, const char* name, double status);
 	void PublishStep(ScriptRunner::STEPS step);
@@ -73,6 +73,8 @@ public:
 	void SubscribeStatus(DeviceType dType, const char* name);
 	void SubscribeSchedule(int number);
 	void PublishSchedule(int number);
+
+	byte GetLengthRootTopic() { return lengthOfRoot; }
 
 private:
 
@@ -88,6 +90,12 @@ private:
 		PARAMS_WEEKMODE,
 		PARAMS_COMMAND,
 		PARAMS_TIMEZONE,
+		PARAMS_IP,
+		PARAMS_BOARD_ID,
+		PARAMS_MQTT_IP,
+		PARAMS_MQTT_PORT,
+		PARAMS_CLOCK_IP,
+		PARAMS_CLOCK_TYPE,
 		CONFIG_PARAMS_LAST
 	} MqttConfigParam;
 
@@ -105,16 +113,15 @@ private:
 	typedef enum {
 		ALERT_CODE,
 		ALERT_TEXT,
-		ALERT_SCRIPT,
 		MQTT_ALERT_LAST
 	} MqttAlertParam;
-/*
-	typedef enum {
-		SCHEDULE_WEEKEND,
-		SCHEDULE_WORKDAY,
-		SCHEDULE_SET_LAST
-	} ScheduleSet;
-*/
+	/*
+		typedef enum {
+			SCHEDULE_WEEKEND,
+			SCHEDULE_WORKDAY,
+			SCHEDULE_SET_LAST
+		} ScheduleSet;
+	*/
 
 	// Setters for config parameters
 	void setWorkMode(byte b, bool save = true);
@@ -132,15 +139,19 @@ private:
 	void setSimulator(byte b, bool save = true);
 	void setSimulator(const char* str) { setSimulator(str[0] - '0'); };
 	void setTimeZone(const char* tz, bool save = true);
-
+	void setMqttIp(IPAddress& ip, bool save = true);
+	void setMqttPort(uint16_t port, bool save = true);
+	void setIp(const char* str, bool save = true){ IPAddress ip; ip.fromString(str); setIp(ip, save); };
+	void setIp(IPAddress& ip, bool save = true);
 
 	byte BoardId() { return boardId; };
 
 	const char* mQTT_ROOT = "HeatPump/";
 	const char* mqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
-									"Hysteresis", "WeekMode","Command","TimeZone" };
+										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockIP","ClockType" };
+
 	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/WeekEnd/Set_", "Schedule/Workdays/Set_" };
-	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text", "Script" };
+	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text"};
 	const char* mqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/" };
 	//const char* mqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
 	void publish(const char* topic, const char* payload);
@@ -166,8 +177,9 @@ private:
 	char boardName[10];
 	double manualTemp = 20.0;
 	double desiredTemp = 20.0;
+	byte lengthOfRoot = 0;
 
-	char topicRoot[MQTT_TOPIC_LENGTH + 1];
+	//char topicRoot[MQTT_TOPIC_LENGTH + 1];
 	//methods
 
 	void readBoardId();
@@ -181,11 +193,16 @@ private:
 	void publishParameters();
 	void publishConfigParameter(MqttConfigParam parmId, double payload);
 	void updateConfig(const char* topic, const char* payload);
-	void initMqttTopics();
+	//void initMqttTopics();
 	void publishConfigParameter(MqttConfigParam parmId, const char* payload);
 	void subscribeConfigParameter(MqttConfigParam parmId);
 	void publishConfigParameter(MqttConfigParam parmId, byte payload);
+	void publishConfigParameter(MqttConfigParam parmId, IPAddress& ip);
+	void publishConfigParameter(MqttConfigParam parmId, unsigned int payload);
+	
 	void publishStatus(DeviceType dType, const char* name, const char* payload);
 	void publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
+
+	MqttConfigParam paramTypeByName(const char* name);
 };
 
