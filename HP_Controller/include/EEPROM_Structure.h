@@ -15,9 +15,8 @@
 // 5-8	|4	|MQTT IP
 // 9-10	|2	|MQTT Port
 
-#define EEPROM_ADDR_MQTT	(EEPROM_ADDR_IP + 4)  //4+2=6 bytes
-
-
+#define EEPROM_ADDR_MQTT_IP	    (EEPROM_ADDR_IP + 4)  //4+2=6 bytes
+#define EEPROM_ADDR_MQTT_PORT   (EEPROM_ADDR_MQTT_IP + 4)  //2 bytes
 //Modes
 //11 - 109 
 // 11		|1	|Mode (0-manual, 1-schedule)
@@ -27,7 +26,7 @@
 // 15		|1	|Weekmode  5-2/6-1/7-0
 // 16		|1	|CMD Stop/Run/...
 
-#define EEPROM_ADDR_CONFIG	(EEPROM_ADDR_MQTT + 6)
+#define EEPROM_ADDR_CONFIG	(EEPROM_ADDR_MQTT_PORT + 2)
 #define EEPROM_ADDR_CONFIG_MODE EEPROM_ADDR_CONFIG
 #define EEPROM_ADDR_CONFIG_MANUALTEMP EEPROM_ADDR_CONFIG+1
 #define EEPROM_ADDR_CONFIG_HEATCOLD EEPROM_ADDR_CONFIG+2

@@ -11,8 +11,10 @@ class SigmaEEPROM
 
  public:
 	static byte ReadBoardId();
-	static void ReadIp(IPAddress& ip);
-	static unsigned int ReadMqtt(IPAddress& ip);
+	//static unsigned int ReadMqtt(IPAddress& ip);
+
+    static void WriteIp(IPAddress& ip, uint16_t addr);
+	static void ReadIp(IPAddress& ip, uint16_t addr);
 
 	static uint16_t Read16(uint16_t addr);
 	static byte Read8(uint16_t addr);

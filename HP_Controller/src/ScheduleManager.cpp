@@ -39,9 +39,9 @@ void ScheduleManager::SubscribeSchedules()
 void ScheduleManager::UpdateSchedule(byte shift, byte setNumber, const char* payload)
 { 
 	AllSchedule[shift + setNumber].UpdateSchedule(payload);
-	if (sortSchedule(shift)) {
-		publishSchedules(shift);
-	}
+	//if (sortSchedule(shift)) {
+	//	publishSchedules(shift);
+	//}
 }
 
 double ScheduleManager::GetDesiredTemperature() {
