@@ -320,7 +320,7 @@ void Configuration::SubscribeAll() {
 	subscribeParameters();
 	DevMgr->SubscribeEquipment();
 	DevMgr->SubscribeStatuses();
-	//ScheduleMgr->SubscribeSchedules();
+	ScheduleMgr->SubscribeSchedules();
 }
 
 void Configuration::subscribeParameters() {
@@ -669,8 +669,13 @@ void Configuration::SubscribeStatus(DeviceType dType, const char* name) {
 
 void Configuration::SubscribeSchedule(int number) {
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
-	
-	topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
+	if (number <= CONFIG_NUMBER_SCHEDULES) {
+		topic = mqttSectionName[SECTION_SCHEDULE_WEEKEND];
+	} else {
+		topic = mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
+		number -= CONFIG_NUMBER_SCHEDULES;
+	}
+	//topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
 	topic += number;
 	mqttClient->Subscribe(topic.c_str());
 }
@@ -682,5 +687,6 @@ void Configuration::PublishSchedule(int number) {
 	topic += number;
 	char payload[MQTT_PAYLOAD_LENGTH + 1];
 	ScheduleMgr->GetSchedule(number).Serialize(payload);
-	mqttClient->Publish(topic.c_str(), payload);
+	Log->append("Schedule:").append(number).append("=").append(payload).Debug();
+	//mqttClient->Publish(topic.c_str(), payload);
 }

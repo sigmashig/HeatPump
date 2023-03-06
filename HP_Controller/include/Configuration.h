@@ -152,7 +152,7 @@ private:
 	const char* mqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
 										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockType" };
 
-	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/WeekEnd/Set_", "Schedule/Workdays/Set_" };
+	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/Weekend/Set_", "Schedule/Workdays/Set_" };
 	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text"};
 	const char* mqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/" };
 	//const char* mqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
