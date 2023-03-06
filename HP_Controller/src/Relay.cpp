@@ -93,7 +93,7 @@ void Relay::UpdateEquipment(const char* line) {
 	//deserializeJson(doc, line);
 	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
-		Config.Log->append("JSON Error=").append(error.f_str()).Debug();
+		Config.Log->append("JSON Error=").append(error.f_str()).Error();
 		return;
 	}
 

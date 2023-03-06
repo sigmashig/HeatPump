@@ -136,7 +136,7 @@ void Configuration::setIp(IPAddress& ip, bool save) {
 	if (!save) {
 		this->ip = ip;
 	} else {
-		if (this->ip != ip) {
+		if (this->ip != ip && Utils::IsIpValid(ip)) {
 			this->ip = ip;
 			Log->Debug("EEPROM IP");
 			SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_IP);
@@ -148,7 +148,7 @@ void Configuration::setMqttIp(IPAddress& ip, bool save) {
 	if (!save) {
 		this->mqttIp = ip;
 	} else {
-		if (this->mqttIp != ip) {
+		if (this->mqttIp != ip && Utils::IsIpValid(ip)) {
 			this->mqttIp = ip;
 			Log->Debug("EEPROM Mqtt IP");
 			SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_MQTT_IP);

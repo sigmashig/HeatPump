@@ -9,29 +9,21 @@ extern Configuration Config;
 
 void OneWireThermo::InitUnit() {
 	parent = &(Config.DevMgr->Bus);
-	//Config.Log->append(F("InitUnit:")).append(Name).Debug();
 	if (OneWireBus::IsZeroAddress(Address)) {
-		// Simulator
-		//Config.Log->Debug("POINT1");
 		isSimulator = true;
 	} else 	if (!parent->CheckAddress(Address)) {
 		Config.Log->append(F("Unit:")).append(Name).append(F(" is absent on the bus")).Error();
 		isSimulator = true;
 	} else {
-		//Config.Log->Debug("POINT2");
 		isSimulator = false;
 		parent->SetResolution(Address);
 	}
-	//Config.Log->Debug("POINT3");
 
 	PublishDeviceAlert(ALERT_EMPTY, true);
-	//Config.Log->Debug("POINT4");
-
 }
 
 
 double OneWireThermo::GetTemperature() {
-	//Config.Log->append("Thermometer:").append(Name).append(";avail=").append(IsAvailable).Debug();
 	if (!isSimulator) {
 		Temperature = parent->GetTemperature(Address);
 		Publish();
@@ -40,12 +32,11 @@ double OneWireThermo::GetTemperature() {
 }
 
 void OneWireThermo::UpdateEquipment(const char* line) {
-	//Config.Log->append(F("UpdateEquipment:")).append((int)strlen(line)).Debug();
 	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	DynamicJsonDocument doc(CAPACITY);
 	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
-		Config.Log->append("JSON Error=").append(error.f_str()).Debug();
+		Config.Log->append("JSON Error=").append(error.f_str()).Error();
 		return;
 	}
 //StaticJsonDocument<CAPACITY> doc;

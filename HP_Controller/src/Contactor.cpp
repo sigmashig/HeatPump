@@ -120,7 +120,7 @@ void Contactor::UpdateEquipment(const char* line)
 	StaticJsonDocument<CAPACITY> doc;
 	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
-		Config.Log->append("JSON Error=").append(error.f_str()).Debug();
+		Config.Log->append("JSON Error=").append(error.f_str()).Error();
 		return;
 	}
 

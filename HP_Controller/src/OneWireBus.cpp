@@ -174,7 +174,7 @@ void OneWireBus::UpdateEquipment(const char* payload) {
 	//deserializeJson(doc, payload);
 	DeserializationError error = deserializeJson(doc, payload);
 	if (error) {
-		Config.Log->append("JSON Error=").append(error.f_str()).Debug();
+		Config.Log->append("JSON Error=").append(error.f_str()).Error();
 		return;
 	}
 

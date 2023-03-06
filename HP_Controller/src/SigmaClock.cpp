@@ -182,7 +182,7 @@ bool SigmaClock::parseJson(const char* buf)
         //DynamicJsonDocument doc(200);
         DeserializationError error = deserializeJson(doc, buf);
         if (error) {
-            Config.Log->append("JSON Error=").append(error.f_str()).Debug();
+            Config.Log->append("JSON Error=").append(error.f_str()).Error();
             return false;
         }
         // extract the data
