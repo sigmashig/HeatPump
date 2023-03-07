@@ -24,6 +24,7 @@ void ScheduleManager::Init()
 
 void ScheduleManager::FinalInit()
 {
+	sort = true;
 }
 
 
@@ -37,11 +38,14 @@ void ScheduleManager::SubscribeSchedules()
 
 
 void ScheduleManager::UpdateSchedule(byte shift, byte setNumber, const char* payload)
-{ 
-	AllSchedule[shift + setNumber].UpdateSchedule(payload);
-	//if (sortSchedule(shift)) {
-	//	publishSchedules(shift);
-	//}
+{
+//	Config.Log->append("UpdateSchedule. Shift=").append(shift).append("; number=").append(setNumber).append("; payload=").append(payload).Debug();
+	AllSchedule[shift + setNumber - 1].UpdateSchedule(payload);
+	if (sort) {
+		if (sortSchedule(shift)) {
+			publishSchedules(shift);
+		}
+	}
 }
 
 double ScheduleManager::GetDesiredTemperature() {

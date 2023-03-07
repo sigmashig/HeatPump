@@ -10,7 +10,7 @@ void callbackFunc(char* topic, uint8_t* payload, unsigned int length) {
 		char* pl = (char*)payload;
 		pl[length] = 0;
 		Config.Log->append("[").append(topic).append("]:").append((char*)payload).Info();
-		Config.ProcessMessage(topic, (char*)payload);
+		Config.ProcessMessage(topic + Config.GetLengthRootTopic(), (char*)payload);
 	} else {
 		Config.Log->Debug("Wrong Length");
 	}
@@ -19,7 +19,7 @@ void callbackFunc(char* topic, uint8_t* payload, unsigned int length) {
 
 Mqtt::Mqtt(IPAddress ip, unsigned int port, EthernetClient& eth, const char* root) : 
 	PubSubClient(ip, port, callbackFunc, eth) {
-	topicRoot = root;
+	strcpy(topicRoot,root);
 	mqttWaiting = MQTT_INITIAL_RETRY_DELAY;
 }
 
@@ -74,11 +74,16 @@ void Mqtt::repeatedLoop(int n) {
 	}
 }
 bool Mqtt::Publish(const char* topic, const char* payload) {
-	//Config.Log->append("Publish length=").append((int)strlen(topic)).Debug();
+	//Config.Log->append("Publish topic length=").append((int)strlen(topic)).Debug();
+	//Config.Log->append("Publish payload length=").append((int)strlen(payload)).Debug();
+	//Config.Log->append("Root length=").append((int)strlen(topicRoot)).Debug();
 	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
+	//Config.Log->Debug("POINT1");
 	topicFull = topicRoot;
+	//Config.Log->Debug("POINT2");
 	topicFull += topic;
-	Config.Log->append(F("Publish [")).append(topicFull.c_str()).append(F("]:")).append(payload).Debug();
+	//Config.Log->Debug("POINT3");
+	//Config.Log->append(F("Publish [")).append(topicFull.c_str()).append(F("]:")).append(payload).Debug();
 	if (connected()) {
 		return publish(topicFull.c_str(), payload);
 	}
@@ -89,12 +94,13 @@ bool Mqtt::Publish(const char* topic, const char* payload) {
 
 void Mqtt::Subscribe(const char* topic) {
 	//Config.Log->append("Subscribe length=").append((int)strlen(topic)).Debug();
-	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
-	topicFull = topicRoot;
-	topicFull += topic;
-	Config.Log->append(F("Subscription:")).append(topicFull.c_str()).Debug();
+	//Config.Log->append("Root length=").append((int)strlen(topicRoot)).Debug();
+	createSafeString(topicFull1, MQTT_TOPIC_LENGTH);
+	topicFull1 = topicRoot;
+	topicFull1 += topic;
+	Config.Log->append(F("Subscription:")).append(topicFull1.c_str()).Debug();
 	if (connected()) {
-		subscribe(topicFull.c_str());
+		subscribe(topicFull1.c_str());
 	}
 }
 /*

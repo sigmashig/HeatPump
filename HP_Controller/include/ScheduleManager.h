@@ -15,6 +15,7 @@ public:
 	Schedule& GetSchedule(byte setNumber) { return AllSchedule[setNumber]; };
 	
 private:
+	bool sort = false;
 	Schedule AllSchedule[2 * CONFIG_NUMBER_SCHEDULES];
 	void readFromEEPROM();
 	bool sortSchedule(byte shift);

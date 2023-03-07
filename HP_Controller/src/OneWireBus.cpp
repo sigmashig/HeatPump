@@ -25,12 +25,18 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 
 void OneWireBus::InitUnit() {
+	//Config.Log->Debug("POINT5");
 	releaseResources();
+	//Config.Log->Debug("POINT6");
 	oneWire = new OneWire(Pin);
+	//Config.Log->Debug("POINT7");
 	PublishDeviceAlert(ALERT_EMPTY, true);
+	//Config.Log->Debug("POINT8");
 
 	sensors = new DallasTemperature(oneWire);
+	//Config.Log->Debug("POINT9");
 	sensors->begin();
+	//Config.Log->Debug("POINT10");
 
 }
 
@@ -139,6 +145,7 @@ String OneWireBus::ConvertAddressToString(const DeviceAddress address) {
 }
 
 bool OneWireBus::IsZeroAddress(DeviceAddress address) {
+
 	bool res = true;
 
 	//Config.Log->append(F("IsZeroAddress: ")).append(ConvertAddressToString(address).c_str()).Debug();
@@ -162,9 +169,15 @@ void OneWireBus::UpdateStatus(const char* payload) {
 }
 
 void OneWireBus::UpdateEquipment(const char* payload) {
-	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
+	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	StaticJsonDocument<CAPACITY> doc;
-	deserializeJson(doc, payload);
+	//deserializeJson(doc, payload);
+	DeserializationError error = deserializeJson(doc, payload);
+	if (error) {
+		Config.Log->append("JSON Error=").append(error.f_str()).Error();
+		return;
+	}
+
 	// extract the data
 	JsonObject json = doc.as<JsonObject>();
 
@@ -178,8 +191,10 @@ void OneWireBus::UpdateEquipment(const char* payload) {
 void OneWireBus::releaseResources() {
 	if (oneWire != NULL) {
 		delete oneWire;
+		oneWire = NULL;
 	}
 	if (sensors != NULL) {
 		delete sensors;
+		sensors = NULL;
 	}
 }

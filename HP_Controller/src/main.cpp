@@ -24,6 +24,7 @@
 #include <BufferedInput.h>
 #include <Ethernet.h>
 #include <PubSubClient.h>
+#include "MemoryExplorer.h"
 
 #include "definitions.h"
 #include "Configuration.h"
@@ -49,7 +50,7 @@ void setup() {
 	SafeString::setOutput(Serial);
 	//init random generator
 	randomSeed(analogRead(0));
-
+	memoryReport("Start");
 	//UpdateEEPROM();
 	//initialization of config
 	Config.Init();
@@ -58,6 +59,8 @@ void setup() {
 	pinMode(LED_BUILTIN, OUTPUT);
 	digitalWrite(LED_BUILTIN, HIGH);
 	Config.Log->Info("Enjoy!");
+	memoryReport("Setup End");
+
 }
 
 // the loop function runs over and over again until power down or reset

@@ -9,9 +9,7 @@ extern Configuration Config;
 
 void OneWireThermo::InitUnit() {
 	parent = &(Config.DevMgr->Bus);
-	
 	if (OneWireBus::IsZeroAddress(Address)) {
-		// Simulator
 		isSimulator = true;
 	} else 	if (!parent->CheckAddress(Address)) {
 		Config.Log->append(F("Unit:")).append(Name).append(F(" is absent on the bus")).Error();
@@ -20,12 +18,12 @@ void OneWireThermo::InitUnit() {
 		isSimulator = false;
 		parent->SetResolution(Address);
 	}
+
 	PublishDeviceAlert(ALERT_EMPTY, true);
 }
 
 
 double OneWireThermo::GetTemperature() {
-	//Config.Log->append("Thermometer:").append(Name).append(";avail=").append(IsAvailable).Debug();
 	if (!isSimulator) {
 		Temperature = parent->GetTemperature(Address);
 		Publish();
@@ -34,9 +32,15 @@ double OneWireThermo::GetTemperature() {
 }
 
 void OneWireThermo::UpdateEquipment(const char* line) {
-	const size_t CAPACITY = JSON_OBJECT_SIZE(JSON_SIZE);
-	StaticJsonDocument<CAPACITY> doc;
-	deserializeJson(doc, line);
+	//const size_t CAPACITY = JSON_OBJECT_SIZE(10);
+	DynamicJsonDocument doc(400);
+	DeserializationError error = deserializeJson(doc, line);
+	if (error) {
+		Config.Log->append("JSON Error=").append(error.f_str()).Error();
+		return;
+	}
+//StaticJsonDocument<CAPACITY> doc;
+	//deserializeJson(doc, line);
 	// extract the data
 	JsonObject json = doc.as<JsonObject>();
 

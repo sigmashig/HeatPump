@@ -13,17 +13,16 @@
 
 void callbackFunc(char* topic, uint8_t* payload, unsigned int length);
 
-class Mqtt :
-    public PubSubClient
-{
+class Mqtt:
+	public PubSubClient {
 public:
 
 	//methods
 	Mqtt(IPAddress ip, unsigned int port, EthernetClient& eth, const char* root);
-    void Init();
+	void Init();
 	bool Publish(const char* topic, const char* payload);
 	void Subscribe(const char* topic);
-//	void PublishLog(DebugLevel level, const char* message);
+	//	void PublishLog(DebugLevel level, const char* message);
 	bool simpleLoop();
 	void MqttLoop(int n = 0);
 	void FinalInit();
@@ -31,7 +30,7 @@ public:
 
 private:
 	unsigned long mqttWaiting;
-	const char* topicRoot;
+	char topicRoot[CONFIG_LENGTH_OF_ROOT + 1];
 	//const char* LOG_END[7] = { "OFF", "FATAL","ERROR","WARN","INFO","DEBUG","ALL" };
 
 	bool mqttReconnect();

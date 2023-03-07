@@ -652,7 +652,7 @@ void ScriptRunner::publishAlert(ALERTCODE code) {
 
 	if (code != alertCode) {
 
-		Config.PublishAlert(code);
+		Config.PublishAlert(code,"Script");
 		alertCode = code;
 	}
 }

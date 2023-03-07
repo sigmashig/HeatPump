@@ -19,8 +19,13 @@ int getNumberOfBlocksInFreeList() {
 
 
 void memoryReport(const char* title) {
+
+    unsigned long free_memory = heapEnd() - newSoil();
+    
     Serial.print("---- Memory report: ");
-    Serial.println(title);
+    Serial.print(title);
+    Serial.print(" === Free Memory:");
+    Serial.println(free_memory);
     Serial.print("HEAP:");
     Serial.print(HS_Pointer);
     Serial.print('-');
