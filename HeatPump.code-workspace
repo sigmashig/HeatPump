@@ -3,6 +3,10 @@
 		{
 			"name": "HP_Controller",
 			"path": "HP_Controller"
+		},
+		{
+			"name": "OneWireDetect",
+			"path": "../OneWireDetect"
 		}
 	],
 	"settings": {
