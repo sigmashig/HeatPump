@@ -55,19 +55,27 @@ void Configuration::Init() {
 }
 
 
-void Configuration::setBoardId(byte id) {
+void Configuration::setBoardId(byte id, bool save) {
+	if (save) {
+		if (id != boardId) {
+			Log->Debug("EEROM write board id");
+			SigmaEEPROM::Write8(EEPROM_ADDR_ID, id);
+		}
+	}
+	
 	boardId = id;
 	mac[5] = id;
 	sprintf(boardName, "Board_%02u", id);
 }
 
+/*
 void Configuration::setIp(byte ip0, byte ip1, byte ip2, byte ip3) {
 	ip[0] = ip0;
 	ip[1] = ip1;
 	ip[2] = ip2;
 	ip[3] = ip3;
 }
-
+*/
 void Configuration::initializeEthernet() {
 	Log->Info("Initializing Ethernet...");
 	if (Ethernet.begin(mac) == 0) {
@@ -93,11 +101,16 @@ void Configuration::initializeEthernet() {
 
 void Configuration::readBoardId() {
 	byte id = SigmaEEPROM::ReadBoardId();
-	setBoardId(id);
-	SigmaEEPROM::ReadIp(ip, EEPROM_ADDR_IP);
-	SigmaEEPROM::ReadIp(mqttIp, EEPROM_ADDR_MQTT_IP);
-	mqttPort = SigmaEEPROM::Read16(EEPROM_ADDR_MQTT_PORT);
-
+	setBoardId(id, false);
+	IPAddress ip0;
+	SigmaEEPROM::ReadIp(ip0, EEPROM_ADDR_IP);
+	setIp(ip0, false);
+	SigmaEEPROM::ReadIp(ip0, EEPROM_ADDR_MQTT_IP);
+	setMqttIp(ip0, false);
+	unsigned long port;
+	port = SigmaEEPROM::Read16(EEPROM_ADDR_MQTT_PORT);
+	setMqttPort(port, false);
+	
 	Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
 		.append(ip[2]).append(".").append(ip[3]).Info();
 	Log->append(F("Mqtt Address is: ")).append(mqttIp[0]).append(".").append(mqttIp[1]).append(".")
@@ -132,14 +145,14 @@ void Configuration::setTimeZone(const char* tz, bool save) {
 	}
 }
 
-void Configuration::setIp(IPAddress& ip, bool save) {
+void Configuration::setIp(IPAddress& ipNew, bool save) {
 	if (!save) {
-		this->ip = ip;
+		this->ip = ipNew;
 	} else {
-		if (this->ip != ip && Utils::IsIpValid(ip)) {
-			this->ip = ip;
+		if (this->ip != ipNew && Utils::IsIpValid(ipNew)) {
+			this->ip = ipNew;
 			Log->Debug("EEPROM IP");
-			SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_IP);
+			SigmaEEPROM::WriteIp(ipNew, EEPROM_ADDR_IP);
 		}
 	}
 }
@@ -290,7 +303,7 @@ void Configuration::Loop(unsigned long timePeriod) {
 		unitsLoop(timePeriod);
 		Runner.Loop(timePeriod);
 	} else if (timePeriod == 60000) {
-		memoryReport("Configuration::Loop 60000");
+		//memoryReport("Configuration::Loop 60000");
 		unitsLoop(timePeriod);
 	} else if (timePeriod == 30000) {
 		unitsLoop(timePeriod);
@@ -414,7 +427,6 @@ void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const
 
 void Configuration::publish(const char* topic, const char* payload) {
 	if (isMqttReady) {
-		//Log->append("Generic:").append("topic=").append(topic).append(" payload=").append(payload).Debug();
 		mqttClient->Publish(topic, payload);
 	}
 }
@@ -628,6 +640,12 @@ void Configuration::Publish(DeviceType dType, const char* name, byte status) {
 	publishStatus(dType, name, p);
 }
 
+
+void Configuration::Publish(DeviceType dType, const char* name, const char* payload) {
+	publishStatus(dType, name, payload);
+}
+
+
 void Configuration::PublishStep(ScriptRunner::STEPS step) {
 	char p[2];
 	sprintf(p, "%c", step);
@@ -641,7 +659,6 @@ void Configuration::Publish(DeviceType dType, const char* name, double status) {
 }
 
 void Configuration::publishStatus(DeviceType dType, const char* name, const char* payload) {
-	//Log->append("Status: ").append(dType).append(" name=").append(name).Debug();
 	if (isMqttReady) {
 		createSafeString(topic, MQTT_TOPIC_LENGTH);
 		topic = mqttSectionName[SECTION_STATUS];

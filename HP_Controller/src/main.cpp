@@ -34,10 +34,10 @@ DebugLevel DLevel = DebugLevel::D_DEBUG;
 
 void UpdateEEPROM() {
 
-	SigmaEEPROM::Write8(EEPROM_ADDR_ID, (byte)0x07);
-	IPAddress ip(192, 168, 0, 90 + 7);
+	SigmaEEPROM::Write8(EEPROM_ADDR_ID, (byte)0x05);
+	IPAddress ip(192, 168, 0, 90 + 5);
 	SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_IP);
-	ip = IPAddress(192, 168, 0, 98);
+	ip = IPAddress(192, 168, 0, 99);
 	SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_MQTT_IP);
 	SigmaEEPROM::Write16(EEPROM_ADDR_MQTT_PORT, (unsigned int)1883);
 }

@@ -1,9 +1,11 @@
-Found:6
-Device:0 Address:28:FF:B8:04:B4:16:05:6C
-Device:1 Address:28:FF:9C:95:87:16:03:02
-Device:2 Address:28:FF:BC:A6:87:16:03:3A
-Device:3 Address:28:FF:DA:2F:B4:16:05:1A
-Device:4 Address:28:FF:2D:F5:B3:16:05:8D
-Device:5 Address:28:FF:F7:F3:B3:16:05:67
-Device:6 Address:28:FF:71:82:90:16:04:39
-Device:7 Address:28:FF:78:71:B4:16:05:67
+Compressor  Device:0 Address:28:FF:B8:04:B4:16:05:6C {'address':'28FFB804B416056C',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}
+CondIn      Device:1 Address:28:FF:9C:95:87:16:03:02 {'address':'28FF9C9587160302',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}
+CondVap     Device:2 Address:28:FF:BC:A6:87:16:03:3A {'address':'28FFBCA68716033A',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':50, 'errorHigh':60}
+GroundIn    Device:3 Address:28:FF:DA:2F:B4:16:05:1A {'address':'28FFDA2FB416051A',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':40, 'errorHigh':50}
+GroundOut   Device:4 Address:28:FF:2D:F5:B3:16:05:8D {'address':'28FF2DF5B316058D',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':40, 'errorHigh':50}
+In          Device:5 Address:28:FF:F7:F3:B3:16:05:67 {'address':'28FFF7F3B3160567',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':50, 'errorHigh':60}
+Out         Device:6 Address:28:FF:71:82:90:16:04:39 {'address':'28FF718290160439',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':50, 'errorHigh':60}
+VapOut      Device:7 Address:28:FF:78:71:B4:16:05:67 {'address':'28FF7871B4160567',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}
+
+
+{'address':'0000000000000000',  'errorLow':'-30', 'warningLow':-20, 'warningHigh':100, 'errorHigh':120}

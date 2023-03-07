@@ -25,12 +25,23 @@ void OneWireThermo::InitUnit() {
 
 double OneWireThermo::GetTemperature() {
 	if (!isSimulator) {
-		Temperature = parent->GetTemperature(Address);
-		Publish();
+		double t = parent->GetTemperature(Address);
+		if (t != Temperature) {
+			Temperature = t;
+			publishTemp();
+		}
 	}
 	return Temperature;
 }
 
+void OneWireThermo::publishTemp() {
+	int p1 = (int)Temperature;
+	int p2 = (int)((Temperature - p1) * 10);
+	char p[10];
+	sprintf(p, "%d.%d", p1, p2);
+	
+	Config.Publish(DevType, Name, p);
+}
 void OneWireThermo::UpdateEquipment(const char* line) {
 	//const size_t CAPACITY = JSON_OBJECT_SIZE(10);
 	DynamicJsonDocument doc(400);
@@ -102,11 +113,6 @@ void OneWireThermo::UnitLoop(unsigned long timeperiod) {
 	if (timeperiod == 1000) {
 		if (!isSimulator) {
 			GetTemperature();
-			if (!IsOk()) {
-				PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
-			} else {
-				PublishDeviceAlert(ALERT_EMPTY);
-			}
 		}
 	}
 }

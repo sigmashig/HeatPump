@@ -63,6 +63,7 @@ public:
 	void PublishAlert(ALERTCODE code, const char* name) { publishAlert(code, ScriptRunner::STEP_EMPTY, name); };
 	//void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step) { publishAlert(code, step, NULL); };
 	void Publish(DeviceType dType, const char* name, byte status);
+    void Publish(DeviceType dType, const char* name, const char* payload);
 	void Publish(DeviceType dType, const char* name, double status);
 	void PublishStep(ScriptRunner::STEPS step);
 	void PublishInfo(const char* txt);
@@ -142,8 +143,9 @@ private:
 	void setMqttIp(IPAddress& ip, bool save = true);
 	void setMqttPort(uint16_t port, bool save = true);
 	//void setIp(const char* str, bool save = true){ IPAddress ip; ip.fromString(str); setIp(ip, save); };
-	void setIp(IPAddress& ip, bool save = true);
+	void setIp(IPAddress& ipNew, bool save = true);
 	void setClockType(byte b, bool save = true);
+	void setBoardId(byte id, bool save = true);
 	
 
 	byte BoardId() { return boardId; };
@@ -185,8 +187,7 @@ private:
 	//methods
 
 	void readBoardId();
-	void setBoardId(byte id);
-	void setIp(byte ip0, byte ip1, byte ip2, byte ip3);
+	//void setIp(byte ip0, byte ip1, byte ip2, byte ip3);
 	void initializeEthernet();
 	void unitsLoop(unsigned long timePeriod);
 

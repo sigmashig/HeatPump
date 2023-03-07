@@ -30,5 +30,6 @@ private:
 	OneWireBus* parent;
 	bool isSimulator = true;
 	bool checkSimulator();
+	void publishTemp();
 };
 

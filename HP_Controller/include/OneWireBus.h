@@ -12,9 +12,11 @@ class OneWireBus:
 public:
 
 	void InitUnit();
+    int GetDeviceCount();
 	void UnitLoop(unsigned long timePeriod);
 	void FinalInitUnit() {};
 
+    
 	void ProcessUnit(ActionType action);
 	double GetTemperature(const DeviceAddress address);
 	bool CheckAddress(const DeviceAddress address);
@@ -37,6 +39,7 @@ private:
 	static byte hexToDec(char c1, char c2);
 	static byte hexToDec(char c1);
 	void releaseResources();
+	void printDevices();
 
 	//	unsigned long prevCycle = 0;
 };

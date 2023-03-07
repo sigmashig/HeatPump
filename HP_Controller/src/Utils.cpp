@@ -63,6 +63,6 @@ double Utils::Str2Double(const char* str)
 
 bool Utils::IsIpValid(IPAddress ip) {
     bool res = true;
-    res = (ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0);
+    res = !(ip[0] == 0 && ip[1] == 0 && ip[2] == 0 && ip[3] == 0);
     return res;
 }

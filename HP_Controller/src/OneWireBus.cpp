@@ -25,21 +25,28 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 
 void OneWireBus::InitUnit() {
-	//Config.Log->Debug("POINT5");
 	releaseResources();
-	//Config.Log->Debug("POINT6");
+	Config.Log->append(F("Init OneWire bus on pin ")).append(Pin).Debug();
 	oneWire = new OneWire(Pin);
-	//Config.Log->Debug("POINT7");
 	PublishDeviceAlert(ALERT_EMPTY, true);
-	//Config.Log->Debug("POINT8");
-
 	sensors = new DallasTemperature(oneWire);
-	//Config.Log->Debug("POINT9");
 	sensors->begin();
-	//Config.Log->Debug("POINT10");
-
+	printDevices();
 }
 
+int OneWireBus::GetDeviceCount() {
+	return sensors->getDeviceCount();
+}
+
+void OneWireBus::printDevices() {
+	Config.Log->append(F("Found ")).append(GetDeviceCount()).append(F(" devices on the bus")).Info();
+	for (int i = 0; i < GetDeviceCount(); i++) {
+		DeviceAddress addr;
+		sensors->getAddress(addr, i);
+
+		Config.Log->append(F("Device ")).append(i).append(F(": ")).append(ConvertAddressToString(addr).c_str()).append(F(" ")).Info();
+	}
+}
 void OneWireBus::ProcessUnit(ActionType action) {
 	//	status = action;
 }
@@ -184,7 +191,7 @@ void OneWireBus::UpdateEquipment(const char* payload) {
 	if (json.containsKey("pin")) {
 		Pin = json["pin"];
 		//releaseResources();
-		InitUnit();
+		//InitUnit();
 	}
 }
 

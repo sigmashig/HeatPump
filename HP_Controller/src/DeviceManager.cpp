@@ -30,13 +30,13 @@ void DeviceManager::updateRelayEquipment(int number, const char* payload) {
 }
 
 void DeviceManager::updateBusEquipment(const char* payload) {
-		byte p = atoi(payload);
-		if (Bus.Pin != p) {
-			Config.Log->Debug("EEPROM BUS");
-			SigmaEEPROM::Write8(EEPROM_ADDR_TBUS_PIN, p);
-		}
-		Bus.Pin = p;
-		Bus.InitUnit();	
+	byte pin = Bus.Pin;
+	Bus.UpdateEquipment(payload);
+	if (Bus.Pin != pin) {
+		Config.Log->Debug("EEPROM BUS");
+		SigmaEEPROM::Write8(EEPROM_ADDR_TBUS_PIN, pin);
+		Bus.InitUnit();
+	}
 }
 
 void DeviceManager::updateThermoEquipment(int number, const char* payload) {
@@ -56,7 +56,7 @@ void DeviceManager::updateThermoEquipment(int number, const char* payload) {
 		|| eLow != AllThermo[number]->ErrorLow || eHigh != AllThermo[number]->ErrorHigh
 		|| wLow != AllThermo[number]->WarningLow || wHigh != AllThermo[number]->WarningHigh
 		) {
-	//	Config.Log->Debug("POINT12");
+		//	Config.Log->Debug("POINT12");
 
 		for (int j = 0; j < 8; j++) {
 			SigmaEEPROM::Write8(EEPROM_ADDR_THERM + number * EEPROM_LEN_THERM + j, AllThermo[number]->Address[j]);
@@ -219,6 +219,7 @@ void DeviceManager::UpdateEquipment(DeviceType dType, const char* name, const ch
 		break;
 	case DEVTYPE_BUS:
 		if (strcmp(Bus.Name, name) == 0) {
+			Config.Log->Debug("POINT1");
 			updateBusEquipment(payload);
 		}
 		break;
