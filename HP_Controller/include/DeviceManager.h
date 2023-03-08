@@ -38,7 +38,7 @@ public:
 	OneWireThermo TInside = OneWireThermo("TInside");
 	OneWireThermo TOutside = OneWireThermo("TOutside");
 
-	OneWireThermo* AllThermo[CONFIG_NUMBER_THERMO] = { &TGndIn, &TGndOut, &TCompressor, &TVapOut, &TCondIn, &TCondIn, &TVapIn, &TOut, &TIn, &TTankOut, &TTankIn, &TInside, &TOutside };
+	OneWireThermo* AllThermo[CONFIG_NUMBER_THERMO] = { &TGndIn, &TGndOut, &TCompressor, &TVapOut, &TCondIn, &TCondOut, &TVapIn, &TOut, &TIn, &TTankOut, &TTankIn, &TInside, &TOutside };
 	
 	Unit* AllDevices[CONFIG_NUMBER_OF_DEVICES];
 
