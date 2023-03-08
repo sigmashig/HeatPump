@@ -18,15 +18,21 @@ void OneWireThermo::InitUnit() {
 		isSimulator = false;
 		parent->SetResolution(Address);
 	}
-
+	if (!IsSimulator()) {
+		publishTemp();
+	}
 	PublishDeviceAlert(ALERT_EMPTY, true);
 }
 
 
 double OneWireThermo::GetTemperature() {
 	if (!isSimulator) {
+		//Config.Log->Debug("POINT 2");
 		double t = parent->GetTemperature(Address);
+		//Config.Log->append(F("Temp is ")).append(t).Debug();
+		//Config.Log->append(F("Temp is ")).append(Temperature).Debug();
 		if (t != Temperature) {
+			//Config.Log->append(Name).Debug("_POINT 1");
 			Temperature = t;
 			publishTemp();
 		}

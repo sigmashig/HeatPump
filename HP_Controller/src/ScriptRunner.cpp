@@ -569,9 +569,9 @@ bool ScriptRunner::checkConditions() {
 			Config.DevMgr->TCondIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 		}
 		res &= res1;
-		res1 = Config.DevMgr->TCondVap.IsOk();
+		res1 = Config.DevMgr->TVapIn.IsOk();
 		if (!res1) {
-			Config.DevMgr->TCondVap.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+			Config.DevMgr->TVapIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 		}
 		res &= res1;
 		res1 = Config.DevMgr->TCompressor.IsOk();

@@ -31,6 +31,7 @@ void OneWireBus::InitUnit() {
 	PublishDeviceAlert(ALERT_EMPTY, true);
 	sensors = new DallasTemperature(oneWire);
 	sensors->begin();
+	//sensors->setResolution(10);
 	printDevices();
 }
 

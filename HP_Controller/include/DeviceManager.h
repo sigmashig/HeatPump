@@ -27,9 +27,10 @@ public:
 	OneWireThermo TGndIn = OneWireThermo("TGndIn");
 	OneWireThermo TGndOut = OneWireThermo("TGndOut");
 	OneWireThermo TCompressor = OneWireThermo("TCompressor");
-	OneWireThermo TVapOut = OneWireThermo("TVapOut");
 	OneWireThermo TCondIn = OneWireThermo("TCondIn");
-	OneWireThermo TCondVap = OneWireThermo("TCondVap");
+	OneWireThermo TCondOut = OneWireThermo("TCondOut");
+	OneWireThermo TVapIn = OneWireThermo("TVapIn");
+	OneWireThermo TVapOut = OneWireThermo("TVapOut");
 	OneWireThermo TOut = OneWireThermo("TOut");
 	OneWireThermo TIn = OneWireThermo("TIn");
 	OneWireThermo TTankOut = OneWireThermo("TTankOut");
@@ -37,7 +38,7 @@ public:
 	OneWireThermo TInside = OneWireThermo("TInside");
 	OneWireThermo TOutside = OneWireThermo("TOutside");
 
-	OneWireThermo* AllThermo[CONFIG_NUMBER_THERMO] = {&TGndIn, &TGndOut, &TCompressor, &TVapOut, &TCondIn, &TCondVap, &TOut, &TIn, &TTankOut, &TTankIn, &TInside, &TOutside};
+	OneWireThermo* AllThermo[CONFIG_NUMBER_THERMO] = { &TGndIn, &TGndOut, &TCompressor, &TVapOut, &TCondIn, &TCondIn, &TVapIn, &TOut, &TIn, &TTankOut, &TTankIn, &TInside, &TOutside };
 	
 	Unit* AllDevices[CONFIG_NUMBER_OF_DEVICES];
 
