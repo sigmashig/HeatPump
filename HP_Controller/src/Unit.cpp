@@ -15,7 +15,9 @@ void const Unit::print(const char* header, DebugLevel level) {
 }
 
 void Unit::Publish() {
-	Config.Publish(DevType, Name, Status);
+	if (!IsSimulator()) {
+		Config.Publish(DevType, Name, Status);
+	}
 }
 
 void Unit::SubscribeEquipment() {

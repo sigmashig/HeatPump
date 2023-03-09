@@ -27,9 +27,11 @@ public:
 	
 protected:
 
+
 	ALERTCODE alertCode = ALERT_EMPTY;
 	virtual ~Unit() {};
 	virtual void const print(const char* header, DebugLevel level);
 	Unit(DeviceType dType, const char* nm) { Name = nm; DevType = dType; }
+	
 };
 

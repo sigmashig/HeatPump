@@ -18,6 +18,8 @@ void Contactor::InitUnit() {
 	startContact = 0;
 	IsOk();
 	//status = !lhOn;
+	
+	Publish();
 	PublishDeviceAlert(ALERT_EMPTY, true);
 
 }

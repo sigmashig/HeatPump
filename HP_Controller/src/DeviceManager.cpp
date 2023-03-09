@@ -158,12 +158,12 @@ bool DeviceManager::Init() {
 }
 
 bool DeviceManager::FinalInit() {
-	/*
+	
 	for (int i = 0; i < CONFIG_NUMBER_OF_DEVICES; i++) {
 		AllDevices[i]->InitUnit();
 	}
-	*/
-
+	
+/*
 	for (int i = 0; i < CONFIG_NUMBER_RELAYS; i++) {
 		AllRelays[i]->InitUnit();
 		AllRelays[i]->Publish();
@@ -177,8 +177,9 @@ bool DeviceManager::FinalInit() {
 		AllThermo[i]->InitUnit();
 		AllThermo[i]->Publish();
 	}
-
+*/
 	return true;
+
 }
 
 
