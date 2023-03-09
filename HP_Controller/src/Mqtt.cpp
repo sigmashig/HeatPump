@@ -82,6 +82,7 @@ bool Mqtt::Publish(const char* topic, const char* payload) {
 	topicFull = topicRoot;
 	topicFull += topic;
 	if (connected()) {
+		Config.Log->append(F("Publish:")).append(topicFull.c_str()).append(F("->")).append(payload).Internal();
 		return publish(topicFull.c_str(), payload);
 	}
 	else {

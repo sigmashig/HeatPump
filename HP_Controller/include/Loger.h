@@ -27,10 +27,12 @@ public:
 	void Debug(const char* message = NULL) { if (message != NULL) { loger->concat(message); } Log(D_DEBUG); }
 	void Error(const char* message = NULL) { if (message != NULL) { loger->concat(message); } Log(D_ERROR); }
 	void Fatal(const char* message = NULL) { if (message != NULL) { loger->concat(message); } Log(D_FATAL); }
+	void Internal(const char* message = NULL) { if (message != NULL) { loger->concat(message); } Log(D_INTERNAL); }
 	void Warn(const __FlashStringHelper* message) { loger->concat(message);  Log(D_WARN); }
 	void Debug(const __FlashStringHelper* message) { loger->concat(message);  Log(D_DEBUG); }
 	void Error(const __FlashStringHelper* message) { loger->concat(message);  Log(D_ERROR); }
 	void Fatal(const __FlashStringHelper* message) { loger->concat(message);  Log(D_FATAL); }
+	void Internal(const __FlashStringHelper* message) { loger->concat(message);  Log(D_INTERNAL); }
 
 
 

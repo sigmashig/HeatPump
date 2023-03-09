@@ -8,7 +8,9 @@ extern DebugLevel DLevel;
 void Loger::Log(DebugLevel level) {
 	if (level <= DLevel) {
 		Serial.println(loger->c_str());
-		//Config.MqttClient->PublishLog(level, loger->c_str());
+		if (level != D_INTERNAL) {
+			//Config.MqttClient->PublishLog(level, loger->c_str());
+		}
 	}
 
 	loger->clear();

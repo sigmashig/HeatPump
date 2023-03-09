@@ -290,6 +290,7 @@ void Configuration::Loop(unsigned long timePeriod) {
 		unitsLoop(timePeriod);
 		Runner.Loop(timePeriod);
 	} else if (timePeriod == 60000) {
+		publishConfigParameter(PARAMS_WATCHDOG, (byte)Counter60);
 		//memoryReport("Configuration::Loop 60000");
 		unitsLoop(timePeriod);
 	} else if (timePeriod == 30000) {
@@ -329,7 +330,8 @@ void Configuration::SubscribeAll() {
 void Configuration::subscribeParameters() {
 
 	for (int i = 0; i < CONFIG_PARAMS_LAST; i++) {
-		if (i != PARAMS_IS_READY) {
+		if (i != PARAMS_IS_READY && i != PARAMS_WATCHDOG
+			&& i != PARAMS_DESIRED_TEMP) {
 			subscribeConfigParameter((MqttConfigParam)i);
 		}
 	}
@@ -353,6 +355,7 @@ void Configuration::PublishInfo(const char* txt) {
 	topic += "Info/";
 	publish(topic.c_str(), txt);
 }
+
 
 void Configuration::publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name) {
 	createSafeString(payload, MQTT_PAYLOAD_LENGTH);
@@ -543,6 +546,7 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 	}
 }
 
+
 /// @brief Update configuration parameters received from MQTT
 /// @param topic - topic of MQTT message
 /// @param payload - payload of MQTT message
@@ -602,6 +606,7 @@ void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* p
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
 	topic = mqttSectionName[SECTION_CONFIG];
 	topic += mqttConfigParamName[parmId];
+	//Log->append("publishConfigParameter: ").append(topic.c_str()).append("; payload=").append(payload).Debug();
 	publish(topic.c_str(), payload);
 }
 
@@ -613,6 +618,7 @@ void Configuration::subscribeConfigParameter(MqttConfigParam parmId) {
 }
 
 void Configuration::publishConfigParameter(MqttConfigParam parmId, byte payload) {
+	//Log->append("publishConfigParameter: ").append(mqttConfigParamName[parmId]).append("; payload=").append(payload).Debug();
 	char p[4];
 	sprintf(p, "%u", payload);
 	publishConfigParameter(parmId, p);

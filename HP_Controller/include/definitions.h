@@ -43,12 +43,13 @@ typedef enum {
 
 typedef enum {
 	D_OFF = 0,
-	D_FATAL = 1,
-	D_ERROR = 2,
-	D_WARN = 3,
-	D_INFO = 4,
-	D_DEBUG = 5,
-	D_ALL = 6
+	D_INTERNAL = 1,
+	D_FATAL = 2,
+	D_ERROR = 3,
+	D_WARN = 4,
+	D_INFO = 5,
+	D_DEBUG = 6,
+	D_ALL = 7
 } DebugLevel;
 
 typedef enum {

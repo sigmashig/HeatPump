@@ -211,6 +211,7 @@ private:
 
 	void updateSingleParam(MqttConfigParam parm, const char* payload);
 
-	MqttConfigParam paramTypeByName(const char* name);
+	//MqttConfigParam paramTypeByName(const char* name);
+	void PublishWatchDog();
 };
 
