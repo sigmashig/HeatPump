@@ -13,7 +13,8 @@
 #include "definitions.h"
 
 
-
+#define WATCHDOG_PUBLICATION_INTERVAL ((unsigned long)2*60*1000) //2 min
+//#define WATCHDOG_PUBLICATION_INTERVAL ((unsigned long)30*1000) //2 min
 
 
 class Configuration {
@@ -76,7 +77,8 @@ public:
 	void PublishSchedule(int number);
 
 	byte GetLengthRootTopic() { return lengthOfRoot; }
-
+	void WatchDogPublication();
+	
 private:
 
 	typedef enum {
@@ -182,6 +184,7 @@ private:
 	double manualTemp = 20.0;
 	double desiredTemp = 20.0;
 	byte lengthOfRoot = 0;
+	unsigned long lastWatchDogPublication = millis();
 
 	//char topicRoot[MQTT_TOPIC_LENGTH + 1];
 	//methods

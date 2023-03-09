@@ -10,7 +10,11 @@ void callbackFunc(char* topic, uint8_t* payload, unsigned int length) {
 		char* pl = (char*)payload;
 		pl[length] = 0;
 		Config.Log->append("[").append(topic).append("]:").append((char*)payload).Info();
-		Config.ProcessMessage(topic + Config.GetLengthRootTopic(), (char*)payload);
+		if (strcmp(topic, MQTT_WATCH_DOG_PUBLICATION) == 0) {
+			Config.WatchDogPublication();
+		} else {
+			Config.ProcessMessage(topic + Config.GetLengthRootTopic(), (char*)payload);
+		}
 	} else {
 		Config.Log->Debug("Wrong Length");
 	}

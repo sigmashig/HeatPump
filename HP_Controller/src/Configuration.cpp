@@ -334,6 +334,9 @@ void Configuration::SubscribeAll() {
 	DevMgr->SubscribeEquipment();
 	DevMgr->SubscribeStatuses();
 	ScheduleMgr->SubscribeSchedules();
+	if (isMqttReady) {
+		mqttClient->SubscribeWatchDogPublication();
+	}
 }
 
 void Configuration::subscribeParameters() {
@@ -706,4 +709,14 @@ void Configuration::PublishSchedule(int number) {
 	ScheduleMgr->GetSchedule(number).Serialize(payload);
 	Log->append("Schedule:").append(number).append("=").append(payload).Debug();
 	//mqttClient->Publish(topic.c_str(), payload);
+}
+
+void Configuration::WatchDogPublication() {
+	if (lastWatchDogPublication + WATCHDOG_PUBLICATION_INTERVAL > millis()) {
+		lastWatchDogPublication = millis();
+	} else {
+		Log->Error("WatchDogPublication: a long time ago...");
+		SubscribeAll();
+	}
+	lastWatchDogPublication = millis();
 }

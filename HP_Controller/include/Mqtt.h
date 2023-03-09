@@ -10,6 +10,7 @@
 #define MQTT_PAYLOAD_LENGTH	200
 #define MQTT_TRY_COUNT 5
 
+#define MQTT_WATCH_DOG_PUBLICATION "Config/WatchDogPublication"
 
 void callbackFunc(char* topic, uint8_t* payload, unsigned int length);
 
@@ -27,7 +28,7 @@ public:
 	void MqttLoop(int n = 0);
 	void FinalInit();
 	bool IsMqtt() { return connected(); }
-
+	void SubscribeWatchDogPublication(){ subscribe(MQTT_WATCH_DOG_PUBLICATION); };
 private:
 	unsigned long mqttWaiting;
 	char topicRoot[CONFIG_LENGTH_OF_ROOT + 1];

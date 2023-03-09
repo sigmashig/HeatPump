@@ -41,12 +41,15 @@ double OneWireThermo::GetTemperature() {
 }
 
 void OneWireThermo::publishTemp() {
-	int p1 = (int)Temperature;
-	int p2 = (int)((Temperature - p1) * 10);
-	char p[10];
-	sprintf(p, "%d.%d", p1, p2);
-	
-	Config.Publish(DevType, Name, p);
+
+	if (Temperature > -50 && Temperature <= 125) {
+		int p1 = (int)Temperature;
+		int p2 = (int)((Temperature - p1) * 10);
+		char p[10];
+		sprintf(p, "%d.%d", p1, p2);
+
+		Config.Publish(DevType, Name, p);
+	}
 }
 void OneWireThermo::UpdateEquipment(const char* line) {
 	//const size_t CAPACITY = JSON_OBJECT_SIZE(10);
