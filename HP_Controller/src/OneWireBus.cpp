@@ -26,7 +26,7 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 void OneWireBus::InitUnit() {
 	releaseResources();
-	Config.Log->append(F("Init OneWire bus on pin ")).append(Pin).Debug();
+	//Config.Log->append(F("Init OneWire bus on pin ")).append(Pin).Debug();
 	oneWire = new OneWire(Pin);
 	PublishDeviceAlert(ALERT_EMPTY, true);
 	sensors = new DallasTemperature(oneWire);
@@ -191,6 +191,7 @@ void OneWireBus::UpdateEquipment(const char* payload) {
 
 	if (json.containsKey("pin")) {
 		Pin = json["pin"];
+		Config.Log->append(F("Pin:")).append(Pin).Debug();
 		//releaseResources();
 		//InitUnit();
 	}

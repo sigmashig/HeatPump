@@ -22,7 +22,6 @@ void DeviceManager::updateRelayEquipment(int number, const char* payload) {
 	AllRelays[number]->UpdateEquipment(payload);
 
 	if (AllRelays[number]->Pin != pin || AllRelays[number]->lhOn != lhOn) {
-		Config.Log->append("EEPROM RELAY:").append("pin=").append(AllRelays[number]->Pin).append("; lhOn=").append(AllRelays[number]->lhOn).Debug();
 		SigmaEEPROM::Write8(EEPROM_ADDR_RELAY + number * EEPROM_LEN_RELAY, AllRelays[number]->Pin);
 		SigmaEEPROM::Write8(EEPROM_ADDR_RELAY + number * EEPROM_LEN_RELAY + 1, AllRelays[number]->lhOn);
 	}
@@ -34,29 +33,23 @@ void DeviceManager::updateBusEquipment(const char* payload) {
 	Bus.UpdateEquipment(payload);
 	if (Bus.Pin != pin) {
 		Config.Log->Debug("EEPROM BUS");
-		SigmaEEPROM::Write8(EEPROM_ADDR_TBUS_PIN, pin);
+		SigmaEEPROM::Write8(EEPROM_ADDR_TBUS_PIN, Bus.Pin);
 		Bus.InitUnit();
 	}
 }
 
 void DeviceManager::updateThermoEquipment(int number, const char* payload) {
-	//Config.Log->append("updateThermoEquipment:").append(number).append(";").append(payload).Debug();
-	//Config.Log->Debug("POINT10");
 	DeviceAddress da;
 	OneWireBus::CopyDeviceAddress(da, AllThermo[number]->Address);
 	double eLow = AllThermo[number]->ErrorLow;
 	double eHigh = AllThermo[number]->ErrorHigh;
 	double wHigh = AllThermo[number]->WarningHigh;
 	double wLow = AllThermo[number]->WarningLow;
-	//Config.Log->Debug("POINT11");
-	//Config.Log->append("Length=").append((int)strlen(payload)).Debug();
 	AllThermo[number]->UpdateEquipment(payload);
-	//Config.Log->Debug("POINT11.1");
 	if (OneWireBus::CompareDeviceAddress(AllThermo[number]->Address, da) != 0
 		|| eLow != AllThermo[number]->ErrorLow || eHigh != AllThermo[number]->ErrorHigh
 		|| wLow != AllThermo[number]->WarningLow || wHigh != AllThermo[number]->WarningHigh
 		) {
-		//	Config.Log->Debug("POINT12");
 
 		for (int j = 0; j < 8; j++) {
 			SigmaEEPROM::Write8(EEPROM_ADDR_THERM + number * EEPROM_LEN_THERM + j, AllThermo[number]->Address[j]);
@@ -66,11 +59,7 @@ void DeviceManager::updateThermoEquipment(int number, const char* payload) {
 		SigmaEEPROM::Write16(EEPROM_ADDR_THERM + number * EEPROM_LEN_THERM + 8 + 4, (int)(AllThermo[number]->WarningHigh * 2));
 		SigmaEEPROM::Write16(EEPROM_ADDR_THERM + number * EEPROM_LEN_THERM + 8 + 6, (int)(AllThermo[number]->WarningLow * 2));
 	}
-	//Config.Log->Debug("POINT13");
-
 	AllThermo[number]->InitUnit();
-	//Config.Log->Debug("POINT14");
-
 }
 
 void DeviceManager::updateContactorEquipment(int number, const char* payload) {
@@ -150,7 +139,7 @@ bool DeviceManager::readFromEEPROM() {
 	VoltageSwitch.lhOn = SigmaEEPROM::Read8(EEPROM_ADDR_CONTACTOR + 2 + 1);
 
 	Bus.Pin = SigmaEEPROM::Read8(EEPROM_ADDR_TBUS_PIN);
-
+	
 	for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
 		for (int j = 0; j < 8; j++) {
 			AllThermo[i]->Address[j] = SigmaEEPROM::Read8(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + j);
@@ -208,6 +197,7 @@ void DeviceManager::SubscribeStatuses() {
 }
 
 void DeviceManager::UpdateEquipment(DeviceType dType, const char* name, const char* payload) {
+
 	switch (dType) {
 	case DEVTYPE_RELAY:
 		for (int i = 0; i < CONFIG_NUMBER_RELAYS; i++) {
@@ -219,7 +209,7 @@ void DeviceManager::UpdateEquipment(DeviceType dType, const char* name, const ch
 		break;
 	case DEVTYPE_BUS:
 		if (strcmp(Bus.Name, name) == 0) {
-			Config.Log->Debug("POINT1");
+			//Config.Log->Debug("POINT1");
 			updateBusEquipment(payload);
 		}
 		break;

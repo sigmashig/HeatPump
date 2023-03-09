@@ -121,12 +121,12 @@ void Configuration::readBoardId() {
 void Configuration::readConfigEEPROM() {
 
 	setWorkMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MODE), false);
-	setManualTemp(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MANUALTEMP), false);
-	setWeekMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_WEEKMODE), false);
-	setHysteresis(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HYSTERESIS), false);
+	setManualTemp(((double)SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_MANUALTEMP))/2.0, false);
 	setHeatMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HEATCOLD), false);
+	setHysteresis(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HYSTERESIS), false);
+	setWeekMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_WEEKMODE), false);
 	setCommand(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CMD), false);
-
+	setClockType(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE), false);
 	char tmp[TIMEZONE_LEN];
 	setTimeZone(SigmaEEPROM::ReadTimezone(tmp));
 
@@ -210,6 +210,10 @@ void Configuration::setWorkMode(byte b, bool save) {
 }
 
 void Configuration::setCommand(byte b, bool save) {
+	//Log->append("setCommand=").append(b).Info();
+	//Log->append("save=").append(save).Info();
+	//Log->append("command=").append(command).Info();
+	
 	if (b == 0 || b == 1 || b == 2) {
 		if (!save) {
 			command = (CMD)(b);
@@ -217,7 +221,7 @@ void Configuration::setCommand(byte b, bool save) {
 		if (command != (CMD)(b)) {
 			command = (CMD)(b);
 			Log->Debug("EEPROM Cmd");
-			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MODE, command);
+			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_CMD, command);
 		}
 	}
 }
@@ -241,21 +245,6 @@ void Configuration::setManualTemp(double t, bool save) {
 	}
 }
 
-/*
-void Configuration::setManualTemp(byte b, bool save) {
-	double t = (double)b / 2.0;
-	if (t >= 15.0 && t <= 50) {
-		if (!save) {
-			manualTemp = t;
-		}
-		if (manualTemp != t) {
-			manualTemp = t;
-			Log->Debug("EEPROM Manual Temp");
-			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MANUALTEMP, (byte)(manualTemp * 2));
-		}
-	}
-}
-*/
 
 void Configuration::setWeekMode(byte b, bool save) {
 	if (b == 0 || b == 1 || b == 2) {
@@ -271,15 +260,13 @@ void Configuration::setWeekMode(byte b, bool save) {
 }
 
 void Configuration::setHysteresis(byte b, bool save) {
-	if (b == 0 || b == 1 || b == 2) {
-		if (!save) {
-			hysteresis = b;
-		}
-		if (hysteresis != b) {
-			hysteresis = b;
-			Log->Debug("EEPROM Hysteresis");
-			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_HYSTERESIS, hysteresis);
-		}
+	if (!save) {
+		hysteresis = b;
+	}
+	if (hysteresis != b) {
+		hysteresis = b;
+		Log->Debug("EEPROM Hysteresis");
+		SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_HYSTERESIS, hysteresis);
 	}
 }
 

@@ -78,16 +78,9 @@ void Mqtt::repeatedLoop(int n) {
 	}
 }
 bool Mqtt::Publish(const char* topic, const char* payload) {
-	//Config.Log->append("Publish topic length=").append((int)strlen(topic)).Debug();
-	//Config.Log->append("Publish payload length=").append((int)strlen(payload)).Debug();
-	//Config.Log->append("Root length=").append((int)strlen(topicRoot)).Debug();
 	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
-	//Config.Log->Debug("POINT1");
 	topicFull = topicRoot;
-	//Config.Log->Debug("POINT2");
 	topicFull += topic;
-	//Config.Log->Debug("POINT3");
-	//Config.Log->append(F("Publish [")).append(topicFull.c_str()).append(F("]:")).append(payload).Debug();
 	if (connected()) {
 		return publish(topicFull.c_str(), payload);
 	}
