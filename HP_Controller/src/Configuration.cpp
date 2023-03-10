@@ -350,7 +350,8 @@ void Configuration::subscribeParameters() {
 
 	for (int i = 0; i < CONFIG_PARAMS_LAST; i++) {
 		if (i != PARAMS_IS_READY && i != PARAMS_WATCHDOG
-			&& i != PARAMS_DESIRED_TEMP) {
+			&& i != PARAMS_DESIRED_TEMP 
+			&& i != PARAMS_VERSION) {
 			subscribeConfigParameter((MqttConfigParam)i);
 		}
 	}
@@ -557,6 +558,17 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 		setClockType(b);
 		break;
 	}
+	case PARAMS_RESET: {
+		byte b = atoi(payload);
+		if (b>=5 && b == Counter60) {
+			Log->Debug("Reset command received");
+			delay(5000);
+			Utils::Reset();
+			
+		}
+		break;
+	}
+		
 	case CONFIG_PARAMS_LAST:
 	case PARAMS_DESIRED_TEMP:
 	case PARAMS_WATCHDOG:
@@ -578,48 +590,7 @@ void Configuration::updateConfig(const char* topic, const char* payload) {
 			return;
 		}
 	}
-	/*
-	createSafeString(topic0, MQTT_TOPIC_LENGTH);
-	topic0 = mqttConfigParamName[PARAMS_WORKMODE];
-	if (strcmp(topic, topic0.c_str()) == 0) {
-		setWorkMode(payload);
-	} else {
-		topic0 = mqttConfigParamName[PARAMS_WEEKMODE];
-		if (strcmp(topic, topic0.c_str()) == 0) {
-			setWeekMode(payload);
-		} else {
-			topic0 = mqttConfigParamName[PARAMS_MANUAL_TEMP];
-			if (strcmp(topic, topic0.c_str()) == 0) {
-				setManualTemp(payload);
-			} else {
-				topic0 = mqttConfigParamName[PARAMS_HEAT_COLD];
-				if (strcmp(topic, topic0.c_str()) == 0) {
-					setHeatMode(payload);
-				} else {
-					topic0 = mqttConfigParamName[PARAMS_HYSTERESIS];
-					if (strcmp(topic, topic0.c_str()) == 0) {
-						setHysteresis(payload);
-					} else {
-						topic0 = mqttConfigParamName[PARAMS_TIMEZONE];
-						if (strcmp(topic, topic0.c_str()) == 0) {
-							Clock->SetTimezone(payload);
-						} else {
-							topic0 = mqttConfigParamName[PARAMS_SIMULATOR];
-							if (strcmp(topic, topic0.c_str()) == 0) {
-								setSimulator(payload);
-							} else {
-								topic0 = mqttConfigParamName[PARAMS_COMMAND];
-								if (strcmp(topic, topic0.c_str()) == 0) {
-									setCommand(payload);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-*/
+	
 }
 
 void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* payload) {

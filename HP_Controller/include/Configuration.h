@@ -100,6 +100,7 @@ private:
 		PARAMS_MQTT_PORT,
 		PARAMS_CLOCK_TYPE,
 		PARAMS_VERSION,
+		PARAMS_RESET,
 		CONFIG_PARAMS_LAST
 	} MqttConfigParam;
 
@@ -157,7 +158,8 @@ private:
 
 	const char* mQTT_ROOT = "HeatPump/";
 	const char* mqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
-										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockType","Version" };
+										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockType","Version",
+										"Reset"};
 
 	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/Weekend/Set_", "Schedule/Workdays/Set_" };
 	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text"};

@@ -109,7 +109,7 @@ bool SigmaClock::readClock()
         return res;
     }
     res = parseResponse(len);
-    Config.Log->append("Response:").append(res).Debug();
+    //Config.Log->append("Response:").append(res).Debug();
     return res;
 }
 
@@ -120,7 +120,7 @@ bool SigmaClock::parseResponse(int len) {
 
     s = client->readStringUntil('\n');
     if (s.indexOf("200 OK") == -1) {
-        Config.Log->append("Response:").append(s.c_str()).Error();
+        //Config.Log->append("Response:").append(s.c_str()).Error();
         return false;
     }
     while (client->available()) {
