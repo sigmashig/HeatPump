@@ -26,6 +26,7 @@
 
 #include "definitions.h"
 #include "Configuration.h"
+#include "version.h"
 
 Configuration Config;
 DebugLevel DLevel = DebugLevel::D_DEBUG;
@@ -48,6 +49,8 @@ void setup() {
 	SafeString::setOutput(Serial);
 	//init random generator
 	randomSeed(analogRead(0));
+	Serial.print("Version: ");
+	Serial.println(VERSION);
 	memoryReport("Start");
 	//UpdateEEPROM();
 	//initialization of config

@@ -5,6 +5,7 @@
 #include "SigmaEEPROM.h"
 #include "ScriptRunner.h"
 #include "MemoryExplorer.h"
+#include "version.h"
 
 
 void Configuration::Init() {
@@ -39,6 +40,7 @@ void Configuration::Init() {
 	mqttClient->Init();
 	if (mqttClient->IsMqtt()) {
 		isMqttReady = true;
+		publishConfigParameter(PARAMS_VERSION, VERSION);
 		publishConfigParameter(PARAMS_IS_READY, "0");
 		SubscribeAll();
 	}
@@ -559,6 +561,7 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 	case PARAMS_DESIRED_TEMP:
 	case PARAMS_WATCHDOG:
 	case PARAMS_IS_READY:
+	case PARAMS_VERSION:
 		break;
 	}
 }
