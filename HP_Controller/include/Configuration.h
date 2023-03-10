@@ -78,6 +78,7 @@ public:
 
 	byte GetLengthRootTopic() { return lengthOfRoot; }
 	void WatchDogPublication();
+
 	
 private:
 
@@ -130,6 +131,7 @@ private:
 	//void setWorkMode(const char* str) { setWorkMode(str[0] - '0'); };
 	//void setManualTemp(byte b, bool save = true);
 	void setManualTemp(double d, bool save = true);
+    void setDesiredTemp(double t);
 	//void setManualTemp(const char* str);
 	void setWeekMode(byte b, bool save = true);
 	//void setWeekMode(const char* str) { setWeekMode(str[0] - '0'); };
@@ -203,15 +205,15 @@ private:
 	void publishConfigParameter(MqttConfigParam parmId, const char* payload);
 	void subscribeConfigParameter(MqttConfigParam parmId);
 	void publishConfigParameter(MqttConfigParam parmId, byte payload);
-	void publishConfigParameter(MqttConfigParam parmId, IPAddress& ip);
-	void publishConfigParameter(MqttConfigParam parmId, unsigned int payload);
+//	void publishConfigParameter(MqttConfigParam parmId, IPAddress& ip);
+//	void publishConfigParameter(MqttConfigParam parmId, unsigned int payload);
 	
 	void publishStatus(DeviceType dType, const char* name, const char* payload);
 	void publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
 
 	void updateSingleParam(MqttConfigParam parm, const char* payload);
 
-	//MqttConfigParam paramTypeByName(const char* name);
-	void PublishWatchDog();
+	void testTemperature();
+
 };
 

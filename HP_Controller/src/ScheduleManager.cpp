@@ -20,17 +20,35 @@ void ScheduleManager::readFromEEPROM() {
 
 void ScheduleManager::Init()
 {
+	/*
+	for (int i = 0; i < CONFIG_NUMBER_SCHEDULES; i++) {
+		AllSchedule[i] = workDays[i];
+		AllSchedule[i + CONFIG_NUMBER_SCHEDULES] = weekEnd[i];
+	}
+*/
 }
 
 void ScheduleManager::FinalInit()
 {
+	Config.Log->Debug("Before sort:");
+	for (int i = 0; i < 2 * CONFIG_NUMBER_SCHEDULES; i++) {
+		Config.Log->append(F("Schedule ")).append(i).append(F(": time:"))
+			.append(AllSchedule[i].GetHour()).append(":").append(AllSchedule[i].GetMinute()).append(" t=").append(AllSchedule[i].GetTemperature()).Debug();
+	}
+	sortSchedule(0);
+	sortSchedule(CONFIG_NUMBER_SCHEDULES);
 	sort = true;
+	Config.Log->Debug("After sort:");
+	for (int i = 0; i < 2 * CONFIG_NUMBER_SCHEDULES; i++) {
+		Config.Log->append(F("Schedule ")).append(i).append(F(": time:"))
+			.append(AllSchedule[i].GetHour()).append(":").append(AllSchedule[i].GetMinute()).append(" t=").append(AllSchedule[i].GetTemperature()).Debug();
+	}
 }
 
 
 void ScheduleManager::SubscribeSchedules()
 {
-	for (int i = 1; i <= 2 * CONFIG_NUMBER_SCHEDULES; i++) {
+	for (int i = 0; i < 2 * CONFIG_NUMBER_SCHEDULES; i++) {
 		Config.SubscribeSchedule(i);
 	}
 	Config.Transfer(2 * CONFIG_NUMBER_SCHEDULES);
@@ -39,41 +57,64 @@ void ScheduleManager::SubscribeSchedules()
 
 void ScheduleManager::UpdateSchedule(byte shift, byte setNumber, const char* payload)
 {
-	AllSchedule[shift + setNumber - 1].UpdateSchedule(payload);
+	AllSchedule[shift + setNumber].UpdateSchedule(payload);
 	if (sort) {
-		if (sortSchedule(shift)) {
-			publishSchedules(shift);
-		}
+		sortSchedule(shift);
 	}
 }
 
-double ScheduleManager::GetDesiredTemperature() {
-	TimeElements tm =  Config.Clock->GetClock();
+byte ScheduleManager::wdOrWe(byte day) {
 	byte shift = 0;
-	
+
+
 	if (Config.GetWeekMode() == WEEKMODE_7_0) {
 		shift = 0;
 	} else if (Config.GetWeekMode() == WEEKMODE_5_2) {
-		if (tm.Wday == 1 || tm.Wday == 7) {
+		if (day == SATURDAY || day == SUNDAY) {
 			shift = CONFIG_NUMBER_SCHEDULES;
 		} else {
 			shift = 0;
 		}
 	} else if (Config.GetWeekMode() == WEEKMODE_6_1) {
-		if (tm.Wday == 1) {
+		if (day == SUNDAY) {
 			shift = CONFIG_NUMBER_SCHEDULES;
 		} else {
 			shift = 0;
 		}
 	}
 
-	for (int i = 0; i < CONFIG_NUMBER_SCHEDULES; i++) {
-		if (AllSchedule[i + shift].CompareTime(tm.Hour, tm.Minute) <= 0
-			&& (AllSchedule[i + shift + 1].CompareTime(tm.Hour, tm.Minute) > 0 || i == CONFIG_NUMBER_SCHEDULES - 1)) {
-			return AllSchedule[i + shift].GetTemperature();
+	return shift;
+}
+
+
+
+double ScheduleManager::GetDesiredTemperature() {
+	DateTime dt = Config.Clock->GetClock();
+	//Config.Log->append(F("GetDesiredTemperature: ")).append(dt.hour).append(":").append(dt.minute).append(" day=").append(dt.day).Debug();
+	return GetDesiredTemperature(dt.hour, dt.minute, dt.day);
+}
+
+double ScheduleManager::GetDesiredTemperature(byte h, byte m, byte day) {
+
+	byte shift = wdOrWe(day);
+	Config.Log->append(F("GetDesiredTemperature: ")).append(h).append(":").append(m).append(" day=").append(day).append(" shift=").append(shift).Debug();
+	if (AllSchedule[shift + 0].CompareTime(h, m) < 0) {
+		// take last schedule for yesterday
+		Config.Log->Debug("GetDesiredTemperature: yesterday");
+
+		byte yDay = SigmaClock::DayYesterday(day);
+		byte sh = wdOrWe(yDay);
+		return AllSchedule[sh + CONFIG_NUMBER_SCHEDULES - 1].GetTemperature();
+		//return GetDesiredTemperature(23,59, yDay);
+	} else {
+		for (int i = 0; i < CONFIG_NUMBER_SCHEDULES - 1; i++) {
+			if (AllSchedule[i + shift].CompareTime(h, m) >= 0
+				&& AllSchedule[i + shift + 1].CompareTime(h, m) < 0) {
+				return AllSchedule[i + shift].GetTemperature();
+			}
 		}
+		return AllSchedule[CONFIG_NUMBER_SCHEDULES - 1 + shift].GetTemperature();
 	}
-	
 	return 0.0;
 }
 
@@ -82,7 +123,7 @@ bool ScheduleManager::sortSchedule(byte shift) {
 	
 	for (int i = 0; i < CONFIG_NUMBER_SCHEDULES; i++) {
 		for (int j = i + 1; j < CONFIG_NUMBER_SCHEDULES; j++) {
-			if (AllSchedule[i + shift].CompareTime(AllSchedule[j + shift].GetHour(), AllSchedule[j + shift].GetMinute()) > 0) {
+			if (AllSchedule[i + shift].CompareTime(AllSchedule[j + shift].GetHour(), AllSchedule[j + shift].GetMinute()) < 0) {
 				Schedule temp = AllSchedule[i + shift];
 				AllSchedule[i + shift] = AllSchedule[j + shift];
 				AllSchedule[j + shift] = temp;
@@ -92,10 +133,11 @@ bool ScheduleManager::sortSchedule(byte shift) {
 	}
 	return res;
 }
-
+/*
 void ScheduleManager::publishSchedules(byte shift) {
 	for (int i = 1; i <= CONFIG_NUMBER_SCHEDULES; i++) {
 		Config.PublishSchedule(i + shift);
 	}
 	Config.Transfer(CONFIG_NUMBER_SCHEDULES);
 }
+*/

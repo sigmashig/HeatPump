@@ -5,8 +5,6 @@
 */
 
 // the setup function runs once when you press reset or power the board
-#include <TimeLib.h>
-#include <DS1307RTC.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <ArduinoJson.hpp>

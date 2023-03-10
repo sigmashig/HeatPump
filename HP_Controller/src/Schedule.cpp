@@ -6,6 +6,7 @@
 extern Configuration Config;
 
 int Schedule::CompareTime(byte hr, byte mn) {
+	
 	if (hr < hour) {
 		return -1;
 	}

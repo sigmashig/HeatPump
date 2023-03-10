@@ -19,7 +19,7 @@ void Configuration::Init() {
 	readConfigEEPROM();
 	Log->Debug("Clock");
 	Clock = new SigmaClock(ethClient);
-	Clock->SetClock();
+	//Clock->SetClock();
 	Log->append("Now:").Info(Clock->PrintClock());
 
 	Log->Debug("DevMgr");
@@ -44,7 +44,7 @@ void Configuration::Init() {
 	}
 
 	mqttClient->FinalInit();
-	//ScheduleMgr->FinalInit();
+	ScheduleMgr->FinalInit();
 	DevMgr->FinalInit();
 	Runner.Init();
 
@@ -52,6 +52,8 @@ void Configuration::Init() {
 		publishConfigParameter(PARAMS_IS_READY, "1");
 	}
 	Log->Info(F("Config init is finished"));
+
+	//testTemperature();
 }
 
 
@@ -242,9 +244,18 @@ void Configuration::setManualTemp(double t, bool save) {
 			Log->Debug("EEPROM Manual Temp");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MANUALTEMP, (byte)(manualTemp * 2));
 		}
+		if (workMode == WORKMODE_MANUAL) {
+			setDesiredTemp(manualTemp);
+		}
 	}
 }
 
+void Configuration::setDesiredTemp(double t) {
+	if (t != desiredTemp) {
+		desiredTemp = t;
+		publishConfigParameter(PARAMS_DESIRED_TEMP, desiredTemp);
+	}
+}
 
 void Configuration::setWeekMode(byte b, bool save) {
 	if (b == 0 || b == 1 || b == 2) {
@@ -295,6 +306,12 @@ void Configuration::Loop(unsigned long timePeriod) {
 		unitsLoop(timePeriod);
 	} else if (timePeriod == 30000) {
 		unitsLoop(timePeriod);
+		if (workMode == WORKMODE::WORKMODE_SCHEDULE) {
+			double t = ScheduleMgr->GetDesiredTemperature();
+			if (t != desiredTemp) {
+				setDesiredTemp(t);
+			}
+		}
 	} else if (timePeriod == 10000) {
 		unitsLoop(timePeriod);
 	} else if (timePeriod == 1000) {
@@ -445,13 +462,13 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 				}
 			}
 		} else {
-			topic0 = mqttSectionName[SECTION_SCHEDULE_WEEKEND];
-			if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Schedule weekend
+			topic0 = mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
+			if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Schedule workdays
 				byte setNumber = atoi(topic + strlen(topic0));
 				ScheduleMgr->UpdateSchedule(0, setNumber, payload);
 			} else {
-				topic0 = mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
-				if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Schedule workday
+				topic0 = mqttSectionName[SECTION_SCHEDULE_WEEKEND];
+				if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Schedule weekend
 					byte setNumber = atoi(topic + strlen(topic0));
 					ScheduleMgr->UpdateSchedule(CONFIG_NUMBER_SCHEDULES, setNumber, payload);
 				} else {
@@ -682,17 +699,17 @@ void Configuration::SubscribeStatus(DeviceType dType, const char* name) {
 
 void Configuration::SubscribeSchedule(int number) {
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
-	if (number <= CONFIG_NUMBER_SCHEDULES) {
-		topic = mqttSectionName[SECTION_SCHEDULE_WEEKEND];
-	} else {
+	if (number < CONFIG_NUMBER_SCHEDULES) {
 		topic = mqttSectionName[SECTION_SCHEDULE_WORKDAYS];
+	} else {
+		topic = mqttSectionName[SECTION_SCHEDULE_WEEKEND];
 		number -= CONFIG_NUMBER_SCHEDULES;
 	}
 	//topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
 	topic += number;
 	mqttClient->Subscribe(topic.c_str());
 }
-
+/*
 void Configuration::PublishSchedule(int number) {
 	Log->append("Schedule:").append(number).Debug();
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
@@ -703,7 +720,7 @@ void Configuration::PublishSchedule(int number) {
 	Log->append("Schedule:").append(number).append("=").append(payload).Debug();
 	//mqttClient->Publish(topic.c_str(), payload);
 }
-
+*/
 void Configuration::WatchDogPublication() {
 	if (lastWatchDogPublication + WATCHDOG_PUBLICATION_INTERVAL > millis()) {
 		lastWatchDogPublication = millis();
@@ -712,4 +729,61 @@ void Configuration::WatchDogPublication() {
 		SubscribeAll();
 	}
 	lastWatchDogPublication = millis();
+}
+
+void Configuration::testTemperature() {
+	double t = 0;
+	double er = 0;
+	weekMode = WEEKMODE_5_2;
+	Log->Debug("testTemperature");
+	Log->Debug("Test right now");
+	t = ScheduleMgr->GetDesiredTemperature();
+	Log->append("AR:").append(t).Debug();
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(6, 15, FRIDAY);
+	Log->append("Test 2:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 1.0;
+	t = ScheduleMgr->GetDesiredTemperature(6, 15, MONDAY);
+	Log->append("Test 3:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(23, 59, MONDAY);
+	Log->append("Test 4:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	
+	weekMode = WEEKMODE_6_1;
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(6, 15, SATURDAY);
+	Log->append("Test 5:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 1.0;
+	t = ScheduleMgr->GetDesiredTemperature(6, 15, MONDAY);
+	Log->append("Test 6:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(23, 59, MONDAY);
+	Log->append("Test 7:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	weekMode = WEEKMODE_7_0;
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(6, 15, SATURDAY);
+	Log->append("Test 8:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(6, 15, MONDAY);
+	Log->append("Test 9:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 1.1;
+	t = ScheduleMgr->GetDesiredTemperature(23, 59, MONDAY);
+	Log->append("Test 10:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	er = 3.1;
+	t = ScheduleMgr->GetDesiredTemperature(12, 54, SUNDAY);
+	Log->append("Test 11:").append(t == er ? "PASSED!" : "FAIL").append(" AR:").append(t).append("; ER=").append(er).Debug();
+
+	
 }

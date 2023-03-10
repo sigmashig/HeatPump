@@ -18,7 +18,8 @@ public:
 	byte GetMinute() { return minute; };
 	void Serialize(char* buffer);
 private:
-	bool isWeekEnd = false;
+	//bool isWeekEnd = false;
+	//int number = 0;
 	byte hour = 0;
 	byte minute = 0;
 	double temperature = 25.0;

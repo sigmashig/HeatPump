@@ -15,6 +15,10 @@ SigmaClock::SigmaClock(EthernetClient* cli, const char* timezone) {
         strcpy(tz, timezone);
     }
     SetTimezone(tz);
+
+    if (!rtc.begin()) {
+        Config.Log->Error("DS3231 not found");
+    }
     SyncClock();
 }
 
@@ -22,64 +26,33 @@ bool SigmaClock::SyncClock() {
     bool res = false;
     if (Config.IsEthernetReady()) {
         if (readClock()) {
-            res = SetClock();
+            SetClock();
         }
     }
     return res;
 }
 
-TimeElements SigmaClock::GetClock() {
-    
-    if (RTC.read(tm)) {
-        if (RTC.chipPresent()) {
-            Config.Log->Error("The RTC is stopped");
-        }
-        else {
-            Config.Log->Error("The RTC read error!  Please check the circuitry.");
-        }
-    }
-    return tm;
-}
-/*
-bool SigmaClock::GetClock(TimeElements& tm)
-{
-    bool res = false;
-    if (isInternet) {
-    }
-    if (!res) {
-        res = RTC.read(tm);
-        if (!res) {
-            if (RTC.chipPresent()) {
-                Config.Log->Error("The RTC is stopped");
-            }
-            else {
-                Config.Log->Error("The RTC read error!  Please check the circuitry.");
-            }
-        }
-    }
-	return res;
-}
-*/
-bool SigmaClock::SetClock(TimeElements tm)
-{
-    bool res = RTC.write(tm);
-    if (!res) {
-        Config.Log->Error("Can't set RTC");
-    }
-    return res;
+
+
+DateTime& SigmaClock::GetClock() {
+    dt = rtc.getTime();
+    return dt;
 }
 
-bool SigmaClock::SetClock()
+void SigmaClock::SetClock(DateTime& dt)
+{
+    rtc.setTime(dt);
+}
+
+void SigmaClock::SetClock()
 {   
-    bool res = false;
-
-    res = SetClock(tm);
-    return res;
+    SetClock(dt);
 }
 
 const char* SigmaClock::PrintClock()
 {
-    sprintf(strClock, "%u-%02u-%02u %02u:%02u:%02u", tm.Year + 1970, tm.Month, tm.Day, tm.Hour, tm.Minute, tm.Second);
+    GetClock();
+    sprintf(strClock, "%u-%02u-%02u %02u:%02u:%02u", dt.year, dt.month, dt.date, dt.hour, dt.minute, dt.second);
     return strClock;
 }
 
@@ -124,7 +97,7 @@ bool SigmaClock::readClock()
                 delay(2000);
                 nTry++;
                 len = client->available();
-    //            Config.Log->append("Try:").append(nTry).append("; response len=").append(len).Info();
+               //Config.Log->append("Try:").append(nTry).append("; response len=").append(len).Info();
             }
         }
         else {
@@ -136,45 +109,36 @@ bool SigmaClock::readClock()
         return res;
     }
     res = parseResponse(len);
- 	return res;
-}
-
-bool SigmaClock::parseResponse(int len)
-{
-    bool res = false;
-    char buf[BUF_SIZE];
-
-    String s;
-    int payloadLen = 0;
- 
-    s = client->readString();
-
-    int i = s.indexOf(HTTP_CONTENT_LENGTH);
-    if (i != 0) {
-        i += strlen(HTTP_CONTENT_LENGTH);
-    }
-    payloadLen = s.substring(i + 1).toInt();
-//    Config.Log->append("Response length=").append(payloadLen).Debug();
-    if (payloadLen >= BUF_SIZE) {
-        Config.Log->append("The response size(").append(payloadLen).append(") is too high").Error();
-        buf[0] = 0;
-    }
-    else if (payloadLen!=0) {       
-        strncpy(buf, s.substring(s.length() - payloadLen,s.length()).c_str(),payloadLen);
-        buf[payloadLen] = 0;
-    }
-    else {
-        buf[0] = 0;
-    }
-    res = (buf[0] != 0);
-    if (res) {
-        res = parseJson(buf);
-    }
+    Config.Log->append("Response:").append(res).Debug();
     return res;
 }
 
+bool SigmaClock::parseResponse(int len) {
+    bool res = false;
+ 
+    String s;
+
+    s = client->readStringUntil('\n');
+    if (s.indexOf("200 OK") == -1) {
+        Config.Log->append("Response:").append(s.c_str()).Error();
+        return false;
+    }
+    while (client->available()) {
+        s = client->readStringUntil('\n');
+        //Config.Log->append("s=").append(s.c_str()).Debug();
+    }
+    //Config.Log->append("Final=").append(s.c_str()).Debug();
+
+    res = parseJson(s.c_str());
+    
+    return res;
+}
+
+
+
 bool SigmaClock::parseJson(const char* buf)
 {
+    //Config.Log->append("JSON:").append(buf).Debug();
     bool res = false;
     if (buf[0] != 0) {
         //const size_t CAPACITY = JSON_OBJECT_SIZE(25);
@@ -191,20 +155,29 @@ bool SigmaClock::parseJson(const char* buf)
         if (root.containsKey("datetime")) {
  
             String s = root["datetime"]; //"2022-01-09T15:32:39.409582+02:00"
-            tm.Year = s.substring(0, 4).toInt()-1970;
-            tm.Month = s.substring(5, 7).toInt();
-            tm.Day = s.substring(8, 10).toInt();
-            tm.Hour = s.substring(11, 13).toInt();
-            tm.Minute = s.substring(14, 16).toInt();
-            tm.Second = s.substring(17, 19).toInt();
+            dt.year = s.substring(0, 4).toInt();
+            dt.month = s.substring(5, 7).toInt();
+            dt.date = s.substring(8, 10).toInt();
+            dt.hour = s.substring(11, 13).toInt();
+            dt.minute = s.substring(14, 16).toInt();
+            dt.second = s.substring(17, 19).toInt();
             
             res = true;
         }
-        else if (root.containsKey("day_of_week")) {
-            tm.Wday = root["day_of_week"];
-            tm.Wday += 1; //Sunday is 1
-        }
+        //else if (root.containsKey("day_of_week")) {
+        //    tm.Wday = root["day_of_week"];
+        //    tm.Wday += 1; //Sunday is 1
+        //}
     }
 //    Config.Log->append("DT=").append(PrintClock(t)).Debug();
     return res;
+}
+
+byte SigmaClock::DayYesterday(byte day) {
+    if (day == 1) {
+        day = 7;
+    } else {
+        day--;
+    }
+    return day;
 }

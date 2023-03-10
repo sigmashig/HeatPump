@@ -1,7 +1,7 @@
 #pragma once
 #include <Ethernet.h>
-#include "TimeLib.h"
-#include "DS1307RTC.h"
+//#include "TimeLib.h"
+#include <microDS3231.h>
 
 // #define CALENDAR_SERVER "worldtimeapi.org"
 #define CALENDAR_SERVER "213.188.196.246"
@@ -13,26 +13,29 @@
 class SigmaClock
 {
 public:
+	
 	typedef enum {
 		CAL_SERVER_WORLDTIMEAPI
 	} CalendarServerType;
 	
 	SigmaClock(EthernetClient* cli, const char* timezone = NULL);
 	bool SyncClock();
-	TimeElements GetClock();
+	DateTime& GetClock();
 //	bool GetClock(TimeElements& tm, bool isInternet=false);
-	bool SetClock(TimeElements tm);
-	bool SetClock();
+	void SetClock(DateTime& dt);
+	void SetClock();
 	const char* PrintClock();
 	void SetTimezone(const char* tzNew);
 	const char* GetTimezone() { return tz; };
 	void Init();
 	void SetServerType(CalendarServerType type) { serverType = type; };
 	CalendarServerType GetServerType() { return serverType; };
+	static byte DayYesterday(byte day);
 	
 private:
+	MicroDS3231 rtc;
 	CalendarServerType serverType;
-	TimeElements tm;
+	DateTime dt;
 	EthernetClient* client;
 	bool readClock();
 	bool parseResponse(int len);
