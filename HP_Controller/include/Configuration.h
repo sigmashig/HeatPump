@@ -79,6 +79,8 @@ public:
 	byte GetLengthRootTopic() { return lengthOfRoot; }
 	void WatchDogPublication();
 
+    void PublishLog(DebugLevel level, const char* message);
+
 	
 private:
 
@@ -112,6 +114,7 @@ private:
 		SECTION_STATUS,
 		SECTION_SCHEDULE_WEEKEND,
 		SECTION_SCHEDULE_WORKDAYS,
+		SECTION_LOG,
 		MQTT_SECTION_LAST
 	} MqttSection;
 
@@ -161,9 +164,12 @@ private:
 										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockType","Version",
 										"Reset"};
 
-	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/Weekend/Set_", "Schedule/Workdays/Set_" };
+	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/Weekend/Set_", "Schedule/Workdays/Set_","Log/" };
 	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text"};
 	const char* mqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/" };
+	const char* LOG_END[8] = { "OFF", "INTERNAL","FATAL","ERROR","WARN","INFO","DEBUG","ALL" };
+
+
 	//const char* mqttScheduleSetName[SCHEDULE_SET_LAST] = { "WeekEnd/", "WorkDays/" };
 	void publish(const char* topic, const char* payload);
 

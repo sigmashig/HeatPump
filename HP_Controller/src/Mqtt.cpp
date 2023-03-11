@@ -78,16 +78,18 @@ void Mqtt::repeatedLoop(int n) {
 	}
 }
 bool Mqtt::Publish(const char* topic, const char* payload) {
+	bool res = false;
 	createSafeString(topicFull, MQTT_TOPIC_LENGTH);
 	topicFull = topicRoot;
 	topicFull += topic;
 	if (connected()) {
-		Config.Log->append(F("Publish:")).append(topicFull.c_str()).append(F("->")).append(payload).Internal();
-		return publish(topicFull.c_str(), payload);
+		res = publish(topicFull.c_str(), payload);
+		//Config.Log->append(F("Publish:")).append(topicFull.c_str()).append(F("->")).append(payload).Internal();
 	}
 	else {
-		return false;
+		res = false;
 	}
+	return res;
 }
 
 void Mqtt::Subscribe(const char* topic) {
@@ -101,15 +103,6 @@ void Mqtt::Subscribe(const char* topic) {
 		subscribe(topicFull1.c_str());
 	}
 }
-/*
-void Mqtt::PublishLog(DebugLevel level, const char* message) {
-
-	if (connected()) {
-		sprintf(topicLog, MQTT_LOG, Config.BoardId(), LOG_END[level]);
-		publish(topicLog, message);
-	}
-}
-*/
 bool Mqtt::simpleLoop() {
 	static long lastConnected = 0;
 	bool res = false;

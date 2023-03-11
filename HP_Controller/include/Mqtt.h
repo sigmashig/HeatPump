@@ -32,7 +32,6 @@ public:
 private:
 	unsigned long mqttWaiting;
 	char topicRoot[CONFIG_LENGTH_OF_ROOT + 1];
-	//const char* LOG_END[7] = { "OFF", "FATAL","ERROR","WARN","INFO","DEBUG","ALL" };
 
 	bool mqttReconnect();
 	void repeatedLoop(int n);

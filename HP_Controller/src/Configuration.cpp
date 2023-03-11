@@ -705,6 +705,21 @@ void Configuration::WatchDogPublication() {
 	lastWatchDogPublication = millis();
 }
 
+
+
+void Configuration::PublishLog(DebugLevel level, const char* message) {
+
+	if (isMqttReady) {
+		char topicLog[MQTT_TOPIC_LENGTH + 1];
+		strcpy(topicLog,mqttSectionName[SECTION_LOG]);
+		strcat(topicLog, LOG_END[level]);
+		publish(topicLog, message);
+	}
+}
+
+
+
+
 void Configuration::testTemperature() {
 	double t = 0;
 	double er = 0;

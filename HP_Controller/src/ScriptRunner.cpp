@@ -258,6 +258,10 @@ bool ScriptRunner::heaterStepGroundStart() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_HEATER_FULLSTOP;
+		res = true;
 	}
 	if (res) {
 		infoMsg1 = false;
@@ -507,9 +511,7 @@ bool ScriptRunner::heaterFullStop() {
 bool ScriptRunner::checkStopGround() {
 	bool res = false;
 
-	//res = Config.DevMgr->TInside.GetTemperature() > Config.GetDesiredTemp() + Config.GetHysteresis();
-	res = true;
-
+	res = Config.DevMgr->TVapOut.GetTemperature() + 2 > Config.DevMgr->TVapIn.GetTemperature();
 	return res;
 }
 
@@ -595,6 +597,7 @@ bool ScriptRunner::checkConditions() {
 			Config.DevMgr->TGndOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 		}
 		res &= res1;
+	case STEP_HEATER_2_CHECK_START:
 		res1 = Config.DevMgr->TOut.IsOk();
 		if (!res1) {
 			Config.DevMgr->TOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
@@ -605,7 +608,6 @@ bool ScriptRunner::checkConditions() {
 			Config.DevMgr->TIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
 		}
 		res &= res1;
-	case STEP_HEATER_2_CHECK_START:
 		// Floor pumps are running
 		res1 = Config.DevMgr->PumpFloor1.IsOk();
 		if (!res1) {
