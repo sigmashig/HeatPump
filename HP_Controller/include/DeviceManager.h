@@ -44,36 +44,29 @@ public:
 
 
 	void UnitLoop(unsigned long timeperiod);
-    void updateRelayEquipment(int number, const char* payload);
-    void updateBusEquipment(const char* payload);
-    void updateThermoEquipment(int number, const char* payload);
-    void updateContactorEquipment(int number, const char* payload);
-	//void UpdateRelayEquipment(const char* name, const char* payLoad);
-	void updateRelayStatus(const char* name, const char* payLoad);
-	//void UpdateContactorEquipment(const char* name, const char* payLoad);
-	void UpdateContactorStatus(const char* name, const char* payLoad);
-	//void UpdateThermoEquipment(const char* name, const char* payLoad);
-	void updateThermoStatus(const char* name, const char* payLoad);
 	DeviceManager();
-	bool readFromEEPROM();
 	bool Init();
 	bool FinalInit();
 
-	void PublishEquipment();
+//	void PublishEquipment();
 
 	void SubscribeEquipment();
 
 	void SubscribeStatuses();
-
-	//void UpdateEquipment(const char* topic, const char* payload);
 	void UpdateEquipment(DeviceType dType, const char* name, const char* payload);
-
     void UpdateStatus(DeviceType dType, const char* name, const char* payload);
-
-//	int IncreaseNumberOfDevices() { return ++numbInitialized; };
 
 private:
 //	int numbInitialized = 0;
+	void setDefaultStates();
+	void updateRelayEquipment(int number, const char* payload);
+	void updateBusEquipment(const char* payload);
+	void updateThermoEquipment(int number, const char* payload);
+	void updateContactorEquipment(int number, const char* payload);
+	void updateRelayStatus(const char* name, const char* payLoad);
+	void updateContactorStatus(const char* name, const char* payLoad);
+	void updateThermoStatus(const char* name, const char* payLoad);
+	bool readFromEEPROM();
 
 };
 

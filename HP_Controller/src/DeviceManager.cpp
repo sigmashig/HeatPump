@@ -94,7 +94,7 @@ void DeviceManager::updateThermoStatus(const char* name, const char* payload) {
 	}
 }
 
-void DeviceManager::UpdateContactorStatus(const char* name, const char* payLoad) {
+void DeviceManager::updateContactorStatus(const char* name, const char* payLoad) {
 	ActionType p = (ActionType)(atoi(payLoad));
 	if (strcmp(PressureSwitch.Name, name) == 0) {
 		PressureSwitch.ProcessUnit(p);
@@ -157,12 +157,23 @@ bool DeviceManager::Init() {
 	return res;
 }
 
+void DeviceManager::setDefaultStates() {
+
+	PumpFloor1.ProcessUnit(ACT_OFF);
+	PumpFloor2.ProcessUnit(ACT_OFF);
+	PumpGnd.ProcessUnit(ACT_OFF);
+	PumpTankIn.ProcessUnit(ACT_OFF);
+	PumpTankOut.ProcessUnit(ACT_OFF);
+	Compressor.ProcessUnit(ACT_OFF);
+
+}
+
 bool DeviceManager::FinalInit() {
 	
 	for (int i = 0; i < CONFIG_NUMBER_OF_DEVICES; i++) {
 		AllDevices[i]->InitUnit();
 	}
-	
+	setDefaultStates();
 /*
 	for (int i = 0; i < CONFIG_NUMBER_RELAYS; i++) {
 		AllRelays[i]->InitUnit();
