@@ -243,7 +243,7 @@ bool ScriptRunner::heaterStepGroundStart() {
 					res = false;
 				}
 				if (Config.IsSimulator() || now - startDelay >= stepDelay) {
-					publishInfo("Start heating");
+					publishInfo("Ground is ready");
 					step = STEP_HEATER_4_HEAT;
 					res = true;
 					startDelay = 0;

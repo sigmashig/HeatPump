@@ -313,6 +313,10 @@ void Configuration::Loop(unsigned long timePeriod) {
 			if (t != desiredTemp) {
 				setDesiredTemp(t);
 			}
+		} else {
+			if (desiredTemp != manualTemp) {
+				setDesiredTemp(manualTemp);
+			}	
 		}
 	} else if (timePeriod == 10000) {
 		unitsLoop(timePeriod);
