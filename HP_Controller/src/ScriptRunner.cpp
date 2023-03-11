@@ -57,7 +57,7 @@ bool ScriptRunner::emptyStep() {
 
 	if (start == 0) {
 		start = now;
-		Config.Log->append("Step: Empty, code=").append(step).Info();
+		Config.Log->append("Step: Empty, code=").append((char)step).Info();
 		publishStep();
 	}
 	if (checkConditions()) {
@@ -82,7 +82,7 @@ bool ScriptRunner::heaterIdle() {
 
 	if (start == 0) {
 		start = now;
-		Config.Log->append("Step: Idle, code=").append(step).Info();
+		Config.Log->append("Step: Idle, code=").append((char)step).Info();
 		publishStep();
 	}
 	if (checkConditions()) {
@@ -120,7 +120,7 @@ bool ScriptRunner::heaterStepInitial() {
 
 	if (start == 0) {
 		start = now;
-		Config.Log->append("Step: Initial, code=").append(step).Info();
+		Config.Log->append("Step: Initial, code=").append((char)step).Info();
 		publishStep();
 	}
 
@@ -182,6 +182,7 @@ bool ScriptRunner::heaterStepCheckStart() {
 	if (start == 0) {
 		start = now;
 		publishStep();
+		Config.Log->append("Step: CheckStart, code=").append((char)step).Info();
 		publishInfo("Waiting for start conditions");
 	}
 	if (checkConditions()) {
@@ -221,6 +222,8 @@ bool ScriptRunner::heaterStepGroundStart() {
 	if (start == 0) {
 		start = now;
 		publishStep();
+		Config.Log->append("Step: Ground Start, code=").append((char)step).Info();
+
 		publishInfo("Starting for Gnd and Tank pumps");
 	}
 	if (checkConditions()) {
@@ -230,15 +233,14 @@ bool ScriptRunner::heaterStepGroundStart() {
 			step = STEP_HEATER_FULLSTOP;
 			res = true;
 		} else if (checkCommand()) {
-
 			Config.DevMgr->PumpGnd.ProcessUnit(ACT_ON);
 			Config.DevMgr->PumpTankIn.ProcessUnit(ACT_ON);
-			res = Config.DevMgr->PumpGnd.IsOk() && Config.DevMgr->PumpTankIn.IsOk();
-			if (res) {
+			if (Config.DevMgr->PumpGnd.IsOk() && Config.DevMgr->PumpTankIn.IsOk()) {
 				if (!infoMsg2) {
 					publishInfo("Both pumps have been started. Waiting for few minutes before start");
 					infoMsg2 = true;
 					startDelay = now;
+					res = false;
 				}
 				if (Config.IsSimulator() || now - startDelay >= stepDelay) {
 					publishInfo("Start heating");
@@ -282,6 +284,8 @@ bool ScriptRunner::heaterStepHeat() {
 	if (start == 0) {
 		start = now;
 		publishStep();
+		Config.Log->append("Step: Start heating, code=").append((char)step).Info();
+
 		publishInfo("Start heating");
 	}
 	if (checkConditions()) {
@@ -328,6 +332,7 @@ bool ScriptRunner::heaterStepCheckStop() {
 	if (start == 0) {
 		start = now;
 		publishStep();
+		Config.Log->append("Step: Check stop conditions, code=").append((char)step).Info();
 		publishInfo("Check stop conditions");
 	}
 	if (checkConditions()) {
@@ -372,6 +377,7 @@ bool ScriptRunner::heaterStepStopCompressor() {
 	if (start == 0) {
 		start = now;
 		publishStep();
+		Config.Log->append("Step: Stop compressor and Tank pump, code=").append((char)step).Info();
 		publishInfo("Stop compressor and Tank pump");
 	}
 	if (checkConditions()) {
@@ -431,6 +437,7 @@ bool ScriptRunner::heaterStepStopGnd() {
 	if (start == 0) {
 		start = now;
 		publishStep();
+		Config.Log->append("Step: Stop Gnd pumps, code=").append((char)step).Info();
 		publishInfo("Stop Gnd pumps");
 	}
 	if (checkConditions()) {
@@ -484,7 +491,7 @@ bool ScriptRunner::heaterFullStop() {
 
 	if (start == 0) {
 		publishStep();
-		Config.Log->append("Step: FULL STOP, code=").append(step).Info();
+		Config.Log->append("Step: FULL STOP, code=").append((char)step).Info();
 		publishInfo("FULL STOP!!!");
 	}
 
