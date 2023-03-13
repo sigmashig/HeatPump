@@ -8,18 +8,11 @@ extern Configuration Config;
 
 
 SigmaClock::SigmaClock(EthernetClient* cli, const char* timezone) {
-    client = cli;
-    if (timezone == NULL) {
-        SigmaEEPROM::ReadTimezone(tz);
-    } else {
-        strcpy(tz, timezone);
-    }
-    SetTimezone(tz);
+    Init(cli, timezone);
+}
 
-    if (!rtc.begin()) {
-        Config.Log->Error("DS3231 not found");
-    }
-    SyncClock();
+SigmaClock::SigmaClock() {
+    
 }
 
 bool SigmaClock::SyncClock() {
@@ -38,6 +31,26 @@ DateTime& SigmaClock::GetClock() {
     dt = rtc.getTime();
     return dt;
 }
+
+void SigmaClock::Init(EthernetClient* cli, const char* timezone) {
+    client = cli;
+    if (timezone == NULL) {
+        SigmaEEPROM::ReadTimezone(tz);
+    } else {
+        strcpy(tz, timezone);
+    }
+    SetTimezone(tz);
+
+    if (!rtc.begin()) {
+        Config.Log->Error("DS3231 not found");
+    }
+    SyncClock();
+    
+}
+
+void SigmaClock::FinalInit() {
+}
+
 
 void SigmaClock::SetClock(DateTime& dt)
 {
@@ -74,7 +87,7 @@ bool SigmaClock::readClock()
     int numbTry = 0;
     int len = 0;
     bool res = false;
-    int connRes;
+    unsigned int connRes;
     char buf[100];
     
     while (numbTry < 5 && len == 0) {

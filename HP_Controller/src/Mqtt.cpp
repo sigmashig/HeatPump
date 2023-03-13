@@ -1,22 +1,21 @@
 #include "Mqtt.h"
 
 #include "Configuration.h"
-
+//#include "MemoryExplorer.h"
 
 extern Configuration Config;
 
 void callbackFunc(char* topic, uint8_t* payload, unsigned int length) {
 	if (length <= MQTT_PAYLOAD_LENGTH && strlen(topic) <= MQTT_TOPIC_LENGTH) {
-		char* pl = (char*)payload;
-		pl[length] = 0;
-		Config.Log->append("[").append(topic).append("]:").append((char*)payload).Info();
+		payload[length] = '\0';
+		Config.Log->append("[").append(topic).append("]:(").append(length).append(")").append((char*)payload).Info();
 		if (strcmp(topic, MQTT_WATCH_DOG_PUBLICATION) == 0) {
 			Config.WatchDogPublication();
 		} else {
 			Config.ProcessMessage(topic + Config.GetLengthRootTopic(), (char*)payload);
 		}
 	} else {
-		Config.Log->Debug("Wrong Length");
+		Config.Log->Error("Wrong Length");
 	}
 }
 
@@ -84,7 +83,7 @@ bool Mqtt::Publish(const char* topic, const char* payload) {
 	topicFull += topic;
 	if (connected()) {
 		res = publish(topicFull.c_str(), payload);
-		//Config.Log->append(F("Publish:")).append(topicFull.c_str()).append(F("->")).append(payload).Internal();
+		Config.Log->append(F("Publish:")).append(topicFull.c_str()).append(F("->")).append(payload).Internal();
 	}
 	else {
 		res = false;
@@ -93,12 +92,10 @@ bool Mqtt::Publish(const char* topic, const char* payload) {
 }
 
 void Mqtt::Subscribe(const char* topic) {
-	//Config.Log->append("Subscribe length=").append((int)strlen(topic)).Debug();
-	//Config.Log->append("Root length=").append((int)strlen(topicRoot)).Debug();
 	createSafeString(topicFull1, MQTT_TOPIC_LENGTH);
 	topicFull1 = topicRoot;
 	topicFull1 += topic;
-	Config.Log->append(F("Subscription:")).append(topicFull1.c_str()).Debug();
+	Config.Log->append(F("Subscription:")).append(topicFull1.c_str()).Info();
 	if (connected()) {
 		subscribe(topicFull1.c_str());
 	}
@@ -128,11 +125,9 @@ bool Mqtt::simpleLoop() {
 }
 
 void Mqtt::MqttLoop(int n) {
-	//Config.Log->append("MqttLoop:").append(n).Debug();
 	for (n *= 2; n >= 0; n--) {
 		simpleLoop();
 		delay(100);
 	}
-	//Config.Log->Debug("Endloop");
 }
 

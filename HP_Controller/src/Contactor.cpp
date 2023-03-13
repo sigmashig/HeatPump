@@ -58,26 +58,10 @@ void Contactor::handleFinish(int newStatus) {
 void Contactor::UnitLoop(unsigned long timePeriod)
 {
 	handleContactor(timePeriod);
-	/*
-	if (!IsOk())
-	{
-		if (!IsAlert)
-		{
-			publishDeviceAlert("Contactor is in alert mode");
-			IsAlert = true;
-		}
-	}
-	else if (IsAlert)
-	{
-		publishDeviceAlert("");
-		IsAlert = false;
-	}
-	*/
 }
 
 bool Contactor::IsOk() {
 	bool res = false;
-	//Config.Log->append("ISOK. Contactor ").append(Name).append(" = ").append(status).Debug();
 	
 	if (Status == lhOn) {
 		PublishDeviceAlert(ALERT_EMPTY);
@@ -98,7 +82,6 @@ void Contactor::ProcessUnit(ActionType event) {
 	} else if (event == ACT_ON) {
 		Status = lhOn;
 	}
-	//Config.Log->append("Contactor ").append(Name).append(" = ").append(status).Debug();
 }
 
 void const Contactor::print(const char* header, DebugLevel level) {

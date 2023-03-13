@@ -8,10 +8,9 @@ extern DebugLevel DLevel;
 void Loger::Log(DebugLevel level) {
 	if (level <= DLevel) {
 		Serial.println(loger->c_str());
-		if (level != D_INTERNAL) {
-			
-			Config.PublishLog(level, loger->c_str());
-		}
+		//if (level != D_INTERNAL && level != D_DEBUG) {			
+			//Config.PublishLog(level, loger->c_str());
+		//}
 	}
 	loger->clear();
 }

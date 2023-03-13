@@ -32,7 +32,7 @@ void DeviceManager::updateBusEquipment(const char* payload) {
 	byte pin = Bus.Pin;
 	Bus.UpdateEquipment(payload);
 	if (Bus.Pin != pin) {
-		Config.Log->Debug("EEPROM BUS");
+		Config.Log->Info("EEPROM BUS");
 		SigmaEEPROM::Write8(EEPROM_ADDR_TBUS_PIN, Bus.Pin);
 		Bus.InitUnit();
 	}
@@ -206,7 +206,6 @@ void DeviceManager::UpdateEquipment(DeviceType dType, const char* name, const ch
 		break;
 	case DEVTYPE_BUS:
 		if (strcmp(Bus.Name, name) == 0) {
-			//Config.Log->Debug("POINT1");
 			updateBusEquipment(payload);
 		}
 		break;

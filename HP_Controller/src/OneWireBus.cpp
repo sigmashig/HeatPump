@@ -26,12 +26,10 @@ double OneWireBus::GetTemperature(const DeviceAddress address) {
 
 void OneWireBus::InitUnit() {
 	releaseResources();
-	//Config.Log->append(F("Init OneWire bus on pin ")).append(Pin).Debug();
 	oneWire = new OneWire(Pin);
 	PublishDeviceAlert(ALERT_EMPTY, true);
 	sensors = new DallasTemperature(oneWire);
 	sensors->begin();
-	//sensors->setResolution(10);
 	printDevices();
 }
 
@@ -158,13 +156,9 @@ String OneWireBus::ConvertAddressToString(const DeviceAddress address) {
 bool OneWireBus::IsZeroAddress(DeviceAddress address) {
 
 	bool res = true;
-
-	//Config.Log->append(F("IsZeroAddress: ")).append(ConvertAddressToString(address).c_str()).Debug();
-	
 	for (int i = 0; res && i < 8; i++) {
 		res &= address[i] == 0;
 	}
-	//Config.Log->append(F("IsZeroAddress: ")).append(res).Debug();
 	return res;
 }
 

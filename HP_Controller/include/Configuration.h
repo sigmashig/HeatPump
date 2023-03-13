@@ -31,7 +31,7 @@ public:
 	Loger* Log;
 	DeviceManager* DevMgr;
 	ScheduleManager* ScheduleMgr;
-	SigmaClock* Clock;
+	SigmaClock Clock;
 	ScriptRunner Runner;
 
 
@@ -43,7 +43,9 @@ public:
 	unsigned long Counter60 = 0;	//1min
 
 
-	// Methods
+   // void check1(const char* title);
+
+// Methods
 	void Init();
 	void Loop(unsigned long timePeriod);
 

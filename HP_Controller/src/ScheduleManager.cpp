@@ -30,6 +30,7 @@ void ScheduleManager::Init()
 
 void ScheduleManager::FinalInit()
 {
+	/*
 	Config.Log->Debug("Before sort:");
 	for (int i = 0; i < 2 * CONFIG_NUMBER_SCHEDULES; i++) {
 		Config.Log->append(F("Schedule ")).append(i).append(F(": time:"))
@@ -43,6 +44,7 @@ void ScheduleManager::FinalInit()
 		Config.Log->append(F("Schedule ")).append(i).append(F(": time:"))
 			.append(AllSchedule[i].GetHour()).append(":").append(AllSchedule[i].GetMinute()).append(" t=").append(AllSchedule[i].GetTemperature()).Debug();
 	}
+	*/
 }
 
 
@@ -89,7 +91,7 @@ byte ScheduleManager::wdOrWe(byte day) {
 
 
 double ScheduleManager::GetDesiredTemperature() {
-	DateTime dt = Config.Clock->GetClock();
+	DateTime dt = Config.Clock.GetClock();
 	//Config.Log->append(F("GetDesiredTemperature: ")).append(dt.hour).append(":").append(dt.minute).append(" day=").append(dt.day).Debug();
 	return GetDesiredTemperature(dt.hour, dt.minute, dt.day);
 }

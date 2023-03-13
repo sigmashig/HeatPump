@@ -19,9 +19,12 @@ public:
 	} CalendarServerType;
 	
 	SigmaClock(EthernetClient* cli, const char* timezone = NULL);
+    SigmaClock();
 	bool SyncClock();
 	DateTime& GetClock();
-//	bool GetClock(TimeElements& tm, bool isInternet=false);
+	void Init(EthernetClient* cli, const char* timezone = NULL);
+    void FinalInit();
+	//	bool GetClock(TimeElements& tm, bool isInternet=false);
 	void SetClock(DateTime& dt);
 	void SetClock();
 	const char* PrintClock();

@@ -25,11 +25,9 @@ void SigmaEEPROM::Write16(uint16_t addr, uint16_t val) {
 
 char* SigmaEEPROM::ReadTimezone(char* tz)
 {
-	//Config.Log->Debug("Point 4.5");
 	int len = Read8(EEPROM_ADDR_TIMEZONE);
-	//Config.Log->append("LEN=").append(len).Debug();
 	if (len >= TIMEZONE_LEN) {
-		strcpy(tz, Config.GetTimezone());
+		strcpy(tz, "XXX");
 	}
 	else {
 		for (int i = 0; i < len; i++) {
@@ -58,18 +56,6 @@ byte SigmaEEPROM::ReadBoardId() {
 	return Read8(EEPROM_ADDR_ID);
 }
 
-/*
-unsigned int SigmaEEPROM::ReadMqtt(IPAddress& ip)
-{
-	for (int i = 0; i < 4; i++) {
-		ip[i] = Read8(EEPROM_ADDR_MQTT_IP + i);
-	}
-	//Config.Log->append(Read8(EEPROM_ADDR_MQTT + 4)).Debug();
-	//Config.Log->append(Read8(EEPROM_ADDR_MQTT + 5)).Debug();
-
-	return Read16(EEPROM_ADDR_MQTT + 4);
-}
-*/
 
 void SigmaEEPROM::WriteIp(IPAddress& ip, uint16_t addr) {
 	bool res = (ip[0] + ip[1] + ip[2] + ip[3]) != 0;

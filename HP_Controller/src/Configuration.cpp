@@ -7,27 +7,41 @@
 #include "MemoryExplorer.h"
 #include "version.h"
 
+/*
+void Configuration::check1(const char* title) {
+	char buf[512];
+	buf[0] = 0;
+	Log->append("POINT0.1=").append(strlen(title)).Internal();	
+	Log->append("===").append(title).append("====").Internal();
+	Log->append("POINT0.2=").append(strlen(title)).Internal();
+	for (int i = 0; i < 20;i++) {
+		strcat(buf, "x");
+		Log->append("POINT1=").append(strlen(buf)).Internal();
+		Log->append("[").append(buf).append("]:").Info();
+		Log->append("POINT2=").append(strlen(buf)).Internal();
+	}
+}
+*/
 
 void Configuration::Init() {
 	Log = new Loger(512);
-
-
 	readBoardId();
 	//initMqttTopics();
 	ethClient = new EthernetClient();
 
 	initializeEthernet();
 	readConfigEEPROM();
-	Log->Debug("Clock");
-	Clock = new SigmaClock(ethClient);
+	Log->Info("Clock");
+	//Clock = new SigmaClock(ethClient);
 	//Clock->SetClock();
-	Log->append("Now:").Info(Clock->PrintClock());
+	Clock.Init(ethClient,timezone);
+	Log->append("Now:").Info(Clock.PrintClock());
 
-	Log->Debug("DevMgr");
+	Log->Info("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
 
-	Log->Debug("Schedule Mgr");
+	Log->Info("Schedule Mgr");
 	ScheduleMgr = new ScheduleManager();
 	ScheduleMgr->Init();
 
@@ -35,9 +49,10 @@ void Configuration::Init() {
 	sprintf(topicRoot, "%s%s/", mQTT_ROOT, boardName);
 	lengthOfRoot = strlen(topicRoot);
 
-	Log->Debug("Mqtt");
+	Log->Info("Mqtt");
 	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
 	mqttClient->Init();
+	
 	if (mqttClient->IsMqtt()) {
 		isMqttReady = true;
 		publishConfigParameter(PARAMS_VERSION, VERSION);
@@ -62,7 +77,7 @@ void Configuration::Init() {
 void Configuration::setBoardId(byte id, bool save) {
 	if (save) {
 		if (id != boardId) {
-			Log->Debug("EEROM write board id");
+			Log->Info("EEROM write board id");
 			SigmaEEPROM::Write8(EEPROM_ADDR_ID, id);
 		}
 	}
@@ -132,20 +147,19 @@ void Configuration::readConfigEEPROM() {
 	setCommand(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CMD), false);
 	setClockType(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE), false);
 	char tmp[TIMEZONE_LEN];
-	setTimeZone(SigmaEEPROM::ReadTimezone(tmp));
-
+	setTimeZone(SigmaEEPROM::ReadTimezone(tmp), false);
 }
 
 void Configuration::setTimeZone(const char* tz, bool save) {
 	if (!save) {
 		strcpy(timezone, tz);
-	}
+	} else {
 
-	if (0 != strcmp(timezone, tz)) {
-		strcpy(timezone, tz);
-
-		Log->Debug("EEPROM TZ");
-		SigmaEEPROM::WriteTimezone(timezone);
+		if (0 != strcmp(timezone, tz)) {
+			strcpy(timezone, tz);
+			Log->Info("EEPROM TZ");
+			SigmaEEPROM::WriteTimezone(timezone);
+		}
 	}
 }
 
@@ -155,7 +169,7 @@ void Configuration::setIp(IPAddress& ipNew, bool save) {
 	} else {
 		if (this->ip != ipNew && Utils::IsIpValid(ipNew)) {
 			this->ip = ipNew;
-			Log->Debug("EEPROM IP");
+			Log->Info("EEPROM IP");
 			SigmaEEPROM::WriteIp(ipNew, EEPROM_ADDR_IP);
 		}
 	}
@@ -167,7 +181,7 @@ void Configuration::setMqttIp(IPAddress& ip, bool save) {
 	} else {
 		if (this->mqttIp != ip && Utils::IsIpValid(ip)) {
 			this->mqttIp = ip;
-			Log->Debug("EEPROM Mqtt IP");
+			Log->Info("EEPROM Mqtt IP");
 			SigmaEEPROM::WriteIp(ip, EEPROM_ADDR_MQTT_IP);
 		}
 	}
@@ -179,7 +193,7 @@ void Configuration::setMqttPort(uint16_t port, bool save) {
 	} else {
 		if (mqttPort != port) {
 			mqttPort = port;
-			Log->Debug("EEPROM Mqtt Port");
+			Log->Info("EEPROM Mqtt Port");
 			SigmaEEPROM::Write16(EEPROM_ADDR_MQTT_PORT, port);
 		}
 	}
@@ -190,11 +204,11 @@ void Configuration::setClockType(byte b, bool save) {
 	SigmaClock::CalendarServerType type = (SigmaClock::CalendarServerType)b;
 	
 	if (!save) {
-		Clock->SetServerType(type);
+		Clock.SetServerType(type);
 	} else {
-		if (Clock->GetServerType() != type) {
-			Clock->SetServerType(type);
-			Log->Debug("EEPROM ClockType");
+		if (Clock.GetServerType() != type) {
+			Clock.SetServerType(type);
+			Log->Info("EEPROM ClockType");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE, type);
 		}
 	}
@@ -207,24 +221,20 @@ void Configuration::setWorkMode(byte b, bool save) {
 		}
 		if (workMode != (WORKMODE)(b)) {
 			workMode = (WORKMODE)(b);
-			Log->Debug("EEPROM WorkMode");
+			Log->Info("EEPROM WorkMode");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MODE, workMode);
 		}
 	}
 }
 
 void Configuration::setCommand(byte b, bool save) {
-	//Log->append("setCommand=").append(b).Info();
-	//Log->append("save=").append(save).Info();
-	//Log->append("command=").append(command).Info();
-	
 	if (b == 0 || b == 1 || b == 2) {
 		if (!save) {
 			command = (CMD)(b);
 		}
 		if (command != (CMD)(b)) {
 			command = (CMD)(b);
-			Log->Debug("EEPROM Cmd");
+			Log->Info("EEPROM Cmd");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_CMD, command);
 		}
 	}
@@ -243,7 +253,7 @@ void Configuration::setManualTemp(double t, bool save) {
 		}
 		if (manualTemp != t) {
 			manualTemp = t;
-			Log->Debug("EEPROM Manual Temp");
+			Log->Info("EEPROM Manual Temp");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_MANUALTEMP, (byte)(manualTemp * 2));
 		}
 		if (workMode == WORKMODE_MANUAL) {
@@ -266,7 +276,7 @@ void Configuration::setWeekMode(byte b, bool save) {
 		}
 		if (weekMode != (WEEKMODE)(b)) {
 			weekMode = (WEEKMODE)(b);
-			Log->Debug("EEPROM WeekMode");
+			Log->Info("EEPROM WeekMode");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_WEEKMODE, weekMode);
 		}
 	}
@@ -278,7 +288,7 @@ void Configuration::setHysteresis(byte b, bool save) {
 	}
 	if (hysteresis != b) {
 		hysteresis = b;
-		Log->Debug("EEPROM Hysteresis");
+		Log->Info("EEPROM Hysteresis");
 		SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_HYSTERESIS, hysteresis);
 	}
 }
@@ -290,7 +300,7 @@ void Configuration::setHeatMode(byte b, bool save) {
 		}
 		if (heatMode != (HEATMODE)(b)) {
 			heatMode = (HEATMODE)(b);
-			Log->Debug("EEPROM HeatCold");
+			Log->Info("EEPROM HeatCold");
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_HEATCOLD, heatMode);
 		}
 	}
@@ -457,7 +467,12 @@ void Configuration::Subscribe(const char* topic) {
 void Configuration::ProcessMessage(const char* topic, const char* payload) {
 	char const * topic0;
 	topic0 = mqttSectionName[SECTION_CONFIG];
+	//Log->append("ProcessMessage: ").append(topic).append(" ").append(payload).Internal();
+	Log->Internal("ProcessMessage");
+	Log->append("Topic length=").append(strlen(topic)).Internal();
+	Log->append("Topic=").append(topic).Internal();
 	if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Config
+		Log->Internal("CONFIG");
 		updateConfig(topic + strlen(topic0), payload);
 	} else {
 		topic0 = mqttSectionName[SECTION_STATUS];
@@ -495,6 +510,7 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 }
 
 void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload) {
+	Log->append("updateSingleParam: ").append(parm).Debug();
 	switch (parm) {
 	case PARAMS_WORKMODE: {
 		byte b = atoi(payload);
@@ -564,7 +580,9 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 	}
 	case PARAMS_RESET: {
 		byte b = atoi(payload);
-		if (b>=5 && b == Counter60) {
+		Log->append("Reset:").append(b).append(" ").append(Counter60).Internal();
+		if (b >= 5 && b == Counter60) {
+			publishConfigParameter(PARAMS_RESET, (byte)0);
 			Log->Debug("Reset command received");
 			delay(5000);
 			Utils::Reset();
@@ -587,7 +605,7 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 /// @param topic - topic of MQTT message
 /// @param payload - payload of MQTT message
 void Configuration::updateConfig(const char* topic, const char* payload) {
-
+	
 	for (int i = 0; i < CONFIG_PARAMS_LAST; i++) {
 		if (strcmp(topic, mqttConfigParamName[i]) == 0) {
 			updateSingleParam((MqttConfigParam)i, payload);
@@ -601,7 +619,6 @@ void Configuration::publishConfigParameter(MqttConfigParam parmId, const char* p
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
 	topic = mqttSectionName[SECTION_CONFIG];
 	topic += mqttConfigParamName[parmId];
-	//Log->append("publishConfigParameter: ").append(topic.c_str()).append("; payload=").append(payload).Debug();
 	publish(topic.c_str(), payload);
 }
 
@@ -613,7 +630,6 @@ void Configuration::subscribeConfigParameter(MqttConfigParam parmId) {
 }
 
 void Configuration::publishConfigParameter(MqttConfigParam parmId, byte payload) {
-	//Log->append("publishConfigParameter: ").append(mqttConfigParamName[parmId]).append("; payload=").append(payload).Debug();
 	char p[4];
 	sprintf(p, "%u", payload);
 	publishConfigParameter(parmId, p);
@@ -687,18 +703,7 @@ void Configuration::SubscribeSchedule(int number) {
 	topic += number;
 	mqttClient->Subscribe(topic.c_str());
 }
-/*
-void Configuration::PublishSchedule(int number) {
-	Log->append("Schedule:").append(number).Debug();
-	createSafeString(topic, MQTT_TOPIC_LENGTH);
-	topic = (number < CONFIG_NUMBER_SCHEDULES ? mqttSectionName[SECTION_SCHEDULE_WEEKEND] : mqttSectionName[SECTION_SCHEDULE_WORKDAYS]);
-	topic += number;
-	char payload[MQTT_PAYLOAD_LENGTH + 1];
-	ScheduleMgr->GetSchedule(number).Serialize(payload);
-	Log->append("Schedule:").append(number).append("=").append(payload).Debug();
-	//mqttClient->Publish(topic.c_str(), payload);
-}
-*/
+
 void Configuration::WatchDogPublication() {
 	if (lastWatchDogPublication + WATCHDOG_PUBLICATION_INTERVAL > millis()) {
 		lastWatchDogPublication = millis();
