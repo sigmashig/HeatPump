@@ -53,7 +53,7 @@ void OneWireBus::ProcessUnit(ActionType action) {
 }
 
 void OneWireBus::UnitLoop(unsigned long timeperiod) {
-	if (timeperiod == 1000) {
+	if (timeperiod == 30000) {
 		RequestTemperature();
 	}
 }

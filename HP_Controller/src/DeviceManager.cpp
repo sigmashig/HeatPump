@@ -174,21 +174,6 @@ bool DeviceManager::FinalInit() {
 		AllDevices[i]->InitUnit();
 	}
 	setDefaultStates();
-/*
-	for (int i = 0; i < CONFIG_NUMBER_RELAYS; i++) {
-		AllRelays[i]->InitUnit();
-		AllRelays[i]->Publish();
-	}
-
-	PressureSwitch.InitUnit();
-	VoltageSwitch.InitUnit();
-	Bus.InitUnit();
-
-	for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
-		AllThermo[i]->InitUnit();
-		AllThermo[i]->Publish();
-	}
-*/
 	return true;
 
 }

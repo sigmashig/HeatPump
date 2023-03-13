@@ -27,12 +27,8 @@ void OneWireThermo::InitUnit() {
 
 double OneWireThermo::GetTemperature() {
 	if (!isSimulator) {
-		//Config.Log->Debug("POINT 2");
 		double t = parent->GetTemperature(Address);
-		//Config.Log->append(F("Temp is ")).append(t).Debug();
-		//Config.Log->append(F("Temp is ")).append(Temperature).Debug();
 		if (t != Temperature) {
-			//Config.Log->append(Name).Debug("_POINT 1");
 			Temperature = t;
 			publishTemp();
 		}
@@ -119,7 +115,7 @@ bool OneWireThermo::checkSimulator() {
 
 void OneWireThermo::UnitLoop(unsigned long timeperiod) {
 
-	if (timeperiod == 1000) {
+	if (timeperiod == 10000) {
 		if (!isSimulator) {
 			GetTemperature();
 		}

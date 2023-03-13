@@ -84,6 +84,7 @@ bool ScriptRunner::heaterIdle() {
 		start = now;
 		Config.Log->append("Step: Idle, code=").append((char)step).Info();
 		publishStep();
+		publishAlert(ALERT_EMPTY);
 	}
 	if (checkConditions()) {
 		if (Config.GetCommand() == CMD_RUN) {
@@ -122,6 +123,7 @@ bool ScriptRunner::heaterStepInitial() {
 		start = now;
 		Config.Log->append("Step: Initial, code=").append((char)step).Info();
 		publishStep();
+		publishAlert(ALERT_EMPTY);
 	}
 
 	if (checkConditions()) {
@@ -184,6 +186,7 @@ bool ScriptRunner::heaterStepCheckStart() {
 		publishStep();
 		Config.Log->append("Step: CheckStart, code=").append((char)step).Info();
 		publishInfo("Waiting for start conditions");
+		publishAlert(ALERT_EMPTY);
 	}
 	if (checkConditions()) {
 		if (checkCommand()) {
@@ -223,8 +226,8 @@ bool ScriptRunner::heaterStepGroundStart() {
 		start = now;
 		publishStep();
 		Config.Log->append("Step: Ground Start, code=").append((char)step).Info();
-
 		publishInfo("Starting for Gnd and Tank pumps");
+		publishAlert(ALERT_EMPTY);
 	}
 	if (checkConditions()) {
 		if (now - start >= stepLong) {
@@ -285,7 +288,7 @@ bool ScriptRunner::heaterStepHeat() {
 		start = now;
 		publishStep();
 		Config.Log->append("Step: Start heating, code=").append((char)step).Info();
-
+		publishAlert(ALERT_EMPTY);
 		publishInfo("Start heating");
 	}
 	if (checkConditions()) {
@@ -333,6 +336,7 @@ bool ScriptRunner::heaterStepCheckStop() {
 		start = now;
 		publishStep();
 		Config.Log->append("Step: Check stop conditions, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
 		publishInfo("Check stop conditions");
 	}
 	if (checkConditions()) {
@@ -378,6 +382,7 @@ bool ScriptRunner::heaterStepStopCompressor() {
 		start = now;
 		publishStep();
 		Config.Log->append("Step: Stop compressor and Tank pump, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
 		publishInfo("Stop compressor and Tank pump");
 	}
 	if (checkConditions()) {
@@ -438,6 +443,7 @@ bool ScriptRunner::heaterStepStopGnd() {
 		start = now;
 		publishStep();
 		Config.Log->append("Step: Stop Gnd pumps, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
 		publishInfo("Stop Gnd pumps");
 	}
 	if (checkConditions()) {
@@ -492,6 +498,7 @@ bool ScriptRunner::heaterFullStop() {
 	if (start == 0) {
 		publishStep();
 		Config.Log->append("Step: FULL STOP, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
 		publishInfo("FULL STOP!!!");
 	}
 
