@@ -53,8 +53,11 @@ void OneWireBus::ProcessUnit(ActionType action) {
 }
 
 void OneWireBus::UnitLoop(unsigned long timeperiod) {
-	if (timeperiod == 30000) {
-		RequestTemperature();
+	if (timeperiod == 10000) {
+		if (Config.Counter10 % 3 == 0) { //request on 20 and 50 sec
+			Config.Log->append(F("Request temperature")).Debug();
+			RequestTemperature();
+		}
 	}
 }
 

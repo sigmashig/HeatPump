@@ -23,13 +23,14 @@ public:
 	void UnitLoop(unsigned long timeperiod);
     void UpdateStatus(const char* payload);
 	void InitUnit();
-	double GetTemperature();
+	double GetTemperature() { return Temperature; }
 	void UpdateEquipment(const char* line);
 	bool IsOk();
 private:
 	OneWireBus* parent;
 	bool isSimulator = true;
 	bool checkSimulator();
+    double getTemperature();
 	void publishTemp();
 };
 

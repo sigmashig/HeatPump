@@ -24,9 +24,9 @@ void OneWireThermo::InitUnit() {
 	PublishDeviceAlert(ALERT_EMPTY, true);
 }
 
-
-double OneWireThermo::GetTemperature() {
+double OneWireThermo::getTemperature() {
 	if (!isSimulator) {
+		Config.Log->append(F("Get temperature from ")).append(Name).Debug();
 		double t = parent->GetTemperature(Address);
 		if (t != Temperature) {
 			Temperature = t;
@@ -117,7 +117,9 @@ void OneWireThermo::UnitLoop(unsigned long timeperiod) {
 
 	if (timeperiod == 10000) {
 		if (!isSimulator) {
-			GetTemperature();
+			if (Config.Counter10 % 3 == 1) { // get temp from sensor every 30 sec: 10 and 40 sec
+				getTemperature();
+			}
 		}
 	}
 }

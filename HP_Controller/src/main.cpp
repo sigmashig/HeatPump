@@ -95,5 +95,5 @@ void loop() {
 	}
 
 	Config.Loop(0);
-	
+	Config.Counter0++;
 }

@@ -4,8 +4,8 @@
 #include "DallasTemperature.h"
 #include "SigmaEEPROM.h"
 
-#define BUS_RESOLUTION 10
-#define BUS_INTERVAL  2000
+#define BUS_RESOLUTION 12
+//#define BUS_INTERVAL  2000
 
 class OneWireBus:
 	public Unit {

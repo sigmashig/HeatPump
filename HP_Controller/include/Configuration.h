@@ -36,8 +36,9 @@ public:
 
 
 	//Timer 
-	unsigned long Counter10 = 0;	//10ms
+	unsigned long Counter0 = 0;		//Runtime
 	unsigned long Counter1 = 0;		//1 sec
+	unsigned long Counter10 = 0;	//10s
 	unsigned long Counter30 = 0;	//30 sec
 	unsigned long Counter60 = 0;	//1min
 
