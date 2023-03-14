@@ -327,6 +327,7 @@ void Configuration::Loop(unsigned long timePeriod) {
 		publishConfigParameter(PARAMS_WATCHDOG, (byte)Counter60);
 		//memoryReport("Configuration::Loop 60000");
 		unitsLoop(timePeriod);
+		checkWatchDogPublication();
 	} else if (timePeriod == 30000) {
 		unitsLoop(timePeriod);
 		if (workMode == WORKMODE::WORKMODE_SCHEDULE) {
@@ -716,16 +717,15 @@ void Configuration::SubscribeSchedule(int number) {
 }
 
 void Configuration::WatchDogPublication() {
-	if (lastWatchDogPublication + WATCHDOG_PUBLICATION_INTERVAL > millis()) {
-		lastWatchDogPublication = millis();
-	} else {
-		Log->Error("WatchDogPublication: a long time ago...");
-		SubscribeAll();
-	}
 	lastWatchDogPublication = millis();
 }
 
-
+void Configuration::checkWatchDogPublication() {
+	if (lastWatchDogPublication + WATCHDOG_PUBLICATION_INTERVAL < millis()) {
+		Log->Error("Last WatchDog publication was too long ago");
+		SubscribeAll();
+	}
+}
 
 void Configuration::PublishLog(DebugLevel level, const char* message) {
 

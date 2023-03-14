@@ -226,6 +226,8 @@ private:
 	void updateSingleParam(MqttConfigParam parm, const char* payload);
 
 	void testTemperature();
+	void checkWatchDogPublication();
+
 
 };
 
