@@ -426,6 +426,7 @@ bool ScriptRunner::heaterStepStopCompressor() {
 	}
 	if (res) {
 		start = 0;
+		startDelay = 0;
 		infoMsg1 = false;
 		infoMsg2 = false;
 	}

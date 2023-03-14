@@ -31,7 +31,7 @@ public:
 	Loger* Log;
 	DeviceManager* DevMgr;
 	ScheduleManager* ScheduleMgr;
-	SigmaClock Clock;
+	//SigmaClock Clock;
 	ScriptRunner Runner;
 
 

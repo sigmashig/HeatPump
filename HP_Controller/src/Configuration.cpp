@@ -24,30 +24,31 @@ void Configuration::check1(const char* title) {
 */
 
 void Configuration::Init() {
+	memoryReport("Init 1");
 	Log = new Loger(512);
 	readBoardId();
-	//initMqttTopics();
-	ethClient = new EthernetClient();
-
+	memoryReport("Init 1.1");
 	initializeEthernet();
+	memoryReport("Init 1.2");
+	ethClient = new EthernetClient();
+	memoryReport("Init 1.3");
 	readConfigEEPROM();
-	Log->Info("Clock");
-	//Clock = new SigmaClock(ethClient);
-	//Clock->SetClock();
-	Clock.Init(ethClient,timezone);
-	Log->append("Now:").Info(Clock.PrintClock());
+	memoryReport("Init 2");
 
 	Log->Info("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
+	memoryReport("Init 3");
 
 	Log->Info("Schedule Mgr");
 	ScheduleMgr = new ScheduleManager();
 	ScheduleMgr->Init();
+	memoryReport("Init 4");
 
 	char topicRoot[CONFIG_LENGTH_OF_ROOT+1];
 	sprintf(topicRoot, "%s%s/", mQTT_ROOT, boardName);
 	lengthOfRoot = strlen(topicRoot);
+	memoryReport("Init 5");
 
 	Log->Info("Mqtt");
 	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
@@ -58,7 +59,14 @@ void Configuration::Init() {
 		publishConfigParameter(PARAMS_VERSION, VERSION);
 		publishConfigParameter(PARAMS_IS_READY, "0");
 		SubscribeAll();
+	} else {
+		Log->Error("MQTT is not ready");
 	}
+	memoryReport("Init 6");
+
+	Log->Info("Clock");
+	SigmaClock::SyncClock();
+	Log->append("Now:").Info(SigmaClock::PrintClock());
 
 	mqttClient->FinalInit();
 	ScheduleMgr->FinalInit();
@@ -116,6 +124,8 @@ void Configuration::initializeEthernet() {
 	} else {
 		Log->append("Can't connect to Ethernet=").append(link).Error();
 	}
+	Log->append("IP Address is: ").append(Utils::PrintIp(Ethernet.localIP())).Info();
+	Log->append("MAC Address is: ").append(Utils::PrintMac(mac)).Info();
 }
 
 void Configuration::readBoardId() {
@@ -200,7 +210,7 @@ void Configuration::setMqttPort(uint16_t port, bool save) {
 }
 
 void Configuration::setClockType(byte b, bool save) {
-	
+/*	
 	SigmaClock::CalendarServerType type = (SigmaClock::CalendarServerType)b;
 	
 	if (!save) {
@@ -212,6 +222,7 @@ void Configuration::setClockType(byte b, bool save) {
 			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE, type);
 		}
 	}
+*/
 }
 
 void Configuration::setWorkMode(byte b, bool save) {
@@ -468,11 +479,11 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 	char const * topic0;
 	topic0 = mqttSectionName[SECTION_CONFIG];
 	//Log->append("ProcessMessage: ").append(topic).append(" ").append(payload).Internal();
-	Log->Internal("ProcessMessage");
-	Log->append("Topic length=").append(strlen(topic)).Internal();
-	Log->append("Topic=").append(topic).Internal();
+	//Log->Internal("ProcessMessage");
+	//Log->append("Topic length=").append(strlen(topic)).Internal();
+	//Log->append("Topic=").append(topic).Internal();
 	if (strncmp(topic, topic0, strlen(topic0)) == 0) { //Config
-		Log->Internal("CONFIG");
+		//Log->Internal("CONFIG");
 		updateConfig(topic + strlen(topic0), payload);
 	} else {
 		topic0 = mqttSectionName[SECTION_STATUS];

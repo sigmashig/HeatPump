@@ -44,6 +44,8 @@ void Mqtt::Init()
 		else {
 			//delay(2000); //mqtt iob has delay 2 sec
 		}
+	} else {
+		Config.Log->Error(F("Ethernet not ready"));
 	}
 }
 

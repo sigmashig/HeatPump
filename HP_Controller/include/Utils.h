@@ -9,6 +9,8 @@ public:
     static double Str2Double(const char* str);
     //static void Ip2Str(char* str, IPAddress ip);
     static bool IsIpValid(IPAddress ip);
+    static char* PrintIp(IPAddress ip);
+    static char* PrintMac(uint8_t* mac);
     static constexpr void(*Reset) (void) = 0;
 };
 
