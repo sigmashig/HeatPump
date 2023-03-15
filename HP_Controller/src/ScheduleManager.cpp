@@ -65,7 +65,7 @@ void ScheduleManager::UpdateSchedule(byte shift, byte setNumber, const char* pay
 	}
 }
 
-byte ScheduleManager::wdOrWe(byte day) {
+byte ScheduleManager::wdOrWe(_WEEK_DAYS_ day) {
 	byte shift = 0;
 
 
@@ -91,20 +91,20 @@ byte ScheduleManager::wdOrWe(byte day) {
 
 
 double ScheduleManager::GetDesiredTemperature() {
-	DateTime dt = SigmaClock::GetClock();  //Config.Clock.GetClock();
+	tm tm0 = SigmaClock::GetClock();  //Config.Clock.GetClock();
 	//Config.Log->append(F("GetDesiredTemperature: ")).append(dt.hour).append(":").append(dt.minute).append(" day=").append(dt.day).Debug();
-	return GetDesiredTemperature(dt.hour, dt.minute, dt.day);
+	return GetDesiredTemperature(tm0.tm_hour,tm0.tm_min,tm0.tm_wday);
 }
 
 double ScheduleManager::GetDesiredTemperature(byte h, byte m, byte day) {
 
-	byte shift = wdOrWe(day);
+	byte shift = wdOrWe((_WEEK_DAYS_)day);
 	Config.Log->append(F("GetDesiredTemperature: ")).append(h).append(":").append(m).append(" day=").append(day).append(" shift=").append(shift).Debug();
 	if (AllSchedule[shift + 0].CompareTime(h, m) < 0) {
 		// take last schedule for yesterday
 		Config.Log->Debug("GetDesiredTemperature: yesterday");
 
-		byte yDay = SigmaClock::DayYesterday(day);
+		_WEEK_DAYS_ yDay = SigmaClock::DayYesterday((_WEEK_DAYS_)day);
 		byte sh = wdOrWe(yDay);
 		return AllSchedule[sh + CONFIG_NUMBER_SCHEDULES - 1].GetTemperature();
 		//return GetDesiredTemperature(23,59, yDay);

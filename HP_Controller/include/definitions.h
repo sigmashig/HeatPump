@@ -89,7 +89,7 @@ typedef enum {
 	WEEKMODE_6_1 = 2,
 	WEEKMODE_7_0 = 3
 } WEEKMODE;
-
+/*
 typedef enum {
 	MONDAY = 1,
 	TUESDAY = 2,
@@ -99,7 +99,7 @@ typedef enum {
 	SATURDAY = 6,
 	SUNDAY = 7
 } DayOfWeek;
-
+*/
 typedef enum {
 	HEATMODE_NOMODE = 0,
 	HEATMODE_HEAT = 1,

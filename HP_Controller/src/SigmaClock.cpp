@@ -1,160 +1,247 @@
 #include "SigmaClock.h"
 #include "ArduinoJson.h"
-//#include "Configuration.h"
-#include "MemoryExplorer.h"
+//#include "MemoryExplorer.h"
 
+int ua_dst(const time_t* timer, int32_t* z) {
+    struct tm       tmptr;
+    uint8_t         month, mday, hour, day_of_week, d;
+    int             n;
 
-bool SigmaClock::IsDateTimeValid(DateTime& dt) {
-    if (dt.year < 2023 || dt.year > 2050) {
-        return false;
+    /* obtain the variables */
+    gmtime_r(timer, &tmptr);
+    month = tmptr.tm_mon;
+    day_of_week = tmptr.tm_wday;
+    mday = tmptr.tm_mday - 1;
+    hour = tmptr.tm_hour;
+
+    if ((month > MARCH) && (month < OCTOBER))
+        return ONE_HOUR;
+
+    if (month < MARCH)
+        return 0;
+    if (month > OCTOBER)
+        return 0;
+
+    /* determine mday of last Sunday */
+    n = tmptr.tm_mday - 1;
+    n -= day_of_week;
+    n += 7;
+    d = n % 7;  /* date of first Sunday */
+
+    n = 31 - d;
+    n /= 7; /* number of Sundays left in the month */
+
+    d = d + 7 * n;  /* mday of final Sunday */
+    if (month == MARCH) {
+        if (d < mday) {
+            return ONE_HOUR;
+        } else if (d > mday) {
+            return 0;
+        } else if (hour < 2) {
+            return 0;
+        }
+        return ONE_HOUR;
+    } else if (d < mday) {
+        return 0;
+    } else if (d > mday) {
+        return ONE_HOUR;
+    } else if (hour < 2) {
+        return ONE_HOUR;
     }
-    if (dt.month < 1 || dt.month > 12) {
-        return false;
+    return 0;
+}
+/*
+void SigmaClock::syncNTP() {
+    EthernetUDP Udp;
+    NTP ntp = NTP(Udp);
+    Serial.println("Starting UDP");
+    ntp.ruleDST("EEST", Last, Sun, Mar, 2, 180); // last sunday in march 2:00, timetone +180min (+2 GMT + 1h summertime offset)
+    ntp.ruleSTD("EET", Last, Sun, Oct, 3, 120); // last sunday in october 3:00, timezone +120min (+2 GMT)
+    Serial.println("begin");
+    ntp.begin("time.nist.gov");
+    //Serial.println("update");
+    //ntp.update();
+    Serial.println("formattedTime");
+    Serial.println(ntp.formattedTime("%Y-%m-%d %H:%M:%S %w %Z %a %A")); // dd. Mmm yyyy
+    ntp.stop();
+}
+*/
+
+unsigned long SigmaClock::getNtpTime() {
+    EthernetUDP Udp;
+    unsigned int localPort = 8888;       // local port to listen for UDP packets
+    char timeServer[] = "pool.ntp.org"; // NTP server
+    int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+    byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets
+
+    unsigned long seconds = 0;
+    Udp.begin(localPort);
+    // set all bytes in the buffer to 0
+    memset(packetBuffer, 0, NTP_PACKET_SIZE);
+    // Initialize values needed to form NTP request
+    // (see URL above for details on the packets)
+    packetBuffer[0] = 0b11100011;   // LI, Version, Mode
+    packetBuffer[1] = 0;     // Stratum, or type of clock
+    packetBuffer[2] = 6;     // Polling Interval
+    packetBuffer[3] = 0xEC;  // Peer Clock Precision
+    // 8 bytes of zero for Root Delay & Root Dispersion
+    packetBuffer[12] = 49;
+    packetBuffer[13] = 0x4E;
+    packetBuffer[14] = 49;
+    packetBuffer[15] = 52;
+
+    // all NTP fields have been given values, now
+    // you can send a packet requesting a timestamp:
+ 
+    Udp.beginPacket(timeServer, 123); // NTP requests are to port 123
+    Udp.write(packetBuffer, NTP_PACKET_SIZE);
+    Udp.endPacket();
+
+    int nTry = 20;
+    int ret = 0;
+    while (ret != 48 && nTry > 0) {
+        delay(100);
+        ret = Udp.parsePacket();
+        nTry--;
     }
-    if (dt.day < 1 || dt.day > 31) {
-        return false;
+
+    if (ret == 48) {
+        // We've received a packet, read the data from it
+        Udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+
+        // the timestamp starts at byte 40 of the received packet and is four bytes,
+        // or two words, long. First, extract the two words:
+
+        unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
+        unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
+        // combine the four bytes (two words) into a long integer
+         // this is NTP time (seconds since Jan 1 1900):
+        seconds = highWord << 16 | lowWord;
+        seconds -= 2208988800UL; // subtract seventy years: 1970-1900
     }
-    if (dt.hour < 0 || dt.hour > 23) {
-        return false;
-    }
-    if (dt.minute < 0 || dt.minute > 59) {
-        return false;
-    }
-    if (dt.second < 0 || dt.second > 59) {
-        return false;
-    }
-    return true;
+    Udp.stop();
+
+    return seconds;
 }
 
 
-bool SigmaClock::SyncClock(CalendarServerType type, const char* timezone) {
+
+bool SigmaClock::SyncClock(CalendarServerType type, int tz) {
     bool res = false;
-    memoryReport("SyncClock");
     if (Ethernet.linkStatus() != LinkOFF) {
-        memoryReport("SyncClock_link");
         switch (type) {
-        case CAL_SERVER_WORLDTIMEAPI:
-            memoryReport("SyncClock_WORLDTIMEAPI");
-            res = readWorldTimeApi(timezone);
+            case CAL_SERVER_WORLDTIMEAPI:
+                res = readWorldTimeApi(tz);
+                break;
+            case CAL_SERVER_NTP:
+                unsigned long t;
+                t= getNtpTime();
+                if (t>0) {
+                    tm tm0 = fromUnixEpoch(t, tz);
+                    SetClock(tm0);
+                    res = true;
+                }
                 break;
         }
     }
     return res;
 }
-bool SigmaClock::readWorldTimeApi(const char* timezone) {
-    bool res = false;
-    memoryReport("readWorldTimeApi_0");
-    
+
+tm SigmaClock::fromUnixEpoch(time_t t, int tz) {
+    tm tm0;
+    set_zone(tz * ONE_HOUR);
+    set_dst(ua_dst);
+    localtime_r(&t, &tm0);
+    return tm0;
+}
+
+bool SigmaClock::readWorldTimeApi(int tz) {
+    bool res = true;
     EthernetClient* client = new EthernetClient();
+    const char* server = "worldtimeapi.org";
+    char* path = (char*)"/api/timezone/GMT";
+    tm tm0;
     
-    //client->setTimeout(5000);
-    memoryReport("readWorldTimeApi");
-    char buf[50];
-#define CALENDAR_SERVER "213.188.196.246"
-//#define CALENDAR_SERVER "worldtimeapi.org"
-#define CALENDAR_SERVER_PATH "/api/timezone/%s"
-    const char* server = CALENDAR_SERVER;
-
-    if (timezone == NULL) {
-        sprintf(buf, CALENDAR_SERVER_PATH, "EET");
+    if (httpConnection(client, server, path, 80)) {
+        tm0 = worldTimeApiParseResponse(client,tz);
+    }
+    if (tm0.tm_year >=2023 && tm0.tm_year<=2050) {
+        SetClock(tm0);
     } else {
-        sprintf(buf, CALENDAR_SERVER_PATH, timezone);
-    }
-
-    DateTime dt;
-    
-    if (httpConnection(client, server, buf, 80)) {
-        //Serial.println("Connected to server");
-        Serial.println("Reading response");
-        dt = worldTimeApiParseResponse(client);
-    }
-
-    if (dt.year != 0) {
-        SetClock(dt);
+        res = false;
     }
     client->stop();
     delete client;
-
     return res;
 }
 
-DateTime SigmaClock::worldTimeApiParseResponse(EthernetClient* client) {
-    char buf[400];
-    DateTime dt;
+tm SigmaClock::worldTimeApiParseResponse(EthernetClient* client, int tz) {
+    char buf[512];
+    tm tm0;
 
     if (extractBody(client, buf)) {
-        Serial.println("Body extracted");
-        Serial.println(buf);
-        dt = worldTimeApiParseJson(buf);
+        tm0 = worldTimeApiParseJson(buf, tz);
     }
-
-    return dt;
+    return tm0;
 }
 
 bool SigmaClock::extractBody(EthernetClient* client, char* body) {
     bool res = false;
-    memoryReport("extractBody");
+    String s;
+
     if (client->available()) {
-        
-        String s;
         s = client->readStringUntil('\n');
-        Serial.println(s);
         if (s.indexOf("200 OK") != -1) {
             while (client->available()) {
                 s = client->readStringUntil('\n');
-                Serial.println(s);
             }
-            Serial.print("len=");
-            Serial.println(s.length());
-            Serial.print("Body=");
-            Serial.println(s.c_str());
             if (s.length() != 0) {
                 strcpy(body, s.c_str());
                 res = true;
             }
         }
-        memoryReport("extractBody_end");
     }
     return res;
 }
 
 
 
-DateTime SigmaClock::worldTimeApiParseJson(const char* buf) {
-    DateTime dt;
+tm SigmaClock::worldTimeApiParseJson(const char* buf, int tz) {
+    tm tm0;
     if (buf[0] != 0) {
         //const size_t CAPACITY = JSON_OBJECT_SIZE(25);
-        //StaticJsonDocument<400> doc;
-        DynamicJsonDocument doc(400);
+        StaticJsonDocument<400> doc;
+        //DynamicJsonDocument doc(200);
         DeserializationError error = deserializeJson(doc, buf);
         if (!error) {
 
             // extract the data
             JsonObject root = doc.as<JsonObject>();
-
+            if (root.containsKey("unixtime")) {
+                time_t t = root["unixtime"];
+                tm0 = fromUnixEpoch(t, tz);
+            }
+            /*
             if (root.containsKey("datetime")) {
 
                 String s = root["datetime"]; //"2022-01-09T15:32:39.409582+02:00"
-                dt.year = s.substring(0, 4).toInt();
-                dt.month = s.substring(5, 7).toInt();
-                dt.date = s.substring(8, 10).toInt();
-                dt.hour = s.substring(11, 13).toInt();
-                dt.minute = s.substring(14, 16).toInt();
-                dt.second = s.substring(17, 19).toInt();
+                tm0.tm_year = s.substring(0, 4).toInt() - 1900;
+                tm0.tm_mon = s.substring(5, 7).toInt() - 1;
+                tm0.tm_mday = s.substring(8, 10).toInt() - 1;
+                tm0.tm_hour = s.substring(11, 13).toInt();
+                tm0.tm_min = s.substring(14, 16).toInt();
+                tm0.tm_min = s.substring(17, 19).toInt();
 
                 //  res = true;
             }
-            //else if (root.containsKey("day_of_week")) {
+            else if (root.containsKey("day_of_week")) {
             //    tm.Wday = root["day_of_week"];
             //    tm.Wday += 1; //Sunday is 1
             //}
-        }else {
-            Serial.print(F("deserializeJson() failed: "));
-            Serial.println(error.c_str());
+*/
         }
-        
     }
-    return dt;
+    return tm0;
 }
 
 
@@ -209,20 +296,40 @@ bool SigmaClock::httpConnection(EthernetClient* client, const char* url, const c
 
 
 
-DateTime SigmaClock::GetClock() {
+tm SigmaClock::GetClock() {
     MicroDS3231 rtc;
     DateTime dt = rtc.getTime();
-    return dt;
+    return fromDateTime(dt);
 }
 
 
+tm SigmaClock::fromDateTime(DateTime& dt) {
+    tm t;
+    t.tm_year = dt.year - 1900 - 30;
+    t.tm_mon = dt.month - 1;
+    t.tm_mday = dt.date;
+    t.tm_hour = dt.hour;
+    t.tm_min = dt.minute;
+    t.tm_sec = dt.second;
+    return t;
+}
 
-void SigmaClock::SetClock(DateTime& dt)
+DateTime SigmaClock::toDateTime(tm& t) {
+    DateTime dt;
+    dt.year = t.tm_year + 1900;
+    dt.month = t.tm_mon + 1;
+    dt.date = t.tm_mday;
+    dt.hour = t.tm_hour;
+    dt.minute = t.tm_min;
+    dt.second = t.tm_sec;
+    return dt;
+}
+
+void SigmaClock::SetClock(tm& t)
 {
-    if (IsDateTimeValid(dt)) {
-        MicroDS3231 rtc;
-        rtc.setTime(dt);
-    }
+    MicroDS3231 rtc;
+    
+    rtc.setTime(toDateTime(t));
 }
 
 /*
@@ -234,18 +341,21 @@ const char* SigmaClock::PrintClock()
 }
 */
 
-byte SigmaClock::DayYesterday(byte day) {
-    if (day == 1) {
-        day = 7;
+enum _WEEK_DAYS_ SigmaClock::DayYesterday(enum _WEEK_DAYS_ day) {
+    if (day == MONDAY) {
+        day = SUNDAY;
     } else {
-        day--;
+        day = (_WEEK_DAYS_) (day - 1);
     }
     return day;
 }
 
 const char* SigmaClock::PrintClock() {
     static char strClock[30];
-    DateTime dt = GetClock();
-    sprintf(strClock, "%u-%02u-%02u %02u:%02u:%02u, day=%u", dt.year, dt.month, dt.date, dt.hour, dt.minute, dt.second, dt.day);
+    tm t = GetClock();
+
+    strftime(strClock, sizeof(strClock), "%Y-%m-%d %H:%M:%S %A (%w)", &t);
     return strClock;    
 }
+
+

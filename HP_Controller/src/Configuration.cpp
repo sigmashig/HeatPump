@@ -4,7 +4,7 @@
 
 #include "SigmaEEPROM.h"
 #include "ScriptRunner.h"
-#include "MemoryExplorer.h"
+//#include "MemoryExplorer.h"
 #include "version.h"
 
 /*
@@ -24,31 +24,23 @@ void Configuration::check1(const char* title) {
 */
 
 void Configuration::Init() {
-	memoryReport("Init 1");
 	Log = new Loger(512);
 	readBoardId();
-	memoryReport("Init 1.1");
 	initializeEthernet();
-	memoryReport("Init 1.2");
 	ethClient = new EthernetClient();
-	memoryReport("Init 1.3");
 	readConfigEEPROM();
-	memoryReport("Init 2");
 
 	Log->Info("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
-	memoryReport("Init 3");
 
 	Log->Info("Schedule Mgr");
 	ScheduleMgr = new ScheduleManager();
 	ScheduleMgr->Init();
-	memoryReport("Init 4");
 
 	char topicRoot[CONFIG_LENGTH_OF_ROOT+1];
 	sprintf(topicRoot, "%s%s/", mQTT_ROOT, boardName);
 	lengthOfRoot = strlen(topicRoot);
-	memoryReport("Init 5");
 
 	Log->Info("Mqtt");
 	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
@@ -62,7 +54,6 @@ void Configuration::Init() {
 	} else {
 		Log->Error("MQTT is not ready");
 	}
-	memoryReport("Init 6");
 
 	Log->Info("Clock");
 	SigmaClock::SyncClock();
@@ -140,8 +131,8 @@ void Configuration::readBoardId() {
 	port = SigmaEEPROM::Read16(EEPROM_ADDR_MQTT_PORT);
 	setMqttPort(port, false);
 	
-	Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
-		.append(ip[2]).append(".").append(ip[3]).Info();
+	//Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
+	//	.append(ip[2]).append(".").append(ip[3]).Info();
 	Log->append(F("Mqtt Address is: ")).append(mqttIp[0]).append(".").append(mqttIp[1]).append(".")
 		.append(mqttIp[2]).append(".").append(mqttIp[3]).append(":").append((uint16_t)mqttPort).Info();
 

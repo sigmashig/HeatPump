@@ -1,6 +1,6 @@
 #pragma once
 #include "Schedule.h"
-#include <microDS3231.h>
+#include <SigmaClock.h>
 
 class ScheduleManager
 {
@@ -22,8 +22,8 @@ private:
 	Schedule AllSchedule[2 * CONFIG_NUMBER_SCHEDULES];
 	void readFromEEPROM();
 	bool sortSchedule(byte shift);
-	byte wdOrWe(DateTime& dt) { return wdOrWe(dt.day); };
-	byte wdOrWe(byte day);
+	byte wdOrWe(tm& t) { return wdOrWe((_WEEK_DAYS_)(t.tm_wday)); };
+	byte wdOrWe(_WEEK_DAYS_ day);
 	//void publishSchedules();
 	//Schedule& GetSchedule(byte shift, byte setNumber) { return AllSchedule[shift + setNumber]; };
 	//Schedule& GetSchedule(byte setNumber) { return AllSchedule[setNumber]; };
