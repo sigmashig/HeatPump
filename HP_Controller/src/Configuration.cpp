@@ -146,11 +146,11 @@ void Configuration::readConfigEEPROM() {
 	setHysteresis(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_HYSTERESIS), false);
 	setWeekMode(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_WEEKMODE), false);
 	setCommand(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CMD), false);
-	setClockType(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE), false);
-	char tmp[TIMEZONE_LEN];
-	setTimeZone(SigmaEEPROM::ReadTimezone(tmp), false);
+	//setClockType(SigmaEEPROM::Read8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE), false);
+	//char tmp[TIMEZONE_LEN];
+	//setTimeZone(SigmaEEPROM::ReadTimezone(tmp), false);
 }
-
+/*
 void Configuration::setTimeZone(const char* tz, bool save) {
 	if (!save) {
 		strcpy(timezone, tz);
@@ -163,7 +163,7 @@ void Configuration::setTimeZone(const char* tz, bool save) {
 		}
 	}
 }
-
+*/
 void Configuration::setIp(IPAddress& ipNew, bool save) {
 	if (!save) {
 		this->ip = ipNew;
@@ -200,21 +200,6 @@ void Configuration::setMqttPort(uint16_t port, bool save) {
 	}
 }
 
-void Configuration::setClockType(byte b, bool save) {
-/*	
-	SigmaClock::CalendarServerType type = (SigmaClock::CalendarServerType)b;
-	
-	if (!save) {
-		Clock.SetServerType(type);
-	} else {
-		if (Clock.GetServerType() != type) {
-			Clock.SetServerType(type);
-			Log->Info("EEPROM ClockType");
-			SigmaEEPROM::Write8(EEPROM_ADDR_CONFIG_CALENDARSERVICETYPE, type);
-		}
-	}
-*/
-}
 
 void Configuration::setWorkMode(byte b, bool save) {
 	if (b == 0 || b == 1 || b == 2) {
@@ -376,7 +361,7 @@ void Configuration::subscribeParameters() {
 }
 
 void Configuration::publishParameters() {
-	publishConfigParameter(PARAMS_TIMEZONE, timezone);
+	//publishConfigParameter(PARAMS_TIMEZONE, timezone);
 	publishConfigParameter(PARAMS_WORKMODE, (byte)workMode);
 	publishConfigParameter(PARAMS_MANUAL_TEMP, (byte)manualTemp);
 	publishConfigParameter(PARAMS_WEEKMODE, (byte)weekMode);
@@ -550,9 +535,11 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 		setCommand(b);
 		break;
 	}
+/*
 	case PARAMS_TIMEZONE:
 		setTimeZone(payload);
 		break;
+*/
 	case PARAMS_IP: {
 		IPAddress ip;
 		ip.fromString(payload);
@@ -575,12 +562,13 @@ void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload)
 		setMqttPort(i);
 		break;
 	}
-	
+/*	
 	case PARAMS_CLOCK_TYPE: {
 		byte b = atoi(payload);
 		setClockType(b);
 		break;
 	}
+*/
 	case PARAMS_RESET: {
 		byte b = atoi(payload);
 		Log->append("Reset:").append(b).append(" ").append(Counter60).Internal();

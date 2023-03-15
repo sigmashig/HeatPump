@@ -11,6 +11,10 @@
 		{
 			"name": "SigmaClock",
 			"path": "../SigmaClock"
+		},
+		{
+			"name": "RtcClock",
+			"path": "../RtcClock/RtcClock"
 		}
 	],
 	"settings": {

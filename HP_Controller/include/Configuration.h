@@ -31,7 +31,6 @@ public:
 	Loger* Log;
 	DeviceManager* DevMgr;
 	ScheduleManager* ScheduleMgr;
-	//SigmaClock Clock;
 	ScriptRunner Runner;
 
 
@@ -43,14 +42,13 @@ public:
 	unsigned long Counter60 = 0;	//1min
 
 
-   // void check1(const char* title);
 
 // Methods
 	void Init();
 	void Loop(unsigned long timePeriod);
 
 	// Config parameters settings
-	const char* GetTimezone() { return timezone; };
+//	const char* GetTimezone() { return timezone; };
 	WORKMODE GetWorkMode() { return workMode; };
 	WEEKMODE GetWeekMode() { return weekMode; };
 	double GetManualTemp() { return manualTemp; };
@@ -63,9 +61,7 @@ public:
 	// Subscriptions
 	void Subscribe(const char* topic);
 
-	//void PublishAlert(ALERTCODE code) { publishAlert(code, ScriptRunner::STEP_EMPTY, NULL); };
 	void PublishAlert(ALERTCODE code, const char* name) { publishAlert(code, ScriptRunner::STEP_EMPTY, name); };
-	//void PublishAlert(ALERTCODE code, ScriptRunner::STEPS step) { publishAlert(code, step, NULL); };
 	void Publish(DeviceType dType, const char* name, byte status);
     void Publish(DeviceType dType, const char* name, const char* payload);
 	void Publish(DeviceType dType, const char* name, double status);
@@ -98,12 +94,12 @@ private:
 		PARAMS_HYSTERESIS,
 		PARAMS_WEEKMODE,
 		PARAMS_COMMAND,
-		PARAMS_TIMEZONE,
+		//PARAMS_TIMEZONE,
 		PARAMS_IP,
 		PARAMS_BOARD_ID,
 		PARAMS_MQTT_IP,
 		PARAMS_MQTT_PORT,
-		PARAMS_CLOCK_TYPE,
+		//PARAMS_CLOCK_TYPE,
 		PARAMS_VERSION,
 		PARAMS_RESET,
 		CONFIG_PARAMS_LAST
@@ -136,27 +132,18 @@ private:
 
 	// Setters for config parameters
 	void setWorkMode(byte b, bool save = true);
-	//void setWorkMode(const char* str) { setWorkMode(str[0] - '0'); };
-	//void setManualTemp(byte b, bool save = true);
 	void setManualTemp(double d, bool save = true);
     void setDesiredTemp(double t);
-	//void setManualTemp(const char* str);
 	void setWeekMode(byte b, bool save = true);
-	//void setWeekMode(const char* str) { setWeekMode(str[0] - '0'); };
 	void setHysteresis(byte b, bool save = true);
-	//void setHysteresis(const char* str) { setHysteresis(str[0] - '0'); };
 	void setHeatMode(byte b, bool save = true);
-	//void setHeatMode(const char* str) { setHeatMode(str[0] - '0'); };
-	//void setCommand(const char* str) { setCommand(str[0] - '0'); };
 	void setCommand(byte b, bool save = true);
 	void setSimulator(byte b, bool save = true);
-	//void setSimulator(const char* str) { setSimulator(str[0] - '0'); };
-	void setTimeZone(const char* tz, bool save = true);
+//	void setTimeZone(const char* tz, bool save = true);
 	void setMqttIp(IPAddress& ip, bool save = true);
 	void setMqttPort(uint16_t port, bool save = true);
-	//void setIp(const char* str, bool save = true){ IPAddress ip; ip.fromString(str); setIp(ip, save); };
 	void setIp(IPAddress& ipNew, bool save = true);
-	void setClockType(byte b, bool save = true);
+//	void setClockType(byte b, bool save = true);
 	void setBoardId(byte id, bool save = true);
 	
 
@@ -164,7 +151,7 @@ private:
 
 	const char* mQTT_ROOT = "HeatPump/";
 	const char* mqttConfigParamName[CONFIG_PARAMS_LAST] = { "IsReady", "WatchDog", "Simulator", "Mode", "ManualTemp","DesiredTemp", "HeatCold" ,
-										"Hysteresis", "WeekMode","Command","TimeZone","IP","BoardId","MqttIP","MqttPort","ClockType","Version",
+										"Hysteresis", "WeekMode","Command",/*"TimeZone",*/"IP","BoardId","MqttIP","MqttPort",/*"ClockType",*/"Version",
 										"Reset"};
 
 	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/Weekend/Set_", "Schedule/Workdays/Set_","Log/" };
@@ -186,7 +173,7 @@ private:
 	HEATMODE heatMode = HEATMODE_HEAT;
 	byte hysteresis = 5;
 	CMD command = CMD_RUN;
-	char timezone[TIMEZONE_LEN] = "EET";
+//	char timezone[TIMEZONE_LEN] = "EET";
 	Mqtt* mqttClient;
 	byte mac[6] = { 0x00, 0xAA, 0x22, 0x07, 0x69, 0x00 };
 	IPAddress ip = IPAddress(192, 168, 0, 90);
@@ -200,11 +187,9 @@ private:
 	byte lengthOfRoot = 0;
 	unsigned long lastWatchDogPublication = millis();
 
-	//char topicRoot[MQTT_TOPIC_LENGTH + 1];
 	//methods
 
 	void readBoardId();
-	//void setIp(byte ip0, byte ip1, byte ip2, byte ip3);
 	void initializeEthernet();
 	void unitsLoop(unsigned long timePeriod);
 
@@ -213,21 +198,18 @@ private:
 	void publishParameters();
 	void publishConfigParameter(MqttConfigParam parmId, double payload);
 	void updateConfig(const char* topic, const char* payload);
-	//void initMqttTopics();
 	void publishConfigParameter(MqttConfigParam parmId, const char* payload);
 	void subscribeConfigParameter(MqttConfigParam parmId);
 	void publishConfigParameter(MqttConfigParam parmId, byte payload);
-//	void publishConfigParameter(MqttConfigParam parmId, IPAddress& ip);
-//	void publishConfigParameter(MqttConfigParam parmId, unsigned int payload);
 	
 	void publishStatus(DeviceType dType, const char* name, const char* payload);
 	void publishAlert(ALERTCODE code, ScriptRunner::STEPS step, const char* name);
 
 	void updateSingleParam(MqttConfigParam parm, const char* payload);
 
-	void testTemperature();
 	void checkWatchDogPublication();
 
+	void testTemperature();
 
 };
 
