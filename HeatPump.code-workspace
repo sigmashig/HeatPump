@@ -9,12 +9,7 @@
 			"path": "../OneWireDetect"
 		},
 		{
-			"name": "SigmaClock",
-			"path": "../SigmaClock"
-		},
-		{
-			"name": "RtcClock",
-			"path": "../RtcClock/RtcClock"
+			"path": "../RtcClock"
 		}
 	],
 	"settings": {

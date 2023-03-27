@@ -24,7 +24,7 @@ public:
     void UpdateStatus(const char* payload);
 	void InitUnit();
 	double GetTemperature() { return Temperature; }
-	void UpdateEquipment(const char* line);
+	bool UpdateEquipment(const char* line);
 	bool IsOk();
 private:
 	OneWireBus* parent;

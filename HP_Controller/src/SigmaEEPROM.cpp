@@ -23,30 +23,6 @@ void SigmaEEPROM::Write16(uint16_t addr, uint16_t val) {
 
 }
 
-char* SigmaEEPROM::ReadTimezone(char* tz)
-{
-	int len = Read8(EEPROM_ADDR_TIMEZONE);
-	if (len >= TIMEZONE_LEN) {
-		strcpy(tz, "XXX");
-	}
-	else {
-		for (int i = 0; i < len; i++) {
-			tz[i] = Read8(EEPROM_ADDR_TIMEZONE + 1 + i);
-		}
-		tz[len] = 0;
-	}
-	return tz;
-}
-
-void SigmaEEPROM::WriteTimezone(const char* tz)
-{
-	int len = strlen(tz);
-	Write8(EEPROM_ADDR_TIMEZONE, len);
-
-	for (int i = 0; i < len; i++) {
-		Write8(EEPROM_ADDR_TIMEZONE + 1 + i, tz[i]);
-	}
-}
 
 void SigmaEEPROM::Write8(uint16_t addr, byte val) {
 	EEPROM.write(addr, val);

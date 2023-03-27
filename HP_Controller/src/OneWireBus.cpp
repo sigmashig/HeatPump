@@ -173,25 +173,26 @@ void OneWireBus::UpdateStatus(const char* payload) {
 	// Nothing to do
 }
 
-void OneWireBus::UpdateEquipment(const char* payload) {
+bool OneWireBus::UpdateEquipment(const char* payload) {
+	bool res = false;
 	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	StaticJsonDocument<CAPACITY> doc;
 	//deserializeJson(doc, payload);
 	DeserializationError error = deserializeJson(doc, payload);
 	if (error) {
 		Config.Log->append("JSON Error=").append(error.f_str()).Error();
-		return;
+		return false;
 	}
 
 	// extract the data
 	JsonObject json = doc.as<JsonObject>();
 
 	if (json.containsKey("pin")) {
-		Pin = json["pin"];
-		Config.Log->append(F("Pin:")).append(Pin).Debug();
-		//releaseResources();
-		//InitUnit();
+		byte pin = json["pin"];
+		res |= (pin != Pin);
+		Pin = pin;
 	}
+	return res;
 }
 
 void OneWireBus::releaseResources() {

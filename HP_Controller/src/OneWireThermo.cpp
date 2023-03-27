@@ -47,37 +47,44 @@ void OneWireThermo::publishTemp() {
 		Config.Publish(DevType, Name, p);
 	}
 }
-void OneWireThermo::UpdateEquipment(const char* line) {
-	//const size_t CAPACITY = JSON_OBJECT_SIZE(10);
+bool OneWireThermo::UpdateEquipment(const char* line) {
+
+	bool res = false;
 	DynamicJsonDocument doc(400);
 	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
 		Config.Log->append("JSON Error=").append(error.f_str()).Error();
-		return;
+		return false;
 	}
-//StaticJsonDocument<CAPACITY> doc;
-	//deserializeJson(doc, line);
-	// extract the data
 	JsonObject json = doc.as<JsonObject>();
 
-	if (json.containsKey("address")) {
+	if (json.containsKey("address")) {	
 		const char* s = json["address"];
+		String s1 = OneWireBus::ConvertAddressToString(Address);
 		OneWireBus::ConvertStringToAddress(Address, s);
-		//checkSimulator();
+		res |= (strcmp(s1.c_str(), s) != 0);
 	}
 	if (json.containsKey("errorLow")) {
-		ErrorLow = json["errorLow"];
+		double e = json["errorLow"];
+		res |= (e != ErrorLow);
+		ErrorLow = e;
 	}
 	if (json.containsKey("errorHigh")) {
-		ErrorHigh = json["errorHigh"];
+		double e = json["errorHigh"];
+		res |= (e != ErrorHigh);
+		ErrorHigh = e;
 	}
 	if (json.containsKey("warningHigh")) {
-		WarningHigh = json["warningHigh"];
+		double e = json["warningHigh"];
+		res |= (e != WarningHigh);
+		WarningHigh = e;
 	}
 	if (json.containsKey("warningLow")) {
-		WarningLow = json["warningLow"];
+		double e = json["warningLow"];
+		res |= (e != WarningLow);
+		WarningLow = e;
 	}
-
+	return res;
 }
 
 bool OneWireThermo::IsOk() {

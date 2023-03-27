@@ -1,6 +1,7 @@
 #pragma once
 #include "Schedule.h"
-#include <SigmaClock.h>
+#include <SigmaClock.hpp>
+#include <time.h>
 
 class ScheduleManager
 {
@@ -13,7 +14,7 @@ public:
 	void UpdateSchedule(byte shift, byte setNumber, const char* payload);
  	double GetDesiredTemperature();
     double GetDesiredTemperature(byte h, byte m, byte day);
-	double GetDesiredTemperature(DateTime& dt);
+	double GetDesiredTemperature(tm& t);
 	
 private:
 	bool sort = false;

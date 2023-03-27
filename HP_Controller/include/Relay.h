@@ -14,7 +14,7 @@ public:
 
 	bool ProcessUnit(ActionType event);
 	void const print(const char* header, DebugLevel level);
-	void UpdateEquipment(const char* line);
+	bool UpdateEquipment(const char* line);
 	bool IsOk();
 	void UpdateStatus(const char* payload);
 

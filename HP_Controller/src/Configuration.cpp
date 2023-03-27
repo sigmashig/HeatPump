@@ -56,8 +56,10 @@ void Configuration::Init() {
 	}
 
 	Log->Info("Clock");
-	SigmaClock::SyncClock();
-	Log->append("Now:").Info(SigmaClock::PrintClock());
+	time_t t = SigmaClock::SyncClock();
+	SigmaClock::SetClock(t);
+	tm tm = SigmaClock::GetClock();
+	Log->append("Now:").Info(SigmaClock::PrintClock(tm));
 
 	mqttClient->FinalInit();
 	ScheduleMgr->FinalInit();
@@ -346,6 +348,7 @@ void Configuration::SubscribeAll() {
 	if (isMqttReady) {
 		mqttClient->SubscribeWatchDogPublication();
 	}
+	
 }
 
 void Configuration::subscribeParameters() {

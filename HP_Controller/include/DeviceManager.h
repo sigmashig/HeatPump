@@ -4,6 +4,7 @@
 #include "Contactor.h"
 #include "OneWireBus.h"
 #include "OneWireThermo.h"
+#include "RTC.hpp"
 
 class DeviceManager
 {
@@ -39,12 +40,14 @@ public:
 	OneWireThermo TOutside = OneWireThermo("TOutside");
 
 	OneWireThermo* AllThermo[CONFIG_NUMBER_THERMO] = { &TGndIn, &TGndOut, &TCompressor, &TVapOut, &TCondIn, &TCondOut, &TVapIn, &TOut, &TIn, &TTankOut, &TTankIn, &TInside, &TOutside };
+
+	RTC Clock = RTC("Clock");
 	
 	Unit* AllDevices[CONFIG_NUMBER_OF_DEVICES];
 
 
 	void UnitLoop(unsigned long timeperiod);
-	DeviceManager();
+ 	DeviceManager();
 	bool Init();
 	bool FinalInit();
 
@@ -59,6 +62,7 @@ public:
 private:
 //	int numbInitialized = 0;
 	void setDefaultStates();
+	void updateClockEquipment(const char* payload);
 	void updateRelayEquipment(int number, const char* payload);
 	void updateBusEquipment(const char* payload);
 	void updateThermoEquipment(int number, const char* payload);

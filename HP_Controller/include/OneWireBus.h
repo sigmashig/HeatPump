@@ -31,7 +31,7 @@ public:
 	OneWireBus(const char* nm);
 	bool IsSimulator();
 	void UpdateStatus(const char* payload);
-	void UpdateEquipment(const char* payload);
+	bool UpdateEquipment(const char* payload);
 private:
 	OneWire* oneWire = NULL;
 	int numberThermo = 0;

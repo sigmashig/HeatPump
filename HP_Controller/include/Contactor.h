@@ -19,7 +19,7 @@ public:
 	void ProcessUnit(ActionType event);
 	void const print(const char* header, DebugLevel level);
 	Contactor(const char* nm);
-    void UpdateEquipment(const char* line);
+    bool UpdateEquipment(const char* line);
     void UpdateStatus(const char* payload);
 	bool IsOk();
 private:

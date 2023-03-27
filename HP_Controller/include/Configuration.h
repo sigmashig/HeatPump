@@ -1,5 +1,5 @@
 #pragma once
-
+#include <Arduino.h>
 #include <Ethernet.h>
 
 #include "Loger.h"
@@ -8,7 +8,7 @@
 #include "Schedule.h"
 #include "ScriptRunner.h"
 #include "ScheduleManager.h"
-#include "SigmaClock.h"
+#include "SigmaClock.hpp"
 #include "Utils.h"
 #include "definitions.h"
 
@@ -129,7 +129,17 @@ private:
 			SCHEDULE_SET_LAST
 		} ScheduleSet;
 	*/
+/*
+	typedef enum {
+		CLOCK_DS3231,
+		CLOCK_DS1302
+	} ClockType;
 
+	struct Clock {
+		ClockType type;
+		DS1302_Pins pins;
+	} clock;
+*/
 	// Setters for config parameters
 	void setWorkMode(byte b, bool save = true);
 	void setManualTemp(double d, bool save = true);

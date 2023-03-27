@@ -99,14 +99,15 @@ Contactor::Contactor(const char* nm) : Unit(DEVTYPE_CONTACTOR, nm)
 {
 }
 
-void Contactor::UpdateEquipment(const char* line)
+bool Contactor::UpdateEquipment(const char* line)
 {
+	bool res = false;
 	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	StaticJsonDocument<CAPACITY> doc;
 	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
 		Config.Log->append("JSON Error=").append(error.f_str()).Error();
-		return;
+		return false;
 	}
 
 	//deserializeJson(doc, line);
@@ -114,11 +115,16 @@ void Contactor::UpdateEquipment(const char* line)
 	JsonObject json = doc.as<JsonObject>();
 
 	if (json.containsKey("pin")) {
-		Pin = json["pin"];
+		byte p = json["pin"];
+		res |= (p != Pin);
+		Pin = p;
 	}
 	if (json.containsKey("lhOn")) {
-		lhOn = json["lhOn"];
+		byte l = json["lhOn"];
+		res |= (l != lhOn);
+		lhOn = l;
 	}
+	return res;
 }
 
 

@@ -10,10 +10,24 @@ void DeviceManager::UnitLoop(unsigned long timeperiod) {
 	PressureSwitch.UnitLoop(timeperiod);
 	VoltageSwitch.UnitLoop(timeperiod);
 	Bus.UnitLoop(timeperiod);
+	Clock.UnitLoop(timeperiod);
 
 	for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
 		AllThermo[i]->UnitLoop(timeperiod);
 	}
+}
+
+void DeviceManager::updateClockEquipment(const char* payload) {
+	bool res = Clock.UpdateEquipment(payload);
+	if (res) {
+		SigmaEEPROM::Write8(EEPROM_ADDR_CLOCK, Clock.GetType());
+		SigmaEEPROM::Write8(EEPROM_ADDR_CLOCK + 1, Clock.GetTz());
+		DS1302_Pins pins = Clock.GetPins();
+		SigmaEEPROM::Write8(EEPROM_ADDR_CLOCK + 2, pins.datPin);
+		SigmaEEPROM::Write8(EEPROM_ADDR_CLOCK + 3, pins.cePin);
+		SigmaEEPROM::Write8(EEPROM_ADDR_CLOCK + 4, pins.clkPin);
+	}
+
 }
 
 void DeviceManager::updateRelayEquipment(int number, const char* payload) {
@@ -121,6 +135,8 @@ DeviceManager::DeviceManager() {
 		AllDevices[j] = AllContactor[i];
 		j++;
 	}
+	AllDevices[j] = &Clock;
+	j++;
 	readFromEEPROM();
 }
 
@@ -139,7 +155,7 @@ bool DeviceManager::readFromEEPROM() {
 	VoltageSwitch.lhOn = SigmaEEPROM::Read8(EEPROM_ADDR_CONTACTOR + 2 + 1);
 
 	Bus.Pin = SigmaEEPROM::Read8(EEPROM_ADDR_TBUS_PIN);
-	
+
 	for (int i = 0; i < CONFIG_NUMBER_THERMO; i++) {
 		for (int j = 0; j < 8; j++) {
 			AllThermo[i]->Address[j] = SigmaEEPROM::Read8(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + j);
@@ -149,6 +165,13 @@ bool DeviceManager::readFromEEPROM() {
 		AllThermo[i]->WarningHigh = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 4))) / 2.0;
 		AllThermo[i]->WarningLow = ((int16_t)(SigmaEEPROM::Read16(EEPROM_ADDR_THERM + i * EEPROM_LEN_THERM + 8 + 6))) / 2.0;
 	}
+
+	Clock.SetType((RTCType)SigmaEEPROM::Read8(EEPROM_ADDR_CLOCK));
+	Clock.SetTz(SigmaEEPROM::Read8(EEPROM_ADDR_CLOCK + 1));
+	DS1302_Pins pins = { SigmaEEPROM::Read8(EEPROM_ADDR_CLOCK + 2)
+		, SigmaEEPROM::Read8(EEPROM_ADDR_CLOCK + 3)
+		, SigmaEEPROM::Read8(EEPROM_ADDR_CLOCK + 4) };
+	Clock.SetPins(pins);
 	return res;
 }
 
@@ -180,6 +203,8 @@ bool DeviceManager::FinalInit() {
 
 
 void DeviceManager::SubscribeEquipment() {
+
+	
 	for (int j = 0; j < CONFIG_NUMBER_OF_DEVICES; j++) {
 		AllDevices[j]->SubscribeEquipment();
 	}
@@ -223,6 +248,11 @@ void DeviceManager::UpdateEquipment(DeviceType dType, const char* name, const ch
 				updateThermoEquipment(i, payload);
 				break;
 			}
+		}
+		break;
+	case DEVTYPE_CLOCK:
+		if (strcmp(Clock.Name, name) == 0) {
+			updateClockEquipment(payload);
 		}
 		break;
 	default:

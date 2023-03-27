@@ -87,25 +87,30 @@ void const Relay::print(const char* header, DebugLevel level) {
 Relay::Relay(const char* nm): Unit(DEVTYPE_RELAY, nm) {
 }
 
-void Relay::UpdateEquipment(const char* line) {
+bool Relay::UpdateEquipment(const char* line) {
+	bool res = false;
 	const size_t CAPACITY = JSON_OBJECT_SIZE(10);
 	StaticJsonDocument<CAPACITY> doc;
-	//deserializeJson(doc, line);
 	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
 		Config.Log->append("JSON Error=").append(error.f_str()).Error();
-		return;
+		return false;
 	}
 
 	// extract the data
 	JsonObject json = doc.as<JsonObject>();
 
 	if (json.containsKey("pin")) {
-		Pin = json["pin"];
+		byte pin = json["pin"];
+		res |= (Pin != pin);
+		Pin = pin;
 	}
 	if (json.containsKey("lhOn")) {
-		lhOn = json["lhOn"];
+		byte l = json["lhOn"];
+		res |= (lhOn != l);
+		lhOn = l;
 	}
+	return res;
 }
 
 bool Relay::IsOk() {

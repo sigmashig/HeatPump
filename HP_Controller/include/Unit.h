@@ -20,7 +20,7 @@ public:
 	void Publish();
 	void SubscribeEquipment();
 	void SubscribeStatus();
-	virtual void UpdateEquipment(const char* payload) = 0;
+	virtual bool UpdateEquipment(const char* payload) = 0;
 	virtual void UpdateStatus(const char* payload) = 0;
 	virtual void UnitLoop(unsigned long timePeriod) = 0;
 	virtual void InitUnit() = 0;
