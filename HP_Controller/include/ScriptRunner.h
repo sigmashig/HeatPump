@@ -18,10 +18,17 @@ public:
 		STEP_HEATER_5_CHECK_STOP = 'h',
 		STEP_HEATER_6_STOP_COMPRESSOR = 'C',
 		STEP_HEATER_7_STOP_PUMPS='T',
-		//STEP_HEATER_E1_STOP='1',
-		//STEP_HEATER_E2_STOP='2',
-		//STEP_HEATER_E3_STOP = '3',
-		STEP_HEATER_FULLSTOP = 'Z'
+		STEP_HEATER_FULLSTOP = 'Z',
+
+		STEP_COOLER_0_IDLE = '9',
+		STEP_COOLER_1_INITIAL = 'i',
+		STEP_COOLER_2_CHECK_START = 's',
+		STEP_COOLER_3_GND_START = 'g',
+		STEP_COOLER_4_CHECK_STOP = 'c',
+		STEP_COOLER_5_STOP = 't',
+		
+		STEP_COOLER_FULLSTOP = 'z'
+
 	} STEPS;
 
 	
@@ -49,11 +56,28 @@ private:
     bool checkAlarm();
 	bool heaterFullStop();
 
-    bool checkStopGround();
+    bool coolerIdle();
+    bool coolerStepInitial();
+	bool coolerStepCheckStart();
+    bool coolerStepGroundStart();
+
+    bool coolerStepCheckStop();
+
+    bool coolerStepStop();
+
+    bool coolerFullStop();
+
+    bool coolerStepCool();
+
+	bool checkStopGround();
 
     bool checkStopHeating();
 
     bool checkStartHeating();
+
+    bool checkStartCooling();
+
+    bool checkStopCooling();
 
 
 	void publishStep();

@@ -43,9 +43,27 @@ void ScriptRunner::StepScript() {
 	case STEP_HEATER_FULLSTOP:
 		heaterFullStop();
 		break;
-	default:
-		Config.Log->Error("Wrong Step");
-		step = STEP_EMPTY;
+
+	case STEP_COOLER_0_IDLE:
+		coolerIdle();
+		break;
+	case STEP_COOLER_1_INITIAL:
+		coolerStepInitial();
+		break;
+	case STEP_COOLER_2_CHECK_START:
+		coolerStepCheckStart();
+		break;
+	case STEP_COOLER_3_GND_START:
+		coolerStepGroundStart();
+		break;
+	case STEP_COOLER_4_CHECK_STOP:
+		coolerStepCheckStop();
+		break;
+	case STEP_COOLER_5_STOP:
+		coolerStepStop();
+		break;
+	case STEP_COOLER_FULLSTOP:
+		coolerFullStop();
 		break;
 	}
 }
@@ -63,6 +81,9 @@ bool ScriptRunner::emptyStep() {
 	if (checkConditions()) {
 		if (Config.GetHeatMode() == HEATMODE_HEAT) {
 			step = STEP_HEATER_0_IDLE;
+			res = true;
+		} else {
+			step = STEP_COOLER_0_IDLE;
 			res = true;
 		}
 	} else { //Some condition is not OK
@@ -523,6 +544,329 @@ bool ScriptRunner::heaterFullStop() {
 	return res;
 }
 
+
+bool ScriptRunner::coolerIdle() {
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	bool res = false;
+
+	if (start == 0) {
+		start = now;
+		Config.Log->append("Step Cooler: Idle, code=").append((char)step).Info();
+		publishStep();
+		publishAlert(ALERT_EMPTY);
+	}
+	if (checkConditions()) {
+		if (Config.GetCommand() == CMD_RUN) {
+			// start!
+			step = STEP_COOLER_1_INITIAL;
+			res = true;
+		} else if (Config.GetCommand() == CMD_STOP) {
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		} else if (Config.GetCommand() == CMD_NOCMD) {
+			//step = STEP_EMPTY;
+			res = false;
+		}
+
+	} else { //Some condition is not OK
+		// Nothing to do. Waiting for wrong condition is fixed
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
+bool ScriptRunner::coolerStepInitial() {
+	bool res = false;
+
+	const unsigned long stepLong = 1 * 60 * (unsigned long)1000;
+	static unsigned long start = 0;
+	static bool infoMsg1 = false;
+	static bool infoMsg2 = false;
+	unsigned long now = millis();
+
+	if (start == 0) {
+		start = now;
+		Config.Log->append("Step Cooler: Initial, code=").append((char)step).Info();
+		publishStep();
+		publishAlert(ALERT_EMPTY);
+	}
+
+	if (checkConditions()) {
+		if (now - start >= stepLong) {
+			publishAlert(ALERT_STEP_TOO_LONG);
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		} else if (checkCommand()) {
+
+			Config.DevMgr->PumpFloor1.ProcessUnit(ACT_ON);
+			Config.DevMgr->PumpFloor2.ProcessUnit(ACT_ON);
+			Config.DevMgr->PumpTankOut.ProcessUnit(ACT_ON);
+			res = Config.DevMgr->PumpFloor1.IsOk()
+				&& Config.DevMgr->PumpFloor2.IsOk()
+				&& Config.DevMgr->PumpTankOut.IsOk();
+			if (res) {
+				if (!infoMsg2) {
+					publishInfo("Both floor's pumps and Tank pump have been started");
+					infoMsg2 = true;
+				}
+				if (Config.IsSimulator()) {
+					delay(1000);
+				}
+				step = STEP_COOLER_2_CHECK_START;
+			} else {
+				if (!infoMsg1) {
+					publishInfo("Waiting for floor pums are started");
+					infoMsg1 = true;
+				}
+			}
+		} else // CMD_STOP CMD_NOCMD
+		{
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_COOLER_FULLSTOP;
+		res = true;
+	}
+
+	if (res) {
+		start = 0;
+		infoMsg1 = false;
+		infoMsg2 = false;
+	}
+	return res;
+}
+
+bool ScriptRunner::coolerStepCheckStart() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		Config.Log->append("Step Cooler: CheckStart, code=").append((char)step).Info();
+		publishInfo("Waiting for start conditions");
+		publishAlert(ALERT_EMPTY);
+	}
+	if (checkConditions()) {
+		if (checkCommand()) {
+			if (checkStartCooling()) {
+				publishInfo("Start cooling");
+				step = STEP_COOLER_3_GND_START;
+				res = true;
+			}
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_COOLER_FULLSTOP;
+		res = true;
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
+bool ScriptRunner::coolerStepGroundStart() {
+	bool res = false;
+	static unsigned long start = 0;
+	static unsigned long startDelay = 0;
+	unsigned long now = millis();
+	static bool infoMsg1 = false;
+	const unsigned long stepLong = 3 * 60 * (unsigned long)1000;
+	const unsigned long stepDelay = 2 * 60 * (unsigned long)1000;
+
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		Config.Log->append("Step Cooler: Ground Start, code=").append((char)step).Info();
+		publishInfo("Starting for Gnd pump");
+		publishAlert(ALERT_EMPTY);
+	}
+	if (checkConditions()) {
+		if (now - start >= stepLong) {
+			publishAlert(ALERT_STEP_TOO_LONG);
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		} else if (checkCommand()) {
+			Config.DevMgr->PumpGnd.ProcessUnit(ACT_ON);
+			if (Config.DevMgr->PumpGnd.IsOk()) {
+				if (Config.IsSimulator() || now - startDelay >= stepDelay) {
+					publishInfo("Ground is ready");
+					step = STEP_COOLER_4_CHECK_STOP;
+					res = true;
+					startDelay = 0;
+				}
+			} else {
+				if (!infoMsg1) {
+					publishInfo("Waiting for Ground pump is started");
+					infoMsg1 = true;
+				}
+			}
+		} else // CMD_STOP CMD_NOCMD
+		{
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_COOLER_FULLSTOP;
+		res = true;
+	}
+	if (res) {
+		infoMsg1 = false;
+		start = 0;
+	}
+	return res;
+
+}
+
+
+bool ScriptRunner::coolerStepCheckStop() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	const unsigned long stepLong = 30 * 60 * (unsigned long)1000;
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		Config.Log->append("Step Cooler: Check stop conditions, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
+		publishInfo("Check stop conditions");
+	}
+	if (checkConditions()) {
+		if (now - start >= stepLong) {
+			publishInfo("Cooling cycle is runing too long. Stop it");
+			prevStep = step;
+			step = STEP_COOLER_5_STOP;
+			res = true;
+		} else if (checkCommand()) {
+			if (checkStopCooling()) {
+				publishInfo("Stop cooling");
+				step = STEP_COOLER_5_STOP;
+				res = true;
+			}
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_COOLER_FULLSTOP;
+		res = true;
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+
+}
+
+bool ScriptRunner::coolerStepStop() {
+	bool res = false;
+	static unsigned long start = 0;
+	unsigned long now = millis();
+	static bool infoMsg1 = false;
+	const unsigned long stepLong = 30 * 60 * (unsigned long)1000;
+
+	if (start == 0) {
+		start = now;
+		publishStep();
+		Config.Log->append("Step Cooler: Stop Gnd pump, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
+		publishInfo("Stop Gnd pump");
+	}
+	if (checkConditions()) {
+		if (checkCommand()) {
+			if (now - start >= stepLong) {
+				publishAlert(ALERT_STEP_TOO_LONG);
+				prevStep = step;
+				step = STEP_HEATER_FULLSTOP;
+				res = true;
+			}
+			Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
+			if (!Config.DevMgr->PumpGnd.IsOk()) {
+				publishInfo("Ground pump is stopped.");
+				if (Config.IsSimulator()) {
+					delay(1000);
+				}
+
+				step = STEP_COOLER_2_CHECK_START;
+				res = true;
+			} else {
+				if (!infoMsg1) {
+					publishInfo("Waiting for stop compresor");
+					infoMsg1 = true;
+				}
+			}
+
+		} else { //NO CMD OR STOP
+			prevStep = step;
+			step = STEP_COOLER_FULLSTOP;
+			res = true;
+		}
+	} else { //Some condition is not OK
+		prevStep = step;
+		step = STEP_COOLER_FULLSTOP;
+		res = true;
+	}
+	if (res) {
+		start = 0;
+		infoMsg1 = false;
+	}
+	return res;
+}
+
+bool ScriptRunner::coolerFullStop() {
+	bool res = false;
+	static unsigned long start = 0;
+	//unsigned long now = millis();
+
+	res = true;
+
+	if (start == 0) {
+		publishStep();
+		Config.Log->append("Step Cooler: FULL STOP, code=").append((char)step).Info();
+		publishAlert(ALERT_EMPTY);
+		publishInfo("FULL STOP!!!");
+	}
+
+	Config.DevMgr->PumpGnd.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpTankOut.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpFloor2.ProcessUnit(ACT_OFF);
+	Config.DevMgr->PumpFloor1.ProcessUnit(ACT_OFF);
+
+	if (Config.IsSimulator()) {
+		delay(1000);
+	}
+
+	if (Config.GetCommand() == CMD_NOCMD || Config.GetCommand() == CMD_RUN) {
+		step = STEP_EMPTY;
+	}
+	if (res) {
+		start = 0;
+	}
+	return res;
+}
+
+
 bool ScriptRunner::checkStopGround() {
 	bool res = false;
 
@@ -533,7 +877,7 @@ bool ScriptRunner::checkStopGround() {
 bool ScriptRunner::checkStopHeating() {
 	bool res = false;
 
-	res = Config.DevMgr->TInside.GetTemperature() > Config.GetDesiredTemp() + Config.GetHysteresis();
+	res = Config.DevMgr->TInside.GetTemperature() >= Config.GetDesiredTemp() + Config.GetHysteresis();
 
 	return res;
 }
@@ -545,6 +889,23 @@ bool ScriptRunner::checkStartHeating() {
 
 	return res;
 }
+
+bool ScriptRunner::checkStartCooling() {
+	bool res = false;
+
+	res = Config.DevMgr->TInside.GetTemperature() >= Config.GetDesiredTemp() + Config.GetHysteresis();
+
+	return res;
+}
+
+bool ScriptRunner::checkStopCooling() {
+	bool res = false;
+
+	res = Config.DevMgr->TInside.GetTemperature() <= Config.GetDesiredTemp() - Config.GetHysteresis();
+
+	return res;
+}
+
 
 bool ScriptRunner::checkCommand() {
 	bool res = true;
@@ -660,9 +1021,73 @@ bool ScriptRunner::checkConditions() {
 		}
 		res &= res1;
 		break;
+		//------------------------------------------------------------------------------------------------
+	case STEP_COOLER_FULLSTOP:
+	case STEP_COOLER_5_STOP:
+	case STEP_COOLER_4_CHECK_STOP:
+	case STEP_COOLER_3_GND_START:
+		res1 = Config.DevMgr->TGndIn.IsOk();
+		if (!res1) {
+			Config.DevMgr->TGndIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->TGndOut.IsOk();
+		if (!res1) {
+			Config.DevMgr->TGndOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;	
+	case STEP_COOLER_2_CHECK_START:
+		res1 = Config.DevMgr->TOut.IsOk();
+		if (!res1) {
+			Config.DevMgr->TOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->TIn.IsOk();
+		if (!res1) {
+			Config.DevMgr->TIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		// Floor pumps are running
+		res1 = Config.DevMgr->PumpFloor1.IsOk();
+		if (!res1) {
+			Config.DevMgr->PumpFloor1.PublishDeviceAlert(ALERT_NOT_RUNNING);
+		}
+		res &= res1;
+		res1 = Config.DevMgr->PumpFloor2.IsOk();
+		if (!res1) {
+			Config.DevMgr->PumpFloor2.PublishDeviceAlert(ALERT_NOT_RUNNING);
+		}
+		res &= res1;
+		
+	case STEP_COOLER_1_INITIAL:
+		// Stop for any alert
+		res &= alertCode == ALERT_EMPTY;
+		// Check Temperature
+		res1 = Config.DevMgr->TTankIn.IsOk();
+		if (!res1) {
+			Config.DevMgr->TTankIn.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+
+		res1 = Config.DevMgr->TTankOut.IsOk();
+		if (!res1) {
+			Config.DevMgr->TTankOut.PublishDeviceAlert(ALERT_TEMP_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+
+	case STEP_COOLER_0_IDLE:
+		// Voltage check
+		res1 = Config.DevMgr->VoltageSwitch.IsOk();
+		if (!res1) {
+			Config.DevMgr->VoltageSwitch.PublishDeviceAlert(ALERT_VOLTAGE_IS_OUT_OF_RANGE);
+		}
+		res &= res1;
+		break;		
 	}
 	return res;
 }
+
+
 
 
 void ScriptRunner::publishAlert(ALERTCODE code) {
