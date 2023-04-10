@@ -73,12 +73,14 @@ public:
 	void SubscribeEquipment(DeviceType dType, const char* name);
 	void SubscribeStatus(DeviceType dType, const char* name);
 	void SubscribeSchedule(int number);
-	void PublishSchedule(int number);
-
+	//void PublishSchedule(int number);
+	void PublishEquipment(DeviceType dType, const char* name, const char* payload);
+	
 	byte GetLengthRootTopic() { return lengthOfRoot; }
 	void WatchDogPublication();
 
     void PublishLog(DebugLevel level, const char* message);
+    tm GetTime();
 
 	
 private:
@@ -166,7 +168,7 @@ private:
 
 	const char* mqttSectionName[MQTT_SECTION_LAST] = { "Config/", "Alert/", "Warning/", "Equipment/", "Status/", "Schedule/Weekend/Set_", "Schedule/Workdays/Set_","Log/" };
 	const char* mqttAlertParamName[MQTT_ALERT_LAST] = { "Code", "Text"};
-	const char* mqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/" };
+	const char* mqttDeviceTypeName[DEVICE_TYPE_LAST] = { "Relay/", "Contactor/", "Bus/", "Temperature/","Script/", "Clock/" };
 	const char* LOG_END[8] = { "OFF", "INTERNAL","FATAL","ERROR","WARN","INFO","DEBUG","ALL" };
 
 
@@ -186,10 +188,10 @@ private:
 //	char timezone[TIMEZONE_LEN] = "EET";
 	Mqtt* mqttClient;
 	byte mac[6] = { 0x00, 0xAA, 0x22, 0x07, 0x69, 0x00 };
-	IPAddress ip = IPAddress(192, 168, 0, 90);
+	IPAddress ip = IPAddress(192, 168, 0, 200);
 	EthernetClient* ethClient;
 	unsigned int mqttPort;
-	IPAddress mqttIp = IPAddress(192, 168, 0, 90);
+	IPAddress mqttIp = IPAddress(192, 168, 0, 99);
 	byte boardId;
 	char boardName[10];
 	double manualTemp = 20.0;

@@ -89,6 +89,12 @@ Relay::Relay(const char* nm): Unit(DEVTYPE_RELAY, nm) {
 
 bool Relay::UpdateEquipment(const char* line) {
 	bool res = false;
+	if (strlen(line) == 0) {
+		Config.Log->Debug("No equipment data. Create default equipment.");
+		PublishDefaultEquipment();
+		return true;
+	}
+
 	const size_t CAPACITY = JSON_OBJECT_SIZE(10);
 	StaticJsonDocument<CAPACITY> doc;
 	DeserializationError error = deserializeJson(doc, line);
@@ -129,3 +135,12 @@ void Relay::UpdateStatus(const char* payload) {
 	ProcessUnit(a);
 }
 
+void Relay::PublishDefaultEquipment() {
+	//	{'pin':30, 'lhOn' : 0}
+	StaticJsonDocument<100> doc;
+	doc["pin"] = Pin;
+	doc["lhOn"] = lhOn;
+	char buffer[100];
+	serializeJson(doc, buffer);
+	PublishEquipment(buffer);
+}

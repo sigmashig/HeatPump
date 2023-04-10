@@ -34,6 +34,10 @@ void Unit::PublishDeviceAlert(ALERTCODE code, bool force) {
 		alertCode = code;
 	}
 }
-
+void Unit::PublishEquipment(const char* payload) {
+	//if (!IsSimulator()) {
+		Config.PublishEquipment(DevType, Name, payload);
+	//}
+}
 
 

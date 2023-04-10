@@ -39,6 +39,7 @@ private:
 	static byte hexToDec(char c1, char c2);
 	static byte hexToDec(char c1);
 	void releaseResources();
+    void PublishDefaultEquipment();
 	void printDevices();
 
 	//	unsigned long prevCycle = 0;

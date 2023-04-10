@@ -7,8 +7,14 @@ RTC::RTC(const char* nm) : Unit(DEVTYPE_CLOCK, nm) {
 }
 
 void RTC::InitUnit() {
-    time_t tm = SigmaClock::SyncClock();
-    SigmaClock::SetClock(tm, tz, type, pins);
+    Config.Log->Debug("Clock Init");
+    time_t tm_sec = SigmaClock::SyncClock();
+    Config.Log->append("TM:").append(tm_sec).Debug();
+    SigmaClock::SetClock(tm_sec, tz, type, pins);
+    Config.Log->append("Clock set").Debug();
+    tm t = GetTime();
+	Config.Log->append("Now:").Info(SigmaClock::PrintClock(t));
+
 }
 
 void RTC::UnitLoop(unsigned long timePeriod) {
@@ -19,14 +25,34 @@ void RTC::UnitLoop(unsigned long timePeriod) {
 }
 
 tm RTC::GetTime() {
+    Config.Log->append("Type:").append(type).append(" Pins:").append(pins.datPin).append(":").append(pins.clkPin).append(":").append(pins.cePin).Debug();
     return SigmaClock::GetClock(type, pins);
 }
 
+void RTC::PublishDefaultEquipment() {
+    // {'type':'DS1302','datPin':14,'clkPin':15,'cePin':16, 'tz':'2'}
+    const size_t CAPACITY = JSON_OBJECT_SIZE(10);
+    StaticJsonDocument<CAPACITY> doc;
+    doc["type"] = (type == RTC_DS1302 ? "DS1302" : "DS3231");
+    doc["datPin"] = pins.datPin;
+    doc["clkPin"] = pins.clkPin;
+    doc["cePin"] = pins.cePin;
+    doc["tz"] = tz;
+    char buffer[256];
+    serializeJson(doc, buffer);
+    Config.Log->append("Publishing default config:").append(buffer).Debug();
+    PublishEquipment(buffer);
+}
 
 bool RTC::UpdateEquipment(const char* line) {
     // {'type':'DS1302','datPin':14,'clkPin':15,'cePin':16, 'tz':'2'}
     bool res = false;
-    const size_t CAPACITY = JSON_OBJECT_SIZE(10);
+    if (strlen(line) == 0) {
+        Config.Log->Debug("No equipment data. Create default equipment.");
+        PublishDefaultEquipment();
+        return true;
+    }
+   const size_t CAPACITY = JSON_OBJECT_SIZE(10);
     StaticJsonDocument<CAPACITY> doc;
     DeserializationError error = deserializeJson(doc, line);
     if (error) {

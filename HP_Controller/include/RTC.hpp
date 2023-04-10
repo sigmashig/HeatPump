@@ -17,6 +17,7 @@ public:
     bool ProcessUnit(ActionType event){ return true;};
     //void SetTime(time_t t, int tz = 2 * ONE_HOUR);
     tm GetTime();
+    void PublishDefaultEquipment();
     //void SetTime(tm& t);
     bool IsConnected(void) { return true; }; // there is no possibility to check if the RTC is connected
 

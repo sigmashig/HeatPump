@@ -101,6 +101,12 @@ Contactor::Contactor(const char* nm) : Unit(DEVTYPE_CONTACTOR, nm)
 
 bool Contactor::UpdateEquipment(const char* line)
 {
+	if (strlen(line) == 0) {
+		Config.Log->Debug("No equipment data. Create default equipment.");
+		PublishDefaultEquipment();
+		return true;
+	}
+
 	bool res = false;
 	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	StaticJsonDocument<CAPACITY> doc;
@@ -131,4 +137,15 @@ bool Contactor::UpdateEquipment(const char* line)
 void Contactor::UpdateStatus(const char* payload) {
 	ActionType a = (ActionType)atoi(payload);
 	ProcessUnit(a);
+}
+
+void Contactor::PublishDefaultEquipment() {
+	//{'pin':30, 'lhOn':0}
+	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
+	StaticJsonDocument<CAPACITY> doc;
+	doc["pin"] = Pin;
+	doc["lhOn"] = lhOn;
+	char buffer[100];
+	serializeJson(doc, buffer);
+	PublishEquipment(buffer);
 }

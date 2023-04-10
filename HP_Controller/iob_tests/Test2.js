@@ -5,11 +5,11 @@
 function Test_Heat_CheckStop2Fail() {
 
     log("INFO: Test Check Stop - ERROR - FULL STOP", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
         var res;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         setTimeout(function () {
             res = getState(HP_PUMP1).val == 0;
             if (!res) {
@@ -65,8 +65,8 @@ function Test_Heat_CheckStop2Fail() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
         ResultProcessing("Timeout");
     }, 10000);
 
@@ -77,9 +77,9 @@ function Test_Heat_CheckStop2Fail() {
 
 
 log("start!");
-var nexStep;
-var stepSubscription = null;
-var alertSubscription = null;
+var HpNexStep;
+var HpStepSubscription = null;
+var HpAlertSubscription = null;
 /*
 var alertSubscription = $(HP_ALERT_CODE).on(function (obj) {
     var alertCode = obj.state.val;
@@ -96,10 +96,10 @@ var alertSubscription = $(HP_ALERT_CODE).on(function (obj) {
     ResultProcessing(result);
 });
 */
-var timer = null;
+var HpTestTimer = null;
 
-var steps = [];
-steps.push(Test_Empty2HeatIdle,
+var HpSteps = [];
+HpSteps.push(Test_Empty2HeatIdle,
     Test_Heat_Idle2Initial,
     Test_Heat_Initial2CheckStart,
     Test_Heat_CheckStart2StartGnd,
@@ -107,7 +107,7 @@ steps.push(Test_Empty2HeatIdle,
     Test_Heat_Heat2CheckStop,
     Test_Heat_CheckStop2Fail,
     Finish);
-var step = 0;
+var HpStep = 0;
 StartTest1();
 
 

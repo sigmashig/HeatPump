@@ -4,43 +4,33 @@
 
 #include "SigmaEEPROM.h"
 #include "ScriptRunner.h"
-//#include "MemoryExplorer.h"
+#include "MemoryExplorer.h"
 #include "version.h"
 
-/*
-void Configuration::check1(const char* title) {
-	char buf[512];
-	buf[0] = 0;
-	Log->append("POINT0.1=").append(strlen(title)).Internal();	
-	Log->append("===").append(title).append("====").Internal();
-	Log->append("POINT0.2=").append(strlen(title)).Internal();
-	for (int i = 0; i < 20;i++) {
-		strcat(buf, "x");
-		Log->append("POINT1=").append(strlen(buf)).Internal();
-		Log->append("[").append(buf).append("]:").Info();
-		Log->append("POINT2=").append(strlen(buf)).Internal();
-	}
-}
-*/
 
 void Configuration::Init() {
+	memoryReport("Configuration::Init()");
 	Log = new Loger(512);
 	readBoardId();
 	initializeEthernet();
 	ethClient = new EthernetClient();
 	readConfigEEPROM();
+	memoryReport("Configuration::Point1");
 
 	Log->Info("DevMgr");
 	DevMgr = new DeviceManager();
 	DevMgr->Init();
+	memoryReport("Configuration::Point2");
 
 	Log->Info("Schedule Mgr");
 	ScheduleMgr = new ScheduleManager();
 	ScheduleMgr->Init();
+	memoryReport("Configuration::Point3");
 
 	char topicRoot[CONFIG_LENGTH_OF_ROOT+1];
 	sprintf(topicRoot, "%s%s/", mQTT_ROOT, boardName);
 	lengthOfRoot = strlen(topicRoot);
+	memoryReport("Configuration::Point4");
 
 	Log->Info("Mqtt");
 	mqttClient = new Mqtt(mqttIp, mqttPort, *ethClient, topicRoot);
@@ -54,22 +44,22 @@ void Configuration::Init() {
 	} else {
 		Log->Error("MQTT is not ready");
 	}
+	memoryReport("Configuration::Point5");
 
 	Log->Info("Clock");
-	time_t t = SigmaClock::SyncClock();
-	SigmaClock::SetClock(t);
-	tm tm = SigmaClock::GetClock();
-	Log->append("Now:").Info(SigmaClock::PrintClock(tm));
 
 	mqttClient->FinalInit();
 	ScheduleMgr->FinalInit();
 	DevMgr->FinalInit();
+	memoryReport("Configuration::Point6");
+
 	Runner.Init();
 
 	if (mqttClient->IsMqtt()) {
 		publishConfigParameter(PARAMS_IS_READY, "1");
 	}
 	Log->Info(F("Config init is finished"));
+	memoryReport("Configuration::Point7");
 
 	//testTemperature();
 }
@@ -133,8 +123,8 @@ void Configuration::readBoardId() {
 	port = SigmaEEPROM::Read16(EEPROM_ADDR_MQTT_PORT);
 	setMqttPort(port, false);
 	
-	//Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
-	//	.append(ip[2]).append(".").append(ip[3]).Info();
+	Log->append(F("IP Address is: ")).append(ip[0]).append(".").append(ip[1]).append(".")
+		.append(ip[2]).append(".").append(ip[3]).Info();
 	Log->append(F("Mqtt Address is: ")).append(mqttIp[0]).append(".").append(mqttIp[1]).append(".")
 		.append(mqttIp[2]).append(".").append(mqttIp[3]).append(":").append((uint16_t)mqttPort).Info();
 
@@ -501,7 +491,7 @@ void Configuration::ProcessMessage(const char* topic, const char* payload) {
 }
 
 void Configuration::updateSingleParam(MqttConfigParam parm, const char* payload) {
-	Log->append("updateSingleParam: ").append(parm).Debug();
+	//Log->append("updateSingleParam: ").append(parm).Debug();
 	switch (parm) {
 	case PARAMS_WORKMODE: {
 		byte b = atoi(payload);
@@ -669,6 +659,16 @@ void Configuration::publishStatus(DeviceType dType, const char* name, const char
 	}
 }
 
+void Configuration::PublishEquipment(DeviceType dType, const char* name, const char* payload) {
+	if (isMqttReady) {
+		createSafeString(topic, MQTT_TOPIC_LENGTH);
+		topic = mqttSectionName[SECTION_EQUIPMENT];
+		topic += mqttDeviceTypeName[dType];
+		topic += name;
+		mqttClient->Publish(topic.c_str(), payload);
+	}
+}
+
 void Configuration::SubscribeEquipment(DeviceType dType, const char* name) {
 	createSafeString(topic, MQTT_TOPIC_LENGTH);
 	topic = mqttSectionName[SECTION_EQUIPMENT];
@@ -719,7 +719,9 @@ void Configuration::PublishLog(DebugLevel level, const char* message) {
 	}
 }
 
-
+tm Configuration::GetTime() {
+	return DevMgr->Clock.GetTime();
+}
 
 
 void Configuration::testTemperature() {

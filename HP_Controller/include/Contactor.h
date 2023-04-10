@@ -21,6 +21,7 @@ public:
 	Contactor(const char* nm);
     bool UpdateEquipment(const char* line);
     void UpdateStatus(const char* payload);
+    void PublishDefaultEquipment();
 	bool IsOk();
 private:
 	unsigned long startContact=0;

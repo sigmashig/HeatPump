@@ -32,6 +32,8 @@ protected:
 	virtual ~Unit() {};
 	virtual void const print(const char* header, DebugLevel level);
 	Unit(DeviceType dType, const char* nm) { Name = nm; DevType = dType; }
+	void PublishEquipment(const char* payload);
+	virtual void PublishDefaultEquipment() = 0;
 	
 };
 

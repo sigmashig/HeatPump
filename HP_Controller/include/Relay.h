@@ -18,6 +18,8 @@ public:
 	bool IsOk();
 	void UpdateStatus(const char* payload);
 
+    void PublishDefaultEquipment();
+
 	Relay(const char* nm);
 private:
 	bool relaySet(bool highLow);

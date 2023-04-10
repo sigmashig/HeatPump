@@ -91,7 +91,7 @@ byte ScheduleManager::wdOrWe(_WEEK_DAYS_ day) {
 
 
 double ScheduleManager::GetDesiredTemperature() {
-	tm tm0 = SigmaClock::GetClock();  //Config.Clock.GetClock();
+	tm tm0 = Config.GetTime();
 	//Config.Log->append(F("GetDesiredTemperature: ")).append(dt.hour).append(":").append(dt.minute).append(" day=").append(dt.day).Debug();
 	return GetDesiredTemperature(tm0.tm_hour,tm0.tm_min,tm0.tm_wday);
 }

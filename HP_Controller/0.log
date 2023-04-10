@@ -1,0 +1,1482 @@
+Version: v0.2.374 - 2023-04-10 17:55:22.524878
+---- Memory report: Start === Free Memory:2587
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1703(5891);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+---- Memory report: Configuration::Init() === Free Memory:2587
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1703(5891);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+IP Address is: 192.168.0.97
+Mqtt Address is: 192.168.0.98:1883
+Initializing Ethernet...
+Ethernet has been initialized
+IP Address is: 192.168.0.97
+MAC Address is: 00:AA:22:07:69:07
+---- Memory report: Configuration::Point1 === Free Memory:2022
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1938(6456);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+DevMgr
+---- Memory report: Configuration::Point2 === Free Memory:1268
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1C2A(7210);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+Schedule Mgr
+---- Memory report: Configuration::Point3 === Free Memory:1193
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1C75(7285);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+---- Memory report: Configuration::Point4 === Free Memory:1185
+HEAP:@1703(5891)-@2116(8470);
+Unallocated from:@1C75(7285);
+Stack pointer: @2196(8598)
+Free List: EMPTY
+-----
+Mqtt
+Mqtt Reconnecting
+Publish:HeatPump/Board_07/Config/Version->v0.2.374 - 2023-04-10 17:55:22.524878
+Publish:HeatPump/Board_07/Config/IsReady->0
+Subscription:HeatPump/Board_07/Config/Simulator
+Subscription:HeatPump/Board_07/Config/Mode
+Subscription:HeatPump/Board_07/Config/ManualTemp
+Subscription:HeatPump/Board_07/Config/HeatCold
+Subscription:HeatPump/Board_07/Config/Hysteresis
+Subscription:HeatPump/Board_07/Config/WeekMode
+Subscription:HeatPump/Board_07/Config/Command
+Subscription:HeatPump/Board_07/Config/IP
+Subscription:HeatPump/Board_07/Config/BoardId
+Subscription:HeatPump/Board_07/Config/MqttIP
+Subscription:HeatPump/Board_07/Config/MqttPort
+Subscription:HeatPump/Board_07/Config/Reset
+[HeatPump/Board_07/Config/Simulator]:(0)
+[HeatPump/Board_07/Config/Mode]:(0)
+[HeatPump/Board_07/Config/ManualTemp]:(0)
+[HeatPump/Board_07/Config/HeatCold]:(0)
+[HeatPump/Board_07/Config/Hysteresis]:(0)
+[HeatPump/Board_07/Config/WeekMode]:(0)
+[HeatPump/Board_07/Config/Command]:(0)
+[HeatPump/Board_07/Config/IP]:(12)192.168.0.97
+[HeatPump/Board_07/Config/BoardId]:(1)7
+[HeatPump/Board_07/Config/MqttIP]:(12)192.168.0.98
+[HeatPump/Board_07/Config/MqttPort]:(4)1883
+[HeatPump/Board_07/Config/Reset]:(0)
+Reset:0 0
+Subscription:HeatPump/Board_07/Equipment/Relay/PumpGnd
+Subscription:HeatPump/Board_07/Equipment/Relay/Compressor
+Subscription:HeatPump/Board_07/Equipment/Relay/PumpTankIn
+Subscription:HeatPump/Board_07/Equipment/Relay/PumpTankOut
+Subscription:HeatPump/Board_07/Equipment/Relay/PumpFloor1
+Subscription:HeatPump/Board_07/Equipment/Relay/PumpFloor2
+Subscription:HeatPump/Board_07/Equipment/Bus/Bus
+Subscription:HeatPump/Board_07/Equipment/Temperature/TGndIn
+Subscription:HeatPump/Board_07/Equipment/Temperature/TGndOut
+Subscription:HeatPump/Board_07/Equipment/Temperature/TCompressor
+Subscription:HeatPump/Board_07/Equipment/Temperature/TVapOut
+Subscription:HeatPump/Board_07/Equipment/Temperature/TCondIn
+Subscription:HeatPump/Board_07/Equipment/Temperature/TCondOut
+Subscription:HeatPump/Board_07/Equipment/Temperature/TVapIn
+Subscription:HeatPump/Board_07/Equipment/Temperature/TOut
+Subscription:HeatPump/Board_07/Equipment/Temperature/TIn
+Subscription:HeatPump/Board_07/Equipment/Temperature/TTankOut
+Subscription:HeatPump/Board_07/Equipment/Temperature/TTankIn
+Subscription:HeatPump/Board_07/Equipment/Temperature/TInside
+Subscription:HeatPump/Board_07/Equipment/Temperature/TOutside
+Subscription:HeatPump/Board_07/Equipment/Contactor/PressureSwitch
+Subscription:HeatPump/Board_07/Equipment/Contactor/VoltageSwitch
+Subscription:HeatPump/Board_07/Equipment/Clock/Clock
+[HeatPump/Board_07/Equipment/Relay/PumpGnd]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'PumpGnd'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/PumpGnd/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/PumpGnd/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Relay/Compressor]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 10 for the first 10 chars of the input.
+        Input arg was 'Compressor'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/Compressor/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/Compressor/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Relay/PumpTankIn]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 10 for the first 10 chars of the input.
+        Input arg was 'PumpTankIn'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/PumpTankIn/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/PumpTankIn/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Relay/PumpTankOut]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 11 for the first 11 chars of the input.
+        Input arg was 'PumpTankOut'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 22 for the first 22 chars of the input.
+        Input arg was 'Alert/PumpTankOut/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 22 for the first 22 chars of the input.
+        Input arg was 'Alert/PumpTankOut/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Relay/PumpFloor1]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 10 for the first 10 chars of the input.
+        Input arg was 'PumpFloor1'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/PumpFloor1/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/PumpFloor1/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Relay/PumpFloor2]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 10 for the first 10 chars of the input.
+        Input arg was 'PumpFloor2'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/PumpFloor2/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 21 for the first 21 chars of the input.
+        Input arg was 'Alert/PumpFloor2/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Bus/Bus]:(10){"pin":19}
+[HeatPump/Board_07/Equipment/Temperature/TGndIn]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 6 for the first 6 chars of the input.
+        Input arg was 'TGndIn'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 6 for the first 6 chars of the input.
+        Input arg was 'TGndIn'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 17 for the first 17 chars of the input.
+        Input arg was 'Alert/TGndIn/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 17 for the first 17 chars of the input.
+        Input arg was 'Alert/TGndIn/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TGndOut]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TGndOut'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TGndOut'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TGndOut/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TGndOut/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TCompressor]:(0)
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 11 for the first 11 chars of the input.
+        Input arg was 'TCompressor'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 11 for the first 11 chars of the input.
+        Input arg was 'TCompressor'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 22 for the first 22 chars of the input.
+        Input arg was 'Alert/TCompressor/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 22 for the first 22 chars of the input.
+        Input arg was 'Alert/TCompressor/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TVapOut]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TVapOut'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TVapOut'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TVapOut/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TVapOut/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TCondIn]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TCondIn'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TCondIn'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TCondIn/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TCondIn/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TCondOut]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 8 for the first 8 chars of the input.
+        Input arg was 'TCondOut'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 8 for the first 8 chars of the input.
+        Input arg was 'TCondOut'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 19 for the first 19 chars of the input.
+        Input arg was 'Alert/TCondOut/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 19 for the first 19 chars of the input.
+        Input arg was 'Alert/TCondOut/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TVapIn]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '33'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-7680}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 6 for the first 6 chars of the input.
+        Input arg was 'TVapIn'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-7680}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Unit:TVapIn is absent on the bus
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 6 for the first 6 chars of the input.
+        Input arg was 'TVapIn'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 17 for the first 17 chars of the input.
+        Input arg was 'Alert/TVapIn/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 17 for the first 17 chars of the input.
+        Input arg was 'Alert/TVapIn/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TOut]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 4 for the first 4 chars of the input.
+        Input arg was 'TOut'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 4 for the first 4 chars of the input.
+        Input arg was 'TOut'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 15 for the first 15 chars of the input.
+        Input arg was 'Alert/TOut/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 15 for the first 15 chars of the input.
+        Input arg was 'Alert/TOut/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TIn]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 3 for the first 3 chars of the input.
+        Input arg was 'TIn'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 3 for the first 3 chars of the input.
+        Input arg was 'TIn'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 14 for the first 14 chars of the input.
+        Input arg was 'Alert/TIn/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 14 for the first 14 chars of the input.
+        Input arg was 'Alert/TIn/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TTankOut]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 8 for the first 8 chars of the input.
+        Input arg was 'TTankOut'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 8 for the first 8 chars of the input.
+        Input arg was 'TTankOut'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 19 for the first 19 chars of the input.
+        Input arg was 'Alert/TTankOut/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 19 for the first 19 chars of the input.
+        Input arg was 'Alert/TTankOut/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TTankIn]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TTankIn'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TTankIn'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TTankIn/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TTankIn/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TInside]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TInside'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 7 for the first 7 chars of the input.
+        Input arg was 'TInside'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TInside/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 18 for the first 18 chars of the input.
+        Input arg was 'Alert/TInside/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Temperature/TOutside]:(2){}
+No equipment data. Create default equipment.
+---- Memory report: OneWireThermo start === Free Memory:400
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1DD9(7641);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+---- Memory report: OneWireThermo point 1 === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( temp, ...) request size:8 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: SafeString( temp, ...) request size:36 exceeds available memory. Returning zero capacity SafeString.
+        temp cap:0 len:0 ''
+Error: temp.write() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '31'
+        temp cap:0 len:0 ''
+Publish equipment:() {"address":null,"errorLow":-30}
+Error: SafeString( topic, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topic cap:0 len:0 ''
+Error: topic = "Equipment/"
+ needs capacity of 10
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 12 for the first 12 chars of the input.
+        Input arg was 'Temperature/'
+        topic cap:0 len:0 ''
+Error: topic.concat() needs capacity of 8 for the first 8 chars of the input.
+        Input arg was 'TOutside'
+        topic cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Publish:->{"address":null,"errorLow":-30}
+---- Memory report: OneWireThermo end === Free Memory:65534
+HEAP:@1703(5891)-@1F69(8041);
+Unallocated from:@1F6B(8043);
+Stack pointer: @1FE9(8169)
+Free List: EMPTY
+-----
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 8 for the first 8 chars of the input.
+        Input arg was 'TOutside'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 19 for the first 19 chars of the input.
+        Input arg was 'Alert/TOutside/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 19 for the first 19 chars of the input.
+        Input arg was 'Alert/TOutside/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Contactor/PressureSwitch]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 14 for the first 14 chars of the input.
+        Input arg was 'PressureSwitch'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 25 for the first 25 chars of the input.
+        Input arg was 'Alert/PressureSwitch/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 25 for the first 25 chars of the input.
+        Input arg was 'Alert/PressureSwitch/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Contactor/VoltageSwitch]:(22){"pin":0,"lhOn":false}
+Error: SafeString( payload, ...) request size:200 exceeds available memory. Returning zero capacity SafeString.
+        payload cap:0 len:0 ''
+Error: payload = "Device: "
+ needs capacity of 8
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 13 for the first 13 chars of the input.
+        Input arg was 'VoltageSwitch'
+        payload cap:0 len:0 ''
+Error: payload.concat() needs capacity of 2 for the first 2 chars of the input.
+        Input arg was '. '
+        payload cap:0 len:0 ''
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 24 for the first 24 chars of the input.
+        Input arg was 'Alert/VoltageSwitch/Code'
+        topicFull cap:0 len:0 ''
+Publish:-> 
+Error: SafeString( topicFull, ...) request size:100 exceeds available memory. Returning zero capacity SafeString.
+        topicFull cap:0 len:0 ''
+Error: topicFull = "HeatPump/Board_07/"
+ needs capacity of 18
+        topicFull cap:0 len:0 ''
+Error: topicFull.concat() needs capacity of 24 for the first 24 chars of the input.
+        Input arg was 'Alert/VoltageSwitch/Text'
+        topicFull cap:0 len:0 ''
+Publish:->
+[HeatPump/Board_07/Equipment/Clock/Clock]:(80){
+  "type": "DS1302",
+  "datPin": 14,
+  "clkPin": 15,
+  "cePin": 16,
+  "tz": 3
+}
+Subscription:HeatPump/Board_07/Status/Relay/PumpGnd
+Subscription:HeatPump/Board_07/Status/Relay/Compressor
+Subscription:HeatPump/Board_07/Status/Relay/PumpTankIn
+Subscription:HeatPump/Board_07/Status/Relay/PumpTankOut
+Subscription:HeatPump/Board_07/Status/Relay/PumpFloor1
+Subscription:HeatPump/Board_07/Status/Relay/PumpFloor2
+Subscription:HeatPump/Board_07/Status/Bus/Bus
+Subscription:HeatPump/Board_07/Status/Temperature/TGndIn
+Subscription:HeatPump/Board_07/Status/Temperature/TGndOut
+Subscription:HeatPump/Board_07/Status/Temperature/TCompressor
+Subscription:HeatPump/Board_07/Status/Temperature/TVapOut
+Subscription:HeatPump/Board_07/Status/Temperature/TCondIn
+Subscription:HeatPump/Board_07/Status/Temperature/TCondOut
+Subscription:HeatPump/Board_07/Status/Temperature/TVapIn
+Subscription:HeatPump/Board_07/Status/Temperature/TOut
+Subscription:HeatPump/Board_07/Status/Temperature/TIn
+Subscription:HeatPump/Board_07/Status/Temperature/TTankOut
+Subscription:HeatPump/Board_07/Status/Temperature/TTankIn
+Subscription:HeatPump/Board_07/Status/Temperature/TInside
+Subscription:HeatPump/Board_07/Status/Temperature/TOutside
+Subscription:HeatPump/Board_07/Status/Contactor/PressureSwitch
+Subscription:HeatPump/Board_07/Status/Contactor/VoltageSwitch
+Subscription:HeatPump/Board_07/Status/Clock/Clock
+[HeatPump/Board_07/Status/Relay/PumpGnd]:(0)
+[HeatPump/Board_07/Status/Relay/Compressor]:(0)
+[HeatPump/Board_07/Status/Relay/PumpTankIn]:(0)
+[HeatPump/Board_07/Status/Relay/PumpTankOut]:(0)
+[HeatPump/Board_07/Status/Relay/PumpFloor1]:(0)
+[HeatPump/Board_07/Status/Relay/PumpFloor2]:(0)
+[HeatPump/Board_07/Status/Bus/Bus]:(0)
+[HeatPump/Board_07/Status/Temperature/TGndIn]:(0)
+[HeatPump/Board_07/Status/Temperature/TGndOut]:(0)
+[HeatPump/Board_07/Status/Temperature/TCompressor]:(0)
+[HeatPump/Board_07/Status/Temperature/TVapOut]:(0)
+[HeatPump/Board_07/Status/Temperature/TCondIn]:(0)
+[HeatPump/Board_07/Status/Temperature/TCondOut]:(0)
+[HeatPump/Board_07/Status/Temperature/TVapIn]:(0)
+[HeatPump/Board_07/Status/Temperature/TOut]:(0)
+[HeatPump/Board_07/Status/Temperature/TIn]:(0)
+[HeatPump/Board_07/Status/Temperature/TTankOut]:(0)
+[HeatPump/Board_07/Status/Temperature/TTankIn]:(0)
+[HeatPump/Board_07/Status/Temperature/TInside]:(0)
+[HeatPump/Board_07/Status/Temperature/TOutside]:(0)
+[HeatPump/Board_07/Status/Contactor/PressureSwitch]:(0)
+[HeatPump/Board_07/Status/Contactor/VoltageSwitch]:(0)
+[HeatPump/Board_07/Status/Clock/Clock]:(0)
+Subscription:HeatPump/Board_07/Schedule/Workdays/Set_0
+Subscription:HeatPump/Board_07/Schedule/Workdays/Set_1
+Subscription:HeatPump/Board_07/Schedule/Workdays/Set_2
+Subscription:HeatPump/Board_07/Schedule/Workdays/Set_3
+Subscription:HeatPump/Board_07/Schedule/Workdays/Set_4
+Subscription:HeatPump/Board_07/Schedule/Workdays/Set_5
+Subscription:HeatPump/Board_07/Schedule/Weekend/Set_0
+Subscription:HeatPump/Board_07/Schedule/Weekend/Set_1
+Subscription:HeatPump/Board_07/Schedule/Weekend/Set_2
+Subscription:HeatPump/Board_07/Schedule/Weekend/Set_3
+Subscription:HeatPump/Board_07/Schedule/Weekend/Set_4
+Subscription:HeatPump/Board_07/Schedule/Weekend/Set_5
+[HeatPump/Board_07/Schedule/Workdays/Set_0]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Workdays/Set_1]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Workdays/Set_2]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Workdays/Set_3]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Workdays/Set_4]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Workdays/Set_5]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Weekend/Set_0]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Weekend/Set_1]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Weekend/Set_2]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Weekend/Set_3]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Weekend/Set_4]:(0)
+JSON Error=EmptyInput
+[HeatPump/Board_07/Schedule/Weekend/Set_5]:(0)
+JSON Error=EmptyInput
+---- Memory report: Configuration::Point5 === Free Memory:837
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1DD9(7641);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+Clock
+Publish:HeatPump/Board_07/Alert/PumpGnd/Code-> 
+Publish:HeatPump/Board_07/Alert/PumpGnd/Text->
+Publish:HeatPump/Board_07/Alert/Compressor/Code-> 
+Publish:HeatPump/Board_07/Alert/Compressor/Text->
+Publish:HeatPump/Board_07/Alert/PumpTankIn/Code-> 
+Publish:HeatPump/Board_07/Alert/PumpTankIn/Text->
+Publish:HeatPump/Board_07/Alert/PumpTankOut/Code-> 
+Publish:HeatPump/Board_07/Alert/PumpTankOut/Text->
+Publish:HeatPump/Board_07/Alert/PumpFloor1/Code-> 
+Publish:HeatPump/Board_07/Alert/PumpFloor1/Text->
+Publish:HeatPump/Board_07/Alert/PumpFloor2/Code-> 
+Publish:HeatPump/Board_07/Alert/PumpFloor2/Text->
+Publish:HeatPump/Board_07/Alert/Bus/Code-> 
+Publish:HeatPump/Board_07/Alert/Bus/Text->
+Found 0 devices on the bus
+Publish:HeatPump/Board_07/Alert/TGndIn/Code-> 
+Publish:HeatPump/Board_07/Alert/TGndIn/Text->
+Publish:HeatPump/Board_07/Alert/TGndOut/Code-> 
+Publish:HeatPump/Board_07/Alert/TGndOut/Text->
+Publish:HeatPump/Board_07/Alert/TCompressor/Code-> 
+Publish:HeatPump/Board_07/Alert/TCompressor/Text->
+Publish:HeatPump/Board_07/Alert/TVapOut/Code-> 
+Publish:HeatPump/Board_07/Alert/TVapOut/Text->
+Publish:HeatPump/Board_07/Alert/TCondIn/Code-> 
+Publish:HeatPump/Board_07/Alert/TCondIn/Text->
+Publish:HeatPump/Board_07/Alert/TCondOut/Code-> 
+Publish:HeatPump/Board_07/Alert/TCondOut/Text->
+Unit:TVapIn is absent on the bus
+Publish:HeatPump/Board_07/Alert/TVapIn/Code-> 
+Publish:HeatPump/Board_07/Alert/TVapIn/Text->
+Publish:HeatPump/Board_07/Alert/TOut/Code-> 
+Publish:HeatPump/Board_07/Alert/TOut/Text->
+Publish:HeatPump/Board_07/Alert/TIn/Code-> 
+Publish:HeatPump/Board_07/Alert/TIn/Text->
+Publish:HeatPump/Board_07/Alert/TTankOut/Code-> 
+Publish:HeatPump/Board_07/Alert/TTankOut/Text->
+Publish:HeatPump/Board_07/Alert/TTankIn/Code-> 
+Publish:HeatPump/Board_07/Alert/TTankIn/Text->
+Publish:HeatPump/Board_07/Alert/TInside/Code-> 
+Publish:HeatPump/Board_07/Alert/TInside/Text->
+Publish:HeatPump/Board_07/Alert/TOutside/Code-> 
+Publish:HeatPump/Board_07/Alert/TOutside/Text->
+Publish:HeatPump/Board_07/Alert/PressureSwitch/Code-> 
+Publish:HeatPump/Board_07/Alert/PressureSwitch/Text->
+Publish:HeatPump/Board_07/Alert/VoltageSwitch/Code-> 
+Publish:HeatPump/Board_07/Alert/VoltageSwitch/Text->
+Clock Init
+TM:1681138595
+Clock set
+Type:2 Pins:14:15:16
+Now:2023-04-10 15:56:38 Monday (1) [Apr April]
+---- Memory report: Configuration::Point6 === Free Memory:796
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1E02(7682);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+Publish:HeatPump/Board_07/Config/IsReady->1
+Config init is finished
+---- Memory report: Configuration::Point7 === Free Memory:796
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1E02(7682);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+Board is ready
+Board Name#:Board_07
+Enjoy!
+---- Memory report: Setup End === Free Memory:796
+HEAP:@1703(5891)-@211E(8478);
+Unallocated from:@1E02(7682);
+Stack pointer: @219E(8606)
+Free List: EMPTY
+-----
+Step: Empty, code=0
+Publish:HeatPump/Board_07/Status/Script/Step->
+Publish:HeatPump/Board_07/Alert/VoltageSwitch/Code->V
+Publish:HeatPump/Board_07/Alert/VoltageSwitch/Text->Device: VoltageSwitch. Voltage is out of range
+[Config/WatchDogPublication]:(13)1681138560013
+Publish:HeatPump/Board_07/Config/DesiredTemp->19.00
+[Config/WatchDogPublication]:(13)1681138620015
+Publish:HeatPump/Board_07/Config/WatchDog->0
+[Config/WatchDogPublication]:(13)1681138680030
+Publish:HeatPump/Board_07/Config/WatchDog->1
+[Config/WatchDogPublication]:(13)1681138740016

@@ -566,8 +566,8 @@ bool ScriptRunner::coolerIdle() {
 			step = STEP_COOLER_FULLSTOP;
 			res = true;
 		} else if (Config.GetCommand() == CMD_NOCMD) {
-			//step = STEP_EMPTY;
-			res = false;
+			step = STEP_EMPTY;
+			res = true;
 		}
 
 	} else { //Some condition is not OK

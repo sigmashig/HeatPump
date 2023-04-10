@@ -53,7 +53,7 @@ void OneWireBus::ProcessUnit(ActionType action) {
 void OneWireBus::UnitLoop(unsigned long timeperiod) {
 	if (timeperiod == 10000) {
 		if (Config.Counter10 % 3 == 0) { //request on 20 and 50 sec
-			Config.Log->append(F("Request temperature")).Debug();
+			//Config.Log->append(F("Request temperature")).Debug();
 			RequestTemperature();
 		}
 	}
@@ -173,12 +173,19 @@ void OneWireBus::UpdateStatus(const char* payload) {
 	// Nothing to do
 }
 
-bool OneWireBus::UpdateEquipment(const char* payload) {
+bool OneWireBus::UpdateEquipment(const char* line) {
+
+	if (strlen(line) == 0) {
+		Config.Log->Debug("No equipment data. Create default equipment.");
+		PublishDefaultEquipment();
+		return true;
+	}
+
 	bool res = false;
 	const size_t CAPACITY = JSON_OBJECT_SIZE(5);
 	StaticJsonDocument<CAPACITY> doc;
 	//deserializeJson(doc, payload);
-	DeserializationError error = deserializeJson(doc, payload);
+	DeserializationError error = deserializeJson(doc, line);
 	if (error) {
 		Config.Log->append("JSON Error=").append(error.f_str()).Error();
 		return false;
@@ -204,4 +211,13 @@ void OneWireBus::releaseResources() {
 		delete sensors;
 		sensors = NULL;
 	}
+}
+
+void OneWireBus::PublishDefaultEquipment() {
+	// {'pin':30}
+	StaticJsonDocument<100> doc;
+	doc["pin"] = Pin;
+	char str[20];
+	serializeJson(doc, str);
+	PublishEquipment(str);	
 }

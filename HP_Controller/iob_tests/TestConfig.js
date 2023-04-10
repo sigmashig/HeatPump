@@ -47,6 +47,13 @@ const HP_TEMP_TANKIN = HP_TEMP + ".TTankIn";
 const HP_TEMP_TANKOUT = HP_TEMP + ".TTankOut";
 const HP_TEMP_VAPOUT = HP_TEMP + ".TVapOut";
 
+var HpTestTimer = null;
+var HpSteps = [];
+var HpStep = 0;
+var HpNexStep;
+var HpStepSubscription = null;
+var HpAlertSubscription = null;
+
 
 function SetInitialConfig() {
     setState(HP_COMMAND, 0); //NO cmd
@@ -84,7 +91,7 @@ function StartTest1() {
     log("isReady=" + isReady);
     if (isReady == '1') {
         SetInitialConfig();
-        step = 0;
+        HpStep = 0;
         ResultProcessing("");
     }
 }
@@ -92,30 +99,30 @@ function StartTest1() {
 function ResultProcessing(result) {
 
     if (result == "") {
-        steps[step]();
+        HpSteps[HpStep]();
     } else {
-        if (stepSubscription != null) {
-            unsubscribe(stepSubscription);
-            stepSubscription = null;
+        if (HpStepSubscription != null) {
+            unsubscribe(HpStepSubscription);
+            HpStepSubscription = null;
         }
 
-        if (alertSubscription != null) {
-            unsubscribe(alertSubscription);
-            alertSubscription = null;
+        if (HpAlertSubscription != null) {
+            unsubscribe(HpAlertSubscription);
+            HpAlertSubscription = null;
         }
-        if (timer != null) {
-            clearTimeout(timer);
-            timer = null;
+        if (HpTestTimer != null) {
+            clearTimeout(HpTestTimer);
+            HpTestTimer = null;
         }
 
         if (result != "OK") {
             log("FAILED! Result:" + result, "error");
             Finish();
         } else {
-            log("PASSED! Step " + step, "info");
-            step++;
-            if (step < steps.length) {
-                steps[step]();
+            log("PASSED! Step " + HpStep, "info");
+            HpStep++;
+            if (HpStep < HpSteps.length) {
+                HpSteps[HpStep]();
             }
         }
     }
@@ -124,7 +131,7 @@ function ResultProcessing(result) {
 
 function Finish() {
     log("OK! Test suite finished");
-    unsubscribe(alertSubscription);
+    unsubscribe(HpAlertSubscription);
     SetInitialConfig();
 }
 
@@ -138,11 +145,11 @@ function Finish() {
 function Test_Empty2HeatIdle() {
 
     log("INFO: Test Empty -> Idle started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
 
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
 
         if (newStep == '0') {
             result = "OK";
@@ -154,8 +161,8 @@ function Test_Empty2HeatIdle() {
         ResultProcessing(result);
     });
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
 
         ResultProcessing("Timeout");
     }, 5000);
@@ -168,11 +175,11 @@ function Test_Empty2HeatIdle() {
 function Test_Heat_Idle2Initial() {
 
     log("INFO: Test Idle -> Initial started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
 
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
 
         if (newStep == 'I') {
             result = "OK";
@@ -184,8 +191,8 @@ function Test_Heat_Idle2Initial() {
         ResultProcessing(result);
     });
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
 
         ResultProcessing("Timeout");
     }, 5000);
@@ -197,10 +204,10 @@ function Test_Heat_Idle2Initial() {
 function Test_Heat_Initial2CheckStart() {
 
     log("INFO: Test Initial -> Check started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         if (getState(HP_PUMP1).val == 1 && getState(HP_PUMP2).val == 1 && getState(HP_PUMP_TANKOUT).val == 1) {
             log("All pumps started", "info");
             if (newStep == 'S') {
@@ -217,8 +224,8 @@ function Test_Heat_Initial2CheckStart() {
         ResultProcessing(result);
     });
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
 
         ResultProcessing("Timeout");
     }, 5000);
@@ -229,10 +236,10 @@ function Test_Heat_Initial2CheckStart() {
 function Test_Heat_CheckStart2StartGnd() {
 
     log("INFO: Test Check -> Gnd started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         if (newStep == 'G') {
             result = "OK";
             log("PASSED! Transfer Check -> Gnd", "info");
@@ -244,8 +251,8 @@ function Test_Heat_CheckStart2StartGnd() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
 
         ResultProcessing("Timeout");
     }, 5000);
@@ -257,10 +264,10 @@ function Test_Heat_CheckStart2StartGnd() {
 function Test_Heat_StartGnd2Heat() {
 
     log("INFO: Test Gnd -> Heat started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         //         log("PumpGND=" + HP_PUMP_GND + "; Pump TankIn=" + HP_PUMP_TANKIN);
         if (getState(HP_PUMP_GND).val == 1 && getState(HP_PUMP_TANKIN).val == 1) {
             log("All pumps started", "info");
@@ -279,8 +286,8 @@ function Test_Heat_StartGnd2Heat() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
         ResultProcessing("Timeout");
     }, 5000);
 
@@ -290,10 +297,10 @@ function Test_Heat_StartGnd2Heat() {
 function Test_Heat_Heat2CheckStop() {
 
     log("INFO: Test Heat -> CheckStop  started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         if (getState(HP_COMPRESSOR).val == 1) {
             log("Compressor started", "info");
             if (newStep == 'h') {
@@ -312,8 +319,8 @@ function Test_Heat_Heat2CheckStop() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
         ResultProcessing("Timeout");
     }, 5000);
 
@@ -325,10 +332,10 @@ function Test_Heat_Heat2CheckStop() {
 function Test_Heat_CheckStop2StopCompressor() {
 
     log("INFO: Test CheckStop ->  Stop compressor started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         if (newStep == 'C') {
             result = "OK";
             log("PASSED! Transfer CheckStop ->  Stop compressor", "info");
@@ -340,8 +347,8 @@ function Test_Heat_CheckStop2StopCompressor() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
         ResultProcessing("Timeout");
     }, 5000);
 
@@ -354,10 +361,10 @@ function Test_Heat_CheckStop2StopCompressor() {
 function Test_Heat_StopCompressor2StopHeating() {
 
     log("INFO: Test Stop Compressor -> Stop Heating started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         if (getState(HP_COMPRESSOR).val == 0) {
             log("Compressor Stoped", "info");
             if (newStep == 'T') {
@@ -375,8 +382,8 @@ function Test_Heat_StopCompressor2StopHeating() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
         ResultProcessing("Timeout");
     }, 5000);
 
@@ -386,10 +393,10 @@ function Test_Heat_StopCompressor2StopHeating() {
 function Test_Heat_StopHeating2CheckStart() {
 
     log("INFO: Test Stop Heating -> Check Start started", "info");
-    stepSubscription = on({ id: HP_STEP }, function (obj) {
+    HpStepSubscription = on({ id: HP_STEP }, function (obj) {
         var newStep = obj.state.val;
         var result;
-        unsubscribe(stepSubscription); // just one step checked
+        unsubscribe(HpStepSubscription); // just one step checked
         if (getState(HP_PUMP_GND).val == 0 && getState(HP_PUMP_TANKIN).val == 0) {
             log("Pumps Stoped", "info");
             if (newStep == 'S') {
@@ -407,8 +414,8 @@ function Test_Heat_StopHeating2CheckStart() {
     });
 
 
-    timer = setTimeout(function () {
-        clearTimeout(timer);
+    HpTestTimer = setTimeout(function () {
+        clearTimeout(HpTestTimer);
         ResultProcessing("Timeout");
     }, 5000);
 

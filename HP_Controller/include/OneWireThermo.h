@@ -22,6 +22,7 @@ public:
 
 	void UnitLoop(unsigned long timeperiod);
     void UpdateStatus(const char* payload);
+    void PublishDefaultEquipment();
 	void InitUnit();
 	double GetTemperature() { return Temperature; }
 	bool UpdateEquipment(const char* line);
