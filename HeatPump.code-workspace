@@ -20,6 +20,13 @@
 		"C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "sameLine",
 		"C_Cpp.vcFormat.newLine.beforeWhileInDoWhile": true,
 		"editor.tabCompletion": "on",
-		"diffEditor.codeLens": true
+		"diffEditor.codeLens": true,
+		"files.associations": {
+			"new": "cpp",
+			"streambuf": "cpp",
+			"functional": "cpp",
+			"typeinfo": "cpp",
+			"variant": "cpp"
+		}
 	}
 }
